@@ -1,49 +1,51 @@
 
-const dropdownContent = document.querySelector('.dropdown-content');
-const weekCards = document.querySelectorAll('.week-card');
+// Funciones para Paneles Laterales
+document.getElementById('about-me-btn').addEventListener('click', () => {
+    document.getElementById('about-me-panel').classList.add('active');
+});
 
-dropdownContent.addEventListener('click', (event) => {
-    if (event.target.tagName === 'A') {
-        const selectedWeek = event.target.dataset.week;
+document.getElementById('testimonials-btn').addEventListener('click', () => {
+    document.getElementById('testimonials-panel').classList.add('active');
+});
 
-        if (selectedWeek === 'all') {
-            weekCards.forEach(card => card.style.display = 'block');
-        } else {
-            weekCards.forEach(card => {
-                if (card.dataset.week === selectedWeek) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+function closePanel(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+// Funciones para el Modal de Semanas
+function openWeek(num) {
+    const modal = document.getElementById('week-modal');
+    document.getElementById('modal-title').innerText = "Semana " + num;
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById('week-modal').style.display = "none";
+}
+
+// Lógica de Proyectos (Simular cambio de pantalla)
+function viewProject(id) {
+    const list = document.getElementById('projects-list');
+    const detail = document.getElementById('project-detail');
+    const content = document.getElementById('project-content');
+
+    list.classList.add('hidden');
+    detail.classList.remove('hidden');
+
+    if(id === 'p1') {
+        content.innerHTML = "<h2>Detalle del Proyecto 1</h2><p>Aquí va toda la info extendida...</p>";
+    } else {
+        content.innerHTML = "<h2>Detalle del Proyecto 2</h2><p>Información de la base de datos...</p>";
     }
-});
+}
 
-// Panel Sobre Mí
-const aboutMeBtn = document.getElementById('about-me-btn');
-const aboutMePanel = document.getElementById('about-me-panel');
-const closeBtn = document.querySelector('.close-btn');
+function hideProject() {
+    document.getElementById('projects-list').classList.remove('hidden');
+    document.getElementById('project-detail').classList.add('hidden');
+}
 
-aboutMeBtn.addEventListener('click', () => {
-    aboutMePanel.classList.add('open');
-});
-
-closeBtn.addEventListener('click', () => {
-    aboutMePanel.classList.remove('open');
-});
-
-// Animación de Barras de Progreso al Desplazarse
-window.addEventListener('scroll', () => {
-    const progressBars = document.querySelectorAll('.progress');
-    const skillsSection = document.getElementById('skills');
-
-    const sectionTop = skillsSection.getBoundingClientRect().top;
-    const windowHeight = window.innerHeight;
-
-    if (sectionTop < windowHeight * 0.8) {
-        progressBars.forEach(bar => {
-            bar.style.width = bar.parentElement.getAttribute('data-progress') + '%';
-        });
-    }
-});
+// Cerrar modales al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('week-modal');
+    if (event.target == modal) closeModal();
+}
