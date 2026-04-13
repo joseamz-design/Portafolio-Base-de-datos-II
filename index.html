@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Académico - Jose Moori</title>
+    <title>Portafolio Pro | José Moori Zegarra</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -24,6 +24,7 @@
                         </ul>
                     </li>
                     <li><a href="#proyectos">Proyectos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
                     <li><a href="javascript:void(0)" class="btn-login" onclick="openLoginModal()">Login <i class="fas fa-sign-in-alt"></i></a></li>
                 </ul>
             </nav>
@@ -31,58 +32,63 @@
     </header>
 
     <main>
-        <section id="inicio" class="hero fade-in">
+        <section id="inicio" class="hero fade-in section-dark">
             <div class="container hero-content">
                 <div class="profile-circle">
-                    <img src="tu-foto.jpg" alt="Jose Andres Moori Zegarra">
+                    <img src="https://via.placeholder.com/150" alt="Foto de José Andrés Moori Zegarra">
                 </div>
-                <h2>Jose Andres Moori Zegarra</h2>
+                <h2>José Andrés Moori Zegarra</h2>
                 <p>Estudiante de Ingeniería en la <span class="highlight">UPLA</span></p>
                 <p class="specialization">Especialización: <span class="highlight">Base de Datos II</span></p>
                 <div class="welcome-box">
                     <p>Bienvenido a mi portafolio académico. En esta página veremos todos los avances en el transcurso del ciclo.</p>
                 </div>
-                <p class="scroll-down">Ver más abajo ↓</p>
             </div>
         </section>
 
-        <section id="proyectos" class="projects container">
-            <h2 class="section-title">Proyectos Destacados</h2>
-            <div class="projects-grid" id="projectsGrid">
-                
-                <div class="project-card" id="project1Card" onclick="toggleProjectDetail('project1Card', 'project1Detail')">
-                    <div class="card-icon"><i class="fas fa-code"></i></div>
-                    <h3>Sistema de Ventas</h3>
-                    <p>Click para ver detalles</p>
-                </div>
+        <section id="proyectos" class="projects section-light">
+            <div class="container">
+                <h2 class="section-title">Proyectos Destacados</h2>
+                <div class="projects-grid" id="projectsGrid">
+                    
+                    <div class="project-card" id="project1Card" onclick="toggleProjectDetail('project1Card', 'project1Detail')">
+                        <div class="card-icon"><i class="fas fa-code"></i></div>
+                        <h3>Sistema de Ventas</h3>
+                        <p>Click para ver detalles</p>
+                    </div>
 
-                <div class="project-card" id="project2Card" onclick="toggleProjectDetail('project2Card', 'project2Detail')">
-                    <div class="card-icon"><i class="fas fa-database"></i></div>
-                    <h3>Gestión de BD</h3>
-                    <p>Click para ver detalles</p>
-                </div>
+                    <div class="project-card" id="project2Card" onclick="toggleProjectDetail('project2Card', 'project2Detail')">
+                        <div class="card-icon"><i class="fas fa-database"></i></div>
+                        <h3>Gestión de BD</h3>
+                        <p>Click para ver detalles</p>
+                    </div>
 
-                <div class="project-detail-panel hidden" id="project1Detail">
-                    <span class="close-detail" onclick="closeProjectDetail('project1Card', 'project1Detail')">&times;</span>
-                    <h3>Detalle del Proyecto 1</h3>
-                    <p>Aquí va toda la info extendida... Esta zona es más grande y detallada para contener toda la descripción necesaria de tu proyecto, como diagramas, capturas y explicaciones.</p>
-                </div>
+                    <div class="project-detail-panel hidden" id="project1Detail">
+                        <span class="close-detail" onclick="closeProjectDetail('project1Card', 'project1Detail')">&times;</span>
+                        <h3>Detalle del Proyecto 1</h3>
+                        <p>Aquí va toda la info extendida... Esta zona es más grande y detallada para contener toda la descripción necesaria de tu proyecto, como diagramas, capturas y explicaciones.</p>
+                    </div>
 
-                <div class="project-detail-panel hidden" id="project2Detail">
-                    <span class="close-detail" onclick="closeProjectDetail('project2Card', 'project2Detail')">&times;</span>
-                    <h3>Detalle del Proyecto 2</h3>
-                    <p>Descripción extendida para el segundo proyecto, centrada en la base de datos y su estructura.</p>
+                    <div class="project-detail-panel hidden" id="project2Detail">
+                        <span class="close-detail" onclick="closeProjectDetail('project2Card', 'project2Detail')">&times;</span>
+                        <h3>Detalle del Proyecto 2</h3>
+                        <p>Descripción extendida para el segundo proyecto, centrada en la base de datos y su estructura.</p>
+                    </div>
                 </div>
-
             </div>
         </section>
 
-        <section id="feedback" class="feedback container">
-            <h2 class="section-title">Quejas y Comentarios</h2>
-            <div class="feedback-box">
-                <p>Déjame saber tus dudas o inquietudes sobre el portafolio.</p>
-                <textarea placeholder="Escribe aquí tu queja o comentario..."></textarea>
-                <button class="btn-coral">Enviar</button>
+        <section id="contacto" class="contact-section section-dark">
+            <div class="container">
+                <div class="contact-bubble fade-in">
+                    <h2 class="section-title">Contáctame</h2>
+                    <p>Si tienes alguna duda o queja, déjala aquí.</p>
+                    <form class="contact-form">
+                        <input type="text" placeholder="Tu Nombre">
+                        <textarea placeholder="Escribe aquí tu mensaje, queja o comentario..."></textarea>
+                        <button type="submit" class="btn-coral">Enviar Mensaje</button>
+                    </form>
+                </div>
             </div>
         </section>
     </main>
@@ -110,10 +116,9 @@
                     <ul class="resource-list" id="resourceList">
                         <li class="resource-item">
                             <span><i class="fas fa-file-pdf"></i> PDF_Clase1.pdf</span>
-                            <span class="upload-stamp invisible-stamp">Subido: <span class="date-now">20/05/2024 10:15:30</span></span>
+                            <span class="upload-stamp invisible-stamp">Subido: 20/05/2024 10:15:30</span>
                             <div class="item-controls">
-                                <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon delete"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn-icon delete" onclick="simularEliminacion(this)"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </li>
                     </ul>
@@ -123,14 +128,54 @@
     </div>
 
     <div id="loginModal" class="modal">
-        <div class="modal-content small-modal">
-            <span class="close-modal corner-x" onclick="closeModal('loginModal')">&times;</span>
-            <h2>Iniciar Sesión</h2>
-            <form class="login-form">
-                <input type="email" placeholder="Correo Electrónico" required>
-                <input type="password" placeholder="Contraseña" required>
-                <button type="submit" class="btn-coral full-width">Entrar</button>
-            </form>
+        <div class="login-register-wrapper">
+            
+            <div class="modal-content small-modal login-panel" id="loginPanel">
+                <span class="close-modal corner-x" onclick="closeModal('loginModal')">&times;</span>
+                <h2>Iniciar Sesión</h2>
+                <form class="login-form" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="Correo Electrónico (@xn8.com)" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPass" placeholder="Contraseña" required>
+                    </div>
+                    <p class="auth-helper"><a href="javascript:void(0)" class="muted-link">¿Olvidaste tu contraseña?</a></p>
+                    <button type="submit" class="btn-coral full-width">Entrar</button>
+                    <p class="auth-helper">¿No tienes cuenta? <a href="javascript:void(0)" onclick="openRegisterPanel()">Regístrate</a></p>
+                </form>
+            </div>
+
+            <div class="modal-content register-panel hidden" id="registerPanel">
+                <span class="close-modal corner-x" onclick="closeRegisterPanel()">&times;</span>
+                <h2>Regístrate</h2>
+                <p class="auth-helper-main">Todos los campos son obligatorios.</p>
+                <form class="register-form" onsubmit="handleRegister(event)">
+                    <input type="text" id="regNombre" placeholder="Nombres" required>
+                    <input type="text" id="regApellido" placeholder="Apellidos" required>
+                    
+                    <div class="validation-container">
+                        <input type="text" id="regDni" placeholder="DNI (8 dígitos)" maxlength="8" required>
+                        <span class="validation-error hidden" id="errDni">Debe tener 8 dígitos</span>
+                    </div>
+
+                    <div class="validation-container">
+                        <input type="tel" id="regPhone" placeholder="Teléfono (9 dígitos)" maxlength="9" required>
+                        <span class="validation-error hidden" id="errPhone">Debe tener 9 dígitos</span>
+                    </div>
+
+                    <div class="validation-container">
+                        <input type="email" id="regEmail" placeholder="Correo (@xn8.com)" required>
+                        <span class="validation-error hidden" id="errEmail">Debe terminar en @xn8.com</span>
+                    </div>
+
+                    <input type="password" id="regPass" placeholder="Contraseña" required>
+                    
+                    <button type="submit" class="btn-coral full-width">Crear Cuenta</button>
+                </form>
+            </div>
         </div>
     </div>
 
