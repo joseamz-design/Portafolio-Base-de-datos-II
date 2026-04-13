@@ -1,120 +1,207 @@
 :root {
-    --bg-dark: #0f172a;
-    --card-bg: #1e293b;
-    --accent: #f43f5e;
+    --bg-dark: #0d1117; /* Fondo original */
+    --bg-card: #1e293b; /* Color de cajas */
+    --coral-main: #f43f5e; /* Rojo coral original */
+    --coral-hover: #e11d48;
     --text-white: #f8fafc;
+    --text-muted: #94a3b8;
 }
 
 body {
     background-color: var(--bg-dark);
     color: var(--text-white);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     margin: 0;
-    overflow-x: hidden;
+    line-height: 1.6;
 }
 
 .container { max-width: 1100px; margin: auto; padding: 20px; }
 
-/* Header & Nav */
+/* Navegación */
 header {
-    background: rgba(15, 23, 42, 0.9);
-    backdrop-filter: blur(10px);
-    padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background-color: var(--bg-dark);
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
+.nav-container { display: flex; justify-content: space-between; align-items: center; }
+.nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
+.nav-links a { text-decoration: none; color: white; font-size: 0.9rem; }
+.logo span { color: var(--coral-main); font-weight: bold; }
 
-.nav-flex { display: flex; justify-content: space-between; align-items: center; }
-
-.nav-links { list-style: none; display: flex; gap: 25px; align-items: center; }
-
-.nav-links a { color: white; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
-
-.login-style {
-    background: var(--accent);
-    padding: 8px 20px;
+.btn-login {
+    background-color: var(--coral-main);
+    color: white;
+    padding: 10px 20px;
     border-radius: 8px;
+    transition: background 0.3s;
 }
+.btn-login:hover { background-color: var(--coral-hover); }
 
 /* Dropdown */
 .dropdown { position: relative; }
-.dropdown-menu {
+.dropdown-content {
     display: none;
     position: absolute;
-    background: var(--card-bg);
-    padding: 10px;
+    background: var(--bg-card);
+    min-width: 150px;
     border-radius: 8px;
-    top: 100%;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    top: 100%; z-index: 10;
 }
-.dropdown:hover .dropdown-menu { display: block; }
+.dropdown:hover .dropdown-content { display: block; }
+.dropdown-content a {
+    color: white; padding: 12px 16px;
+    display: block; transition: background 0.3s;
+}
+.dropdown-content a:hover { background-color: rgba(255,255,255,0.05); }
 
-/* Panels Flotantes (Derecha) */
-.side-panel {
-    position: fixed;
-    top: 0;
-    right: -400px;
+/* Sección Inicio: COMPLETAMENTE CENTRADA */
+.hero { text-align: center; padding: 100px 0; }
+.hero-content { display: flex; flex-direction: column; align-items: center; }
+
+.profile-circle {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--coral-main);
+    margin-bottom: 30px;
+}
+.profile-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+.highlight { color: var(--coral-main); font-weight: 600; }
+.specialization { margin-top: -10px; font-size: 1rem; color: var(--text-muted); }
+
+.welcome-box {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 12px;
+    border-left: 4px solid var(--coral-main);
+    max-width: 700px; margin: 40px auto;
+}
+
+.scroll-down { margin-top: 50px; color: var(--text-muted); font-size: 0.8rem; }
+
+/* Proyectos con Animación de Desaparición Lateral */
+.projects-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+    margin-top: 50px;
+    flex-wrap: wrap; /* Para pantallas móviles */
+}
+
+.project-card {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 15px;
+    cursor: pointer;
+    text-align: center;
     width: 350px;
-    height: 100%;
-    background: var(--card-bg);
-    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
-    padding: 40px 20px;
+    transition: transform 0.3s, background 0.3s, opacity 0.5s ease-out;
+}
+.project-card:hover { transform: translateY(-5px); background: #2d3a4f; }
+
+.card-icon { color: var(--coral-main); font-size: 2.5rem; margin-bottom: 20px; }
+
+/* Panel de Detalle (Grande y reemplazando) */
+.project-detail-panel {
+    background: var(--bg-card);
+    padding: 50px;
+    border-radius: 15px;
+    width: 100%;
+    margin-top: 20px;
+    animation: fadeIn 0.5s;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
-.side-panel.active { right: 0; }
+.hidden { display: none !important; }
 
-/* Modales (Popups) */
+/* Clases de animación controladas por JS */
+.fade-out-left { transform: translateX(-100px); opacity: 0; pointer-events: none; }
+.fade-out-right { transform: translateX(100px); opacity: 0; pointer-events: none; }
+
+/* Cerrar Detalles: X en la esquina */
+.close-detail {
+    position: absolute;
+    top: 20px; right: 25px;
+    font-size: 2rem;
+    cursor: pointer; color: var(--text-muted);
+}
+.close-detail:hover { color: var(--coral-main); }
+
+/* Modales */
 .modal {
-    display: none;
-    position: fixed;
+    display: none; position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 2000;
+    background: rgba(0,0,0,0.8); z-index: 100;
     justify-content: center; align-items: center;
 }
 
 .modal-content {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-    border-left: 5px solid var(--accent);
-    animation: modalIn 0.3s ease;
+    background: var(--bg-card);
+    padding: 40px; border-radius: 15px;
+    border-left: 5px solid var(--coral-main);
+    position: relative;
+    animation: slideUp 0.3s ease;
 }
 
-@keyframes modalIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+/* Modal Gigante de Semanas */
+.large-modal { width: 90%; height: 90vh; overflow-y: auto; }
+.small-modal { width: 90%; max-width: 400px; text-align: center;}
+
+/* X de esquina para Semanas */
+.corner-x {
+    position: absolute;
+    top: 15px; right: 25px;
+    font-size: 2rem; cursor: pointer; color: var(--text-muted);
 }
+.corner-x:hover { color: var(--coral-main); }
 
-/* Botones de Acción dentro de Semanas */
-.action-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-
+/* Botones de Acción */
+.modal-actions-container { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
 .btn-action {
-    padding: 10px 15px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: 0.3s;
+    padding: 12px 20px; border-radius: 8px; text-decoration: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.3s;
 }
-
 .download { background: #334155; color: white; }
-.upload { background: var(--accent); color: white; }
+.coral-bg { background-color: var(--coral-main); color: white; }
+.coral-bg:hover { background-color: var(--coral-hover); }
 
-/* Proyectos Section */
-.hidden { display: none; }
-.projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.project-card {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: center;
-    transition: 0.3s;
+/* Zona de Gestión y Tareas */
+.management-section { margin-top: 50px; text-align: left; }
+.resource-list { list-style: none; padding: 0; margin-top: 20px; }
+.resource-item {
+    background: rgba(255,255,255,0.03);
+    padding: 15px; border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; position: relative;
 }
-.project-card:hover { transform: translateY(-5px); background: #2d3a4f; }
+
+.invisible-stamp { color: #52617a; font-size: 0.8rem; margin-right: 20px;}
+
+.item-controls { display: flex; gap: 10px; }
+.btn-icon { background: none; border: none; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+.edit { color: var(--text-muted); } .edit:hover { color: #fff; }
+.delete { color: #f87171; } .delete:hover { color: #ef4444; }
+
+/* Sección Quejas */
+.feedback { padding: 100px 0; text-align: center; }
+.feedback-box { max-width: 600px; margin: auto; }
+.feedback-box textarea {
+    width: 100%; height: 150px;
+    padding: 15px; background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white; border-radius: 8px;
+    margin: 20px 0; font-family: inherit;
+}
+.btn-coral {
+    background-color: var(--coral-main); color: white;
+    padding: 12px 30px; border: none; border-radius: 8px;
+    cursor: pointer; font-weight: 600;
+}
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
