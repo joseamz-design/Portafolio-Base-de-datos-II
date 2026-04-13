@@ -3,102 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Pro | UPLA</title>
+    <title>Portafolio Académico - Jose Moori</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
     <header>
-        <div class="container nav-flex">
+        <div class="container nav-container">
             <h1 class="logo">UPLA <span>BD II</span></h1>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#inicio">Inicio</a></li>
                     <li class="dropdown">
-                        <a href="javascript:void(0)">Semanas <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="javascript:void(0)" onclick="openWeek(1)">Semana 1</a></li>
-                            <li><a href="javascript:void(0)" onclick="openWeek(2)">Semana 2</a></li>
+                        <a href="javascript:void(0)" class="dropbtn">Semanas <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-content">
+                            <li><a href="javascript:void(0)" onclick="openWeekModal(1)">Semana 1</a></li>
+                            <li><a href="javascript:void(0)" onclick="openWeekModal(2)">Semana 2</a></li>
                         </ul>
                     </li>
-                    <li><a href="#projects">Proyectos</a></li>
-                    <li><a href="javascript:void(0)" id="testimonials-btn">Testimonios</a></li>
-                    <li><a href="javascript:void(0)" id="about-me-btn" class="login-style">Sobre Mí</a></li>
+                    <li><a href="#proyectos">Proyectos</a></li>
+                    <li><a href="javascript:void(0)" class="btn-login" onclick="openLoginModal()">Login <i class="fas fa-sign-in-alt"></i></a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main id="main-content">
-        <section id="hero">
-            <div class="hero-card fade-in">
-                <img src="https://via.placeholder.com/150" alt="Foto Perfil" class="profile-img">
-                <h2>Henry Anderson Gomez Vasquez</h2>
-                <p>Estudiante de Ingeniería en la <span>UPLA</span></p>
-                <div class="welcome-box">
-                    Bienvenido a mi portafolio académico. Aquí registro mi aprendizaje detallado.
+    <main>
+        <section id="inicio" class="hero fade-in">
+            <div class="container hero-content">
+                <div class="profile-circle">
+                    <img src="tu-foto.jpg" alt="Jose Andres Moori Zegarra">
                 </div>
+                <h2>Jose Andres Moori Zegarra</h2>
+                <p>Estudiante de Ingeniería en la <span class="highlight">UPLA</span></p>
+                <p class="specialization">Especialización: <span class="highlight">Base de Datos II</span></p>
+                <div class="welcome-box">
+                    <p>Bienvenido a mi portafolio académico. En esta página veremos todos los avances en el transcurso del ciclo.</p>
+                </div>
+                <p class="scroll-down">Ver más abajo ↓</p>
             </div>
         </section>
 
-        <section id="projects" class="container">
+        <section id="proyectos" class="projects container">
             <h2 class="section-title">Proyectos Destacados</h2>
-            <div class="projects-grid" id="projects-list">
-                <div class="project-card" onclick="viewProject('p1')">
-                    <div class="project-img"><i class="fas fa-code"></i></div>
+            <div class="projects-grid" id="projectsGrid">
+                
+                <div class="project-card" id="project1Card" onclick="toggleProjectDetail('project1Card', 'project1Detail')">
+                    <div class="card-icon"><i class="fas fa-code"></i></div>
                     <h3>Sistema de Ventas</h3>
                     <p>Click para ver detalles</p>
                 </div>
-                <div class="project-card" onclick="viewProject('p2')">
-                    <div class="project-img"><i class="fas fa-database"></i></div>
+
+                <div class="project-card" id="project2Card" onclick="toggleProjectDetail('project2Card', 'project2Detail')">
+                    <div class="card-icon"><i class="fas fa-database"></i></div>
                     <h3>Gestión de BD</h3>
                     <p>Click para ver detalles</p>
                 </div>
+
+                <div class="project-detail-panel hidden" id="project1Detail">
+                    <span class="close-detail" onclick="closeProjectDetail('project1Card', 'project1Detail')">&times;</span>
+                    <h3>Detalle del Proyecto 1</h3>
+                    <p>Aquí va toda la info extendida... Esta zona es más grande y detallada para contener toda la descripción necesaria de tu proyecto, como diagramas, capturas y explicaciones.</p>
+                </div>
+
+                <div class="project-detail-panel hidden" id="project2Detail">
+                    <span class="close-detail" onclick="closeProjectDetail('project2Card', 'project2Detail')">&times;</span>
+                    <h3>Detalle del Proyecto 2</h3>
+                    <p>Descripción extendida para el segundo proyecto, centrada en la base de datos y su estructura.</p>
+                </div>
+
             </div>
-            
-            <div id="project-detail" class="hidden">
-                <button onclick="hideProject()" class="btn-back"><i class="fas fa-arrow-left"></i> Volver</button>
-                <div id="project-content"></div>
+        </section>
+
+        <section id="feedback" class="feedback container">
+            <h2 class="section-title">Quejas y Comentarios</h2>
+            <div class="feedback-box">
+                <p>Déjame saber tus dudas o inquietudes sobre el portafolio.</p>
+                <textarea placeholder="Escribe aquí tu queja o comentario..."></textarea>
+                <button class="btn-coral">Enviar</button>
             </div>
         </section>
     </main>
 
-    <aside id="about-me-panel" class="side-panel">
-        <div class="panel-content">
-            <span class="close-btn" onclick="closePanel('about-me-panel')">&times;</span>
-            <h2>Sobre Mí</h2>
-            <p>Información detallada del estudiante...</p>
-            <button class="btn-download"><i class="fas fa-download"></i> Descargar CV</button>
-        </div>
-    </aside>
-
-    <aside id="testimonials-panel" class="side-panel">
-        <div class="panel-content">
-            <span class="close-btn" onclick="closePanel('testimonials-panel')">&times;</span>
-            <h2>Testimonios</h2>
-            <div class="testimonial-bubble">
-                <p>"Excelente trabajo en base de datos."</p>
-                <span>- Ing. de Cargo</span>
-            </div>
-        </div>
-    </aside>
-
-    <div id="week-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title">Semana X</h2>
-            <div class="week-body">
-                <p>Contenido académico y recursos de la sesión.</p>
-                <div class="action-buttons">
+    <div id="weekModal" class="modal">
+        <div class="modal-content large-modal">
+            <span class="close-modal corner-x" onclick="closeModal('weekModal')">&times;</span>
+            <h2 id="weekModalTitle" class="modal-main-title">Semana 1</h2>
+            
+            <div class="week-modal-body">
+                <div class="modal-welcome">
+                    Contenido académico y recursos de la sesión.
+                </div>
+                
+                <div class="modal-actions-container">
                     <a href="#" class="btn-action download"><i class="fas fa-file-pdf"></i> Descargar Clase</a>
-                    <label class="btn-action upload">
+                    <label class="btn-action upload coral-bg">
                         <i class="fas fa-cloud-upload-alt"></i> Subir Tarea
-                        <input type="file" style="display: none;">
+                        <input type="file" style="display: none;" onchange="simularSubida(this, 'Semanas')">
                     </label>
                 </div>
+
+                <div class="management-section">
+                    <h3><i class="fas fa-tasks"></i> Gestión de Recursos</h3>
+                    <ul class="resource-list" id="resourceList">
+                        <li class="resource-item">
+                            <span><i class="fas fa-file-pdf"></i> PDF_Clase1.pdf</span>
+                            <span class="upload-stamp invisible-stamp">Subido: <span class="date-now">20/05/2024 10:15:30</span></span>
+                            <div class="item-controls">
+                                <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close-modal corner-x" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form class="login-form">
+                <input type="email" placeholder="Correo Electrónico" required>
+                <input type="password" placeholder="Contraseña" required>
+                <button type="submit" class="btn-coral full-width">Entrar</button>
+            </form>
         </div>
     </div>
 
