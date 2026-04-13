@@ -1,3 +1,4 @@
+
 const dropdownContent = document.querySelector('.dropdown-content');
 const weekCards = document.querySelectorAll('.week-card');
 
@@ -30,4 +31,19 @@ aboutMeBtn.addEventListener('click', () => {
 
 closeBtn.addEventListener('click', () => {
     aboutMePanel.classList.remove('open');
+});
+
+// Animación de Barras de Progreso al Desplazarse
+window.addEventListener('scroll', () => {
+    const progressBars = document.querySelectorAll('.progress');
+    const skillsSection = document.getElementById('skills');
+
+    const sectionTop = skillsSection.getBoundingClientRect().top;
+    const windowHeight = window.innerHeight;
+
+    if (sectionTop < windowHeight * 0.8) {
+        progressBars.forEach(bar => {
+            bar.style.width = bar.parentElement.getAttribute('data-progress') + '%';
+        });
+    }
 });
