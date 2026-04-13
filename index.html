@@ -1,107 +1,91 @@
-// Al cargar la página, recuperamos las tareas guardadas
-document.addEventListener('DOMContentLoaded', () => {
-    loadResources();
-});
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio | José Moori Zegarra</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
 
-// Abrir y Cerrar Modales
-function openWeekModal(n) {
-    document.getElementById('modalWeekTitle').innerText = `Semana ${n}`;
-    document.getElementById('weekModal').style.display = 'flex';
-}
+    <header>
+        <div class="nav-container">
+            <h1 class="logo">UPLA <span>BD II</span></h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="javascript:void(0)" onclick="openWeekModal(1)">Semanas</a></li>
+                    <li><a href="#proyectos">Proyectos</a></li>
+                    <li><button class="btn-login" onclick="openLoginModal()">Login</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-function openLoginModal() {
-    document.getElementById('loginModal').style.display = 'flex';
-}
+    <section id="inicio" class="section dark-bg">
+        <div class="hero-content">
+            <div class="profile-img"></div>
+            <h2>Jose Andres Moori Zegarra</h2>
+            <p>Estudiante de Ingeniería en la <span class="upla-text">UPLA</span></p>
+            <p>Especialización: <span class="coral-text">Base de Datos II</span></p>
+            <div class="welcome-card">
+                <p>Bienvenido a mi portafolio académico. Aquí registro mi aprendizaje detallado del ciclo.</p>
+            </div>
+        </div>
+    </section>
 
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-}
+    <section id="proyectos" class="section light-bg">
+        <h2 class="section-title">Proyectos Destacados</h2>
+        <div class="projects-grid">
+            <div class="project-card" onclick="showProject(1)">
+                <div class="icon">🚀</div>
+                <h3>Sistema de Ventas</h3>
+                <p>Click para ver detalles</p>
+            </div>
+            <div class="project-card" onclick="showProject(2)">
+                <div class="icon">📊</div>
+                <h3>Gestión de BD</h3>
+                <p>Click para ver detalles</p>
+            </div>
+        </div>
+        <div id="projectDetail" class="project-detail-box hidden sticky-box">
+            <button class="close-btn" onclick="hideProject()">&times;</button>
+            <h3 id="detailTitle">Detalle</h3>
+            <p id="detailText">Información...</p>
+        </div>
+    </section>
 
-// Lógica de Proyectos
-function showProject(n) {
-    const detail = document.getElementById('projectDetail');
-    detail.classList.remove('hidden');
-    document.getElementById('detailTitle').innerText = n === 1 ? "Sistema de Ventas" : "Gestión de BD";
-    document.getElementById('detailText').innerText = "Este proyecto trata sobre el desarrollo de una solución integral de bases de datos para el ciclo actual.";
-}
+    <div id="weekModal" class="modal">
+        <div class="modal-content large">
+            <span class="close" onclick="closeModal('weekModal')">&times;</span>
+            <h2 id="modalWeekTitle">Semana 1</h2>
+            <div class="modal-body">
+                <p>Contenido académico y recursos de la sesión.</p>
+                <div class="buttons-row">
+                    <button class="btn-outline" onclick="downloadMaterial()">Descargar Clase</button>
+                    <button class="btn-coral" onclick="document.getElementById('fileInput').click()">Subir Tarea</button>
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(event)">
+                </div>
+                <div class="resource-management">
+                    <h4><span class="icon">📋</span> Gestión de Recursos</h4>
+                    <div id="resourceList">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-function hideProject() {
-    document.getElementById('projectDetail').classList.add('hidden');
-}
+    <div id="loginModal" class="modal">
+        <div class="auth-card">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <input type="email" id="loginEmail" placeholder="Correo">
+            <input type="password" id="loginPass" placeholder="Contraseña">
+            <button class="btn-coral" onclick="doLogin()">Entrar</button>
+        </div>
+    </div>
 
-// --- GESTIÓN DE ARCHIVOS CON GUARDADO (LOCALSTORAGE) ---
-
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const id = 'file-' + Date.now();
-        const newResource = {
-            id: id,
-            name: file.name,
-            date: new Date().toLocaleString()
-        };
-
-        // Guardar en la lista del navegador
-        saveResourceToLocal(newResource);
-        
-        // Dibujar en pantalla
-        renderResource(newResource);
-
-        event.target.value = ''; // Limpiar input
-    }
-}
-
-// Función para dibujar el recurso en el HTML
-function renderResource(res) {
-    const list = document.getElementById('resourceList');
-    const item = document.createElement('div');
-    item.className = 'resource-item';
-    item.id = res.id;
-    item.innerHTML = `
-        <span>${res.name} <small style="color: #666; font-size: 0.7rem; display: block;">${res.date}</small></span>
-        <button class="btn-delete" onclick="deleteResource('${res.id}')">🗑️</button>
-    `;
-    list.appendChild(item);
-}
-
-// Guardar en LocalStorage
-function saveResourceToLocal(resource) {
-    let resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-    resources.push(resource);
-    localStorage.setItem('myTasks', JSON.stringify(resources));
-}
-
-// Cargar desde LocalStorage
-function loadResources() {
-    const list = document.getElementById('resourceList');
-    list.innerHTML = ""; // Limpiar antes de cargar
-    let resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-    resources.forEach(res => renderResource(res));
-}
-
-// Eliminar y actualizar LocalStorage
-function deleteResource(id) {
-    if (confirm("¿Deseas eliminar este recurso permanentemente?")) {
-        // Eliminar del HTML
-        document.getElementById(id).remove();
-
-        // Eliminar del LocalStorage
-        let resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-        resources = resources.filter(res => res.id !== id);
-        localStorage.setItem('myTasks', JSON.stringify(resources));
-    }
-}
-
-function downloadMaterial() {
-    alert("Iniciando descarga del material de clase...");
-}
-
-function doLogin() {
-    const email = document.getElementById('loginEmail').value;
-    if (email) {
-        alert("Bienvenido: " + email);
-        closeModal('loginModal');
-    } else {
-        alert("Ingresa un correo");
-    }
-}
+    <script src="script.js"></script>
+</body>
+</html>
