@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Nombre - Portafolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Tu Nombre</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li class="dropdown">
+                        <a href="#">Semanas</a>
+                        <ul class="dropdown-content">
+                            <li><a href="#" data-week="1">Semana 1</a></li>
+                            <li><a href="#" data-week="2">Semana 2</a></li>
+                            <li><a href="#" data-week="3">Semana 3</a></li>
+                            <li><a href="#" data-week="all">Todas</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Proyectos</a></li>
+                    <li><a href="#">Contacto</a></li>
+                    <li><a href="#" id="about-me-btn">Sobre Mí</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h2>Bienvenido a mi Portafolio Académico</h2>
+                <p>Aquí encontrarás un registro de mis avances y proyectos realizados durante este ciclo.</p>
+            </div>
+        </section>
+
+        <section id="weeks-container">
+            <div class="container">
+                <div class="week-card" data-week="1">
+                    <h3>Semana 1</h3>
+                    <p>Contenido de la semana 1...</p>
+                </div>
+                <div class="week-card" data-week="2">
+                    <h3>Semana 2</h3>
+                    <p>Contenido de la semana 2...</p>
+                </div>
+                <div class="week-card" data-week="3">
+                    <h3>Semana 3</h3>
+                    <p>Contenido de la semana 3...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <aside id="about-me-panel">
+        <div class="about-me-content">
+            <span class="close-btn">&times;</span>
+            <h2>Sobre Mí</h2>
+            <p>Aquí puedes poner tu información personal, foto, habilidades, etc.</p>
+        </div>
+    </aside>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Tu Nombre. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
