@@ -1,75 +1,67 @@
-// Navegación Profesional
-function smoothScroll(e, id) {
-    e.preventDefault();
-    const element = document.getElementById(id);
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// Abrir y Cerrar Modales
+function openWeekModal(n) {
+    document.getElementById('modalWeekTitle').innerText = `Semana ${n}`;
+    document.getElementById('weekModal').style.display = 'flex';
 }
 
-// Control de Proyectos
-function showProject(num) {
+function openLoginModal() {
+    document.getElementById('loginModal').style.display = 'flex';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+// Lógica de Proyectos
+function showProject(n) {
     const detail = document.getElementById('projectDetail');
-    const title = document.getElementById('detailTitle');
-    const text = document.getElementById('detailText');
-    
     detail.classList.remove('hidden');
-    title.innerText = num === 1 ? "Sistema de Ventas" : "Gestión de BD";
-    text.innerText = "Detalle extendido del proyecto " + num + ". Este recuadro te seguirá mientras bajes en esta sección.";
-    
-    // Animación rápida de tarjetas
-    document.querySelectorAll('.project-card').forEach(c => c.style.opacity = '0.3');
-    document.getElementById('card' + num).style.opacity = '1';
+    document.getElementById('detailTitle').innerText = n === 1 ? "Sistema de Ventas" : "Gestión de BD";
+    document.getElementById('detailText').innerText = "Este proyecto trata sobre el desarrollo de una solución integral de bases de datos para el ciclo actual.";
 }
 
 function hideProject() {
     document.getElementById('projectDetail').classList.add('hidden');
-    document.querySelectorAll('.project-card').forEach(c => c.style.opacity = '1');
 }
 
-// Modales
-function openWeekModal(n) { document.getElementById('weekModal').style.display = 'flex'; }
-function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+// --- GESTIÓN DE ARCHIVOS (SEMANAS) ---
 
-// Auth: Login / Registro
-function toggleAuth() {
-    document.getElementById('registerCard').classList.toggle('hidden');
+function downloadMaterial() {
+    alert("Iniciando descarga del material de clase...");
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const list = document.getElementById('resourceList');
+        const id = 'file-' + Date.now();
+        
+        const item = document.createElement('div');
+        item.className = 'resource-item';
+        item.id = id;
+        item.innerHTML = `
+            <span>${file.name}</span>
+            <button class="btn-delete" onclick="deleteResource('${id}')">🗑️</button>
+        `;
+        
+        list.appendChild(item);
+        event.target.value = ''; // Reset para permitir re-subir
+    }
 }
 
 function deleteResource(id) {
-    if(confirm("¿Eliminar recurso?")) document.getElementById(id).remove();
+    if (confirm("¿Deseas eliminar este recurso?")) {
+        document.getElementById(id).remove();
+    }
 }
 
-// VALIDACIÓN Y REGISTRO
-function doRegister() {
-    const dni = document.getElementById('regDni').value;
-    const tel = document.getElementById('regTel').value;
-    const email = document.getElementById('regEmail').value;
-    const pass = document.getElementById('regPass').value;
-
-    if (dni.length !== 8) return alert("DNI debe tener 8 dígitos");
-    if (tel.length !== 9) return alert("Teléfono debe tener 9 dígitos");
-    if (!email.endsWith("@xn8.com")) return alert("El correo debe ser @xn8.com");
-    if (!pass) return alert("La contraseña es obligatoria");
-
-    // Guardar en LocalStorage
-    localStorage.setItem('userEmail', email);
-    localStorage.setItem('userPass', pass);
-
-    alert("¡Registrado con éxito!");
-    toggleAuth(); // Se "oculta" volviendo al login
-}
-
+// Login Simple
 function doLogin() {
     const email = document.getElementById('loginEmail').value;
-    const pass = document.getElementById('loginPass').value;
-
-    const savedEmail = localStorage.getItem('userEmail');
-    const savedPass = localStorage.getItem('userPass');
-
-    if (email === savedEmail && pass === savedPass) {
-        alert("Bienvenido, José.");
+    if (email) {
+        alert("Bienvenido: " + email);
         closeModal('loginModal');
     } else {
-        alert("Datos incorrectos. ¿Ya te registraste?");
+        alert("Ingresa un correo");
     }
 }
