@@ -1,178 +1,186 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Académico - Jose Moori Zegarra</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
+// Funciones Generales de Modales
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
 
-    <header id="mainHeader">
-        <div class="container nav-container">
-            <h1 class="logo">UPLA <span>BD II</span></h1>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="#inicio" class="nav-link">Inicio</a></li>
-                    <li class="dropdown">
-                        <a href="javascript:void(0)" class="nav-link dropbtn">Semanas <i class="fas fa-caret-down"></i></a>
-                        <ul class="dropdown-content">
-                            <li><a href="javascript:void(0)" onclick="openWeekModal(1)">Semana 1</a></li>
-                            <li><a href="javascript:void(0)" onclick="openWeekModal(2)">Semana 2</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#proyectos" class="nav-link">Proyectos</a></li>
-                    <li><a href="javascript:void(0)" class="nav-link" onclick="openContactModal()">Contacto</a></li>
-                    <li><a href="javascript:void(0)" class="btn-login" onclick="openLoginModal()">Login <i class="fas fa-user-circle"></i></a></li>
-                </ul>
-            </nav>
+// Lógica de Semanas
+function openWeekModal(num) {
+    const modal = document.getElementById('weekModal');
+    document.getElementById('weekModalTitle').innerText = "Semana " + num;
+    modal.style.display = "flex";
+}
+
+// --- Lógica Avanzada de Proyectos (José Moori Zegarra) ---
+
+function toggleProjectDetail(cardId, detailId) {
+    const grid = document.getElementById('projectsGrid');
+    const card = document.getElementById(cardId);
+    const detail = document.getElementById(detailId);
+    
+    // Identificar la otra tarjeta
+    const otherCardId = (cardId === 'project1Card') ? 'project2Card' : 'project1Card';
+    const otherCard = document.getElementById(otherCardId);
+
+    // Si el detalle ya está abierto, cerrarlo (comportamiento opcional)
+    if (!detail.classList.contains('hidden')) {
+        closeProjectDetail(cardId, detailId);
+        return;
+    }
+
+    // 1. Ocultar el otro proyecto con animación lateral RÁPIDA
+    if (cardId === 'project1Card') {
+        otherCard.classList.add('fade-out-right'); // El 2 se va a la derecha
+    } else {
+        otherCard.classList.add('fade-out-left'); // El 1 se va a la izquierda
+    }
+
+    // 2. Esperar a que la animación termine, luego mostrar el detalle
+    setTimeout(() => {
+        otherCard.classList.add('hidden'); // Ocultar completamente
+        detail.classList.remove('hidden'); // Mostrar detalle grande
+    }, 200); // Mismo tiempo que la transición CSS (0.2s)
+}
+
+function closeProjectDetail(cardId, detailId) {
+    const detail = document.getElementById(detailId);
+    
+    const otherCardId = (cardId === 'project1Card') ? 'project2Card' : 'project1Card';
+    const otherCard = document.getElementById(otherCardId);
+
+    // 1. Ocultar detalle
+    detail.classList.add('hidden');
+
+    // 2. Reaparecer el otro proyecto
+    otherCard.classList.remove('hidden');
+    
+    // Quitar clases de animación para que se vea estático de nuevo
+    setTimeout(() => {
+        otherCard.classList.remove('fade-out-left', 'fade-out-right');
+    }, 50);
+}
+
+// --- Gestión de Semanas (Solo tachito funciona, Editar no) ---
+
+function simularSubida(input, tipo) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    
+    // Obtener fecha y hora exacta
+    const ahora = new Date();
+    const stampText = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString();
+
+    // Crear item en la lista
+    const list = document.getElementById('resourceList');
+    const newItem = document.createElement('li');
+    newItem.className = "resource-item";
+    
+    newItem.innerHTML = `
+        <span><i class="fas fa-file-alt"></i> ${file.name}</span>
+        <span class="upload-stamp invisible-stamp">Subido: ${stampText}</span>
+        <div class="item-controls">
+            <button class="btn-icon delete" onclick="simularEliminacion(this)"><i class="fas fa-trash-alt"></i></button>
         </div>
-    </header>
+    `;
+    
+    list.appendChild(newItem);
+    alert(`Archivo "${file.name}" subido simuladamente.`);
+    input.value = ''; // Resetear input
+}
 
-    <main>
-        <section id="inicio" class="hero fade-in section-dark">
-            <div class="container hero-content">
-                <div class="profile-circle">
-                    <img src="tu-foto.jpg" alt="Jose Andres Moori Zegarra">
-                </div>
-                <h2>Jose Andres Moori Zegarra</h2>
-                <p>Estudiante de Ingeniería en la <span class="highlight">UPLA</span></p>
-                <p class="specialization">Especialización: <span class="highlight">Base de Datos II</span></p>
-                <div class="welcome-box">
-                    <p>Bienvenido a mi portafolio académico. Aquí registro mi progreso en la materia.</p>
-                </div>
-            </div>
-        </section>
+function simularEliminacion(btn) {
+    if (confirm("¿Estás seguro de eliminar este recurso?")) {
+        btn.closest('.resource-item').remove();
+    }
+}
 
-        <section id="proyectos" class="projects section-light">
-            <div class="container">
-                <h2 class="section-title">Proyectos Destacados</h2>
-                <div class="projects-grid" id="projectsGrid">
-                    
-                    <div class="project-card" id="project1Card" onclick="toggleProjectDetail('project1Card', 'project1Detail')">
-                        <div class="card-icon"><i class="fas fa-code"></i></div>
-                        <h3>Sistema de Ventas</h3>
-                        <p>Click para detalles</p>
-                    </div>
+// --- Lógica de AUTENTICACIÓN Avanzada ---
 
-                    <div class="project-card" id="project2Card" onclick="toggleProjectDetail('project2Card', 'project2Detail')">
-                        <div class="card-icon"><i class="fas fa-database"></i></div>
-                        <h3>Gestión de BD</h3>
-                        <p>Click para detalles</p>
-                    </div>
+// Abrir Modal de Login
+function openLoginModal() {
+    document.getElementById('loginModal').style.display = "flex";
+    document.getElementById('registerPanel').classList.add('hidden'); // Asegurar registro oculto
+}
 
-                    <div class="project-detail-panel hidden" id="project1Detail">
-                        <span class="close-detail" onclick="closeProjectDetail('project1Card', 'project1Detail')">&times;</span>
-                        <h3>Detalle del Proyecto 1</h3>
-                        <p>Descripción detallada, diagramas y capturas...</p>
-                    </div>
+// Abrir Panel de Registro
+function openRegisterPanel() {
+    document.getElementById('registerPanel').classList.remove('hidden');
+}
 
-                    <div class="project-detail-panel hidden" id="project2Detail">
-                        <span class="close-detail" onclick="closeProjectDetail('project2Card', 'project2Detail')">&times;</span>
-                        <h3>Detalle del Proyecto 2</h3>
-                        <p>Información técnica y estructura de la base de datos...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+// Cerrar Panel de Registro (como ocultándose atrás)
+function closeRegisterPanel() {
+    const panel = document.getElementById('registerPanel');
+    panel.style.animation = "fadeIn 0.3s reverse forwards"; // Animación rápida de desaparición
+    setTimeout(() => {
+        panel.classList.add('hidden');
+        panel.style.animation = ""; // Resetear animación
+    }, 300);
+}
 
-    <div id="weekModal" class="modal">
-        <div class="modal-content large-modal">
-            <span class="close-modal corner-x" onclick="closeModal('weekModal')">&times;</span>
-            <h2 id="weekModalTitle" class="modal-main-title">Semana 1</h2>
-            
-            <div class="week-modal-body">
-                <div class="modal-welcome">Contenido y recursos.</div>
-                
-                <div class="modal-actions-container">
-                    <a href="#" class="btn-action download"><i class="fas fa-file-pdf"></i> PDF Clase</a>
-                    <label class="btn-action upload coral-bg">
-                        <i class="fas fa-cloud-upload-alt"></i> Subir Tarea
-                        <input type="file" style="display: none;" onchange="simularSubida(this)">
-                    </label>
-                </div>
+// Validaciones de Registro
+const validateField = (id, errorId, isValid) => {
+    const field = document.getElementById(id);
+    const errorSpan = document.getElementById(errorId);
+    if (!isValid) {
+        errorSpan.classList.remove('hidden');
+        return false;
+    } else {
+        errorSpan.classList.add('hidden');
+        return true;
+    }
+};
 
-                <div class="management-section">
-                    <h3><i class="fas fa-tasks"></i> Gestión de Recursos</h3>
-                    <ul class="resource-list" id="resourceList">
-                        <li class="resource-item">
-                            <span><i class="fas fa-file-pdf"></i> PDF_Clase1.pdf</span>
-                            <span class="upload-stamp invisible-stamp">Subido: 20/05/2024 10:15</span>
-                            <div class="item-controls">
-                                <button class="btn-icon delete" onclick="eliminarRecurso(this)"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+const dniRegex = /^\d{8}$/;
+const phoneRegex = /^\d{9}$/;
+const emailRegex = /^[a-zA-Z0-9._-]+@xn8\.com$/;
 
-    <div id="contactModal" class="modal">
-        <div class="modal-content floating-bubble">
-            <span class="close-modal corner-x" onclick="closeModal('contactModal')">&times;</span>
-            <h2><i class="fas fa-envelope"></i> Contáctame</h2>
-            <div class="contact-links">
-                <a href="mailto:jose.moori@upla.edu.pe"><i class="fas fa-at"></i> Correo UPLA</a>
-                <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-            </div>
-        </div>
-    </div>
+// Manejar Registro
+function handleRegister(event) {
+    event.preventDefault();
 
-    <div id="authContainer" class="modal auth-modal">
-        
-        <div id="loginPanel" class="auth-panel auth-active">
-            <span class="close-modal corner-x" onclick="closeAuth()">&times;</span>
-            <h2>Iniciar Sesión</h2>
-            <form class="auth-form" onsubmit="intentarLogin(event)">
-                <div class="input-group">
-                    <input type="email" id="loginEmail" placeholder="Correo Electrónico" required>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="loginPass" placeholder="Contraseña" required>
-                </div>
-                <a href="#" class="auth-link">¿Olvidaste tu contraseña?</a>
-                <button type="submit" class="btn-coral full-width">Entrar</button>
-            </form>
-            <p class="auth-switch">¿No tienes cuenta? <a href="javascript:void(0)" onclick="toggleAuth('register')">Regístrate</a></p>
-        </div>
+    const dni = document.getElementById('regDni').value;
+    const phone = document.getElementById('regPhone').value;
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
 
-        <div id="registerPanel" class="auth-panel auth-hidden">
-            <span class="close-modal corner-x" onclick="closeAuth()">&times;</span>
-            <div class="register-header">
-                <h2>Crea tu Cuenta</h2>
-                <p class="muted-text">Todos los campos son obligatorios</p>
-            </div>
-            <form class="auth-form" onsubmit="intentarRegistro(event)">
-                <div class="form-row">
-                    <input type="text" id="regNames" placeholder="Nombres" required>
-                    <input type="text" id="regSurnames" placeholder="Apellidos" required>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="regDni" placeholder="DNI (8 dígitos)" required maxlength="8">
-                    <span class="error-msg" id="dniError">Debe tener 8 dígitos numéricos.</span>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="regPhone" placeholder="Teléfono (9 dígitos)" required maxlength="9">
-                    <span class="error-msg" id="phoneError">Debe tener 9 dígitos numéricos.</span>
-                </div>
-                <div class="input-group">
-                    <input type="email" id="regEmail" placeholder="Correo (@xn8.com)" required>
-                    <span class="error-msg" id="emailError">Debe terminar en @xn8.com</span>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="regPass1" placeholder="Contraseña" required>
-                </div>
-                <button type="submit" class="btn-coral full-width">Registrarte</button>
-            </form>
-            <p class="auth-switch">¿Ya tienes cuenta? <a href="javascript:void(0)" onclick="toggleAuth('login')">Inicia Sesión</a></p>
-        </div>
+    let isAllValid = true;
+    isAllValid &= validateField('regDni', 'errDni', dniRegex.test(dni));
+    isAllValid &= validateField('regPhone', 'errPhone', phoneRegex.test(phone));
+    isAllValid &= validateField('regEmail', 'errEmail', emailRegex.test(email));
 
-    </div>
+    if (!isAllValid) return; // Detener si hay errores
 
-    <script src="script.js"></script>
-</body>
-</html>
+    // Guardar datos en localStorage (en el navegador del usuario)
+    localStorage.setItem('auth_email', email);
+    localStorage.setItem('auth_pass', pass);
+
+    alert("Registro exitoso. Ahora puedes iniciar sesión.");
+    closeRegisterPanel();
+}
+
+// Manejar Login
+function handleLogin(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+
+    // Obtener datos guardados
+    const savedEmail = localStorage.getItem('auth_email');
+    const savedPass = localStorage.getItem('auth_pass');
+
+    if (email === savedEmail && pass === savedPass) {
+        alert("Inicio de sesión exitoso. ¡Bienvenido!");
+        closeModal('loginModal');
+        // Aquí podrías habilitar secciones protegidas, etc.
+        document.body.classList.add('authenticated'); 
+    } else {
+        alert("Correo o contraseña incorrectos. Regístrate primero.");
+    }
+}
+
+// Cerrar modales al hacer clic fuera
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+    }
+}
