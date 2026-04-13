@@ -1,100 +1,89 @@
-// Cargar recursos al iniciar
-document.addEventListener('DOMContentLoaded', () => {
-    loadResources();
-});
+// Al abrir la web, cargar lo guardado
+document.addEventListener('DOMContentLoaded', loadTasks);
 
-// --- GESTIÓN DE ARCHIVOS CON DESCARGA REAL ---
+function openWeekModal(n) {
+    document.getElementById('modalTitle').innerText = "Semana " + n;
+    document.getElementById('weekModal').style.display = 'flex';
+}
 
-function handleFileUpload(event) {
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+
+// --- PERSISTENCIA DE TAREAS ---
+
+function uploadTask(event) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
+    if (!file) return;
 
-        // Convertimos el archivo a una cadena de texto (Base64) para poder guardarlo
-        reader.onload = function(e) {
-            const id = 'file-' + Date.now();
-            const newResource = {
-                id: id,
-                name: file.name,
-                date: new Date().toLocaleString(),
-                content: e.target.result // Aquí se guarda el contenido real del archivo
-            };
-
-            saveResourceToLocal(newResource);
-            renderResource(newResource);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const newTask = {
+            id: "task-" + Date.now(),
+            name: file.name,
+            content: e.target.result // Datos reales del archivo
         };
 
-        reader.readAsDataURL(file);
-        event.target.value = ''; 
-    }
+        let tasks = JSON.parse(localStorage.getItem('tasks_moori')) || [];
+        tasks.push(newTask);
+        localStorage.setItem('tasks_moori', JSON.stringify(tasks));
+
+        renderTask(newTask);
+        alert("Tarea guardada en memoria.");
+    };
+    reader.readAsDataURL(file);
 }
 
-// Función para dibujar el recurso con enlace de descarga
-function renderResource(res) {
-    const list = document.getElementById('resourceList');
-    const item = document.createElement('div');
-    item.className = 'resource-item';
-    item.id = res.id;
-
-    // El nombre del archivo ahora tiene un estilo de enlace y la función de descargar
-    item.innerHTML = `
-        <div style="cursor: pointer; flex-grow: 1;" onclick="downloadFile('${res.id}')">
-            <span style="color: #f43f5e; font-weight: 600; text-decoration: underline;">
-                📄 ${res.name}
-            </span>
-            <small style="color: #a0aec0; font-size: 0.7rem; display: block;">
-                Subido el: ${res.date} (Clic para descargar)
-            </small>
-        </div>
-        <button class="btn-delete" onclick="deleteResource('${res.id}')" style="margin-left: 10px;">🗑️</button>
-    `;
-    list.appendChild(item);
-}
-
-// Función mágica para descargar el archivo guardado
-function downloadFile(id) {
-    const resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-    const fileData = resources.find(res => res.id === id);
-
-    if (fileData) {
-        const link = document.createElement('a');
-        link.href = fileData.content; // El contenido Base64
-        link.download = fileData.name; // El nombre original
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } else {
-        alert("Error: No se encontró el contenido del archivo.");
-    }
-}
-
-// --- PERSISTENCIA (LOCALSTORAGE) ---
-
-function saveResourceToLocal(resource) {
-    let resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-    resources.push(resource);
-    // Nota: El contenido Base64 puede ser pesado, esto funciona bien para PDFs y fotos pequeñas.
-    try {
-        localStorage.setItem('myTasks', JSON.stringify(resources));
-    } catch (e) {
-        alert("¡Cuidado! El archivo es muy grande para la memoria del navegador. Intenta con archivos más pequeños.");
-    }
-}
-
-function loadResources() {
-    const list = document.getElementById('resourceList');
+function loadTasks() {
+    const list = document.getElementById('taskList');
     list.innerHTML = "";
-    let resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-    resources.forEach(res => renderResource(res));
+    const tasks = JSON.parse(localStorage.getItem('tasks_moori')) || [];
+    tasks.forEach(renderTask);
 }
 
-function deleteResource(id) {
-    if (confirm("¿Deseas eliminar este archivo de la memoria?")) {
-        document.getElementById(id).remove();
-        let resources = JSON.parse(localStorage.getItem('myTasks')) || [];
-        resources = resources.filter(res => res.id !== id);
-        localStorage.setItem('myTasks', JSON.stringify(resources));
+function renderTask(task) {
+    const list = document.getElementById('taskList');
+    const div = document.createElement('div');
+    div.className = 'task-item';
+    div.id = task.id;
+    div.innerHTML = `
+        <div onclick="downloadTask('${task.id}')" class="task-name">📄 ${task.name}</div>
+        <button onclick="deleteTask('${task.id}')" style="background:none; border:none; cursor:pointer">🗑️</button>
+    `;
+    list.appendChild(div);
+}
+
+function downloadTask(id) {
+    const tasks = JSON.parse(localStorage.getItem('tasks_moori')) || [];
+    const t = tasks.find(x => x.id === id);
+    if (t) {
+        const link = document.createElement('a');
+        link.href = t.content;
+        link.download = t.name;
+        link.click();
     }
 }
 
-// Las demás funciones (openModal, showProject, etc.) se mantienen igual...
+function deleteTask(id) {
+    if(confirm("¿Borrar tarea?")) {
+        let tasks = JSON.parse(localStorage.getItem('tasks_moori')) || [];
+        tasks = tasks.filter(x => x.id !== id);
+        localStorage.setItem('tasks_moori', JSON.stringify(tasks));
+        document.getElementById(id).remove();
+    }
+}
+
+// Proyectos
+function showProject(n) {
+    const panel = document.getElementById('projectDetail');
+    panel.classList.remove('hidden');
+    document.getElementById('detailTitle').innerText = n === 1 ? "Sistema de Ventas" : "Gestión de BD";
+    document.getElementById('detailText').innerText = "Este proyecto está guardado en el recuadro que baja contigo para que no pierdas la información de vista mientras navegas.";
+}
+
+function hideProject() { document.getElementById('projectDetail').classList.add('hidden'); }
+
+function doLogin() {
+    alert("¡Hola José! Sesión iniciada.");
+    closeModal('loginModal');
+}
