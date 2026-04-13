@@ -6,7 +6,6 @@
     <title>Portafolio | José Moori Zegarra</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -15,9 +14,9 @@
             <h1 class="logo">UPLA <span>BD II</span></h1>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="#inicio" onclick="smoothScroll(event, 'inicio')">Inicio</a></li>
-                    <li><a href="#proyectos" onclick="smoothScroll(event, 'proyectos')">Proyectos</a></li>
+                    <li><a href="#inicio">Inicio</a></li>
                     <li><a href="javascript:void(0)" onclick="openWeekModal(1)">Semanas</a></li>
+                    <li><a href="#proyectos">Proyectos</a></li>
                     <li><button class="btn-login" onclick="openLoginModal()">Login</button></li>
                 </ul>
             </nav>
@@ -38,50 +37,43 @@
 
     <section id="proyectos" class="section light-bg">
         <h2 class="section-title">Proyectos Destacados</h2>
-        <div class="projects-grid" id="projectsGrid">
-            <div class="project-card" id="card1" onclick="showProject(1)">
+        <div class="projects-grid">
+            <div class="project-card" onclick="showProject(1)">
                 <div class="icon">🚀</div>
                 <h3>Sistema de Ventas</h3>
                 <p>Click para ver detalles</p>
             </div>
-            <div class="project-card" id="card2" onclick="showProject(2)">
+            <div class="project-card" onclick="showProject(2)">
                 <div class="icon">📊</div>
                 <h3>Gestión de BD</h3>
                 <p>Click para ver detalles</p>
             </div>
         </div>
-
         <div id="projectDetail" class="project-detail-box hidden sticky-box">
             <button class="close-btn" onclick="hideProject()">&times;</button>
-            <h3 id="detailTitle">Detalle del Proyecto</h3>
-            <p id="detailText">Información extendida...</p>
-        </div>
-    </section>
-
-    <section id="contacto" class="section dark-bg">
-        <div class="contact-bubble">
-            <h3>Contáctame</h3>
-            <p>¿Tienes alguna duda? Envíame un mensaje.</p>
-            <input type="text" placeholder="Tu nombre">
-            <textarea placeholder="Tu mensaje..."></textarea>
-            <button class="btn-coral">Enviar</button>
+            <h3 id="detailTitle">Detalle</h3>
+            <p id="detailText">Información...</p>
         </div>
     </section>
 
     <div id="weekModal" class="modal">
         <div class="modal-content large">
             <span class="close" onclick="closeModal('weekModal')">&times;</span>
-            <h2>Semana 1</h2>
+            <h2 id="modalWeekTitle">Semana 1</h2>
             <div class="modal-body">
+                <p>Contenido académico y recursos de la sesión.</p>
                 <div class="buttons-row">
-                    <button class="btn-outline">Descargar Clase</button>
-                    <button class="btn-coral">Subir Tarea</button>
+                    <button class="btn-outline" onclick="downloadMaterial()">Descargar Clase</button>
+                    <button class="btn-coral" onclick="document.getElementById('fileInput').click()">Subir Tarea</button>
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(event)">
                 </div>
                 <div class="resource-management">
-                    <h4>Gestión de Recursos</h4>
-                    <div class="resource-item" id="res1">
-                        <span>PDF_Clase1.pdf</span>
-                        <button class="btn-delete" onclick="deleteResource('res1')">🗑️</button>
+                    <h4><span class="icon">📋</span> Gestión de Recursos</h4>
+                    <div id="resourceList">
+                        <div class="resource-item" id="res-init">
+                            <span>PDF_Clase1.pdf</span>
+                            <button class="btn-delete" onclick="deleteResource('res-init')">🗑️</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,28 +81,12 @@
     </div>
 
     <div id="loginModal" class="modal">
-        <div class="auth-container">
-            <div class="auth-card" id="loginCard">
-                <span class="close" onclick="closeModal('loginModal')">&times;</span>
-                <h2>Iniciar Sesión</h2>
-                <input type="email" id="loginEmail" placeholder="Correo">
-                <input type="password" id="loginPass" placeholder="Contraseña">
-                <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
-                <button class="btn-coral" onclick="doLogin()">Entrar</button>
-                <p>¿No tienes cuenta? <a href="javascript:void(0)" onclick="toggleAuth()">Regístrate</a></p>
-            </div>
-            <div class="auth-card hidden" id="registerCard">
-                <p class="obligatorio">Todos los campos son obligatorios</p>
-                <h2>Regístrate</h2>
-                <input type="text" id="regNom" placeholder="Nombres">
-                <input type="text" id="regApe" placeholder="Apellidos">
-                <input type="text" id="regDni" placeholder="DNI (8 dígitos)">
-                <input type="text" id="regTel" placeholder="Teléfono (9 dígitos)">
-                <input type="email" id="regEmail" placeholder="Correo (@xn8.com)">
-                <input type="password" id="regPass" placeholder="Contraseña">
-                <button class="btn-coral" onclick="doRegister()">Registrarme</button>
-                <button class="btn-link" onclick="toggleAuth()">Volver al Login</button>
-            </div>
+        <div class="auth-card">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <input type="email" id="loginEmail" placeholder="Correo">
+            <input type="password" id="loginPass" placeholder="Contraseña">
+            <button class="btn-coral" onclick="doLogin()">Entrar</button>
         </div>
     </div>
 
