@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu Nombre - Portafolio</title>
+    <title>Tu Nombre - Portafolio Creativo</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> </head>
 <body>
 
     <header>
         <div class="container">
-            <h1>Tu Nombre</h1>
+            <h1 class="logo">Tu Nombre</h1>
             <nav>
                 <ul>
-                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#hero">Inicio</a></li>
                     <li class="dropdown">
-                        <a href="#">Semanas</a>
+                        <a href="#weeks-container">Semanas <i class="fas fa-caret-down"></i></a>
                         <ul class="dropdown-content">
                             <li><a href="#" data-week="1">Semana 1</a></li>
                             <li><a href="#" data-week="2">Semana 2</a></li>
@@ -24,36 +24,100 @@
                             <li><a href="#" data-week="all">Todas</a></li>
                         </ul>
                     </li>
-                    <li><a href="#">Proyectos</a></li>
-                    <li><a href="#">Contacto</a></li>
-                    <li><a href="#" id="about-me-btn">Sobre Mí</a></li>
+                    <li><a href="#skills">Habilidades</a></li>
+                    <li><a href="#projects">Proyectos</a></li>
+                    <li><a href="#testimonials">Testimonios</a></li>
+                    <li><a href="#contact">Contacto</a></li>
+                    <li><a href="#" id="about-me-btn" class="btn-primary">Sobre Mí</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main>
-        <section id="hero">
+        <section id="hero" class="fade-in">
             <div class="container">
                 <h2>Bienvenido a mi Portafolio Académico</h2>
-                <p>Aquí encontrarás un registro de mis avances y proyectos realizados durante este ciclo.</p>
+                <p>Explora mi camino de aprendizaje y descubre los proyectos que he realizado durante este ciclo en Ingeniería de Sistemas en la UPLA.</p>
+                <a href="#weeks-container" class="btn-secondary">Ver Mis Semanas</a>
             </div>
         </section>
 
-        <section id="weeks-container">
+        <section id="weeks-container" class="fade-in">
             <div class="container">
-                <div class="week-card" data-week="1">
-                    <h3>Semana 1</h3>
-                    <p>Contenido de la semana 1...</p>
+                <h2 class="section-title">Mis Semanas de Avances</h2>
+                <div class="week-grid">
+                    <div class="week-card scale-up" data-week="1">
+                        <h3>Semana 1</h3>
+                        <p>Contenido de la semana 1...</p>
+                    </div>
+                    <div class="week-card scale-up" data-week="2">
+                        <h3>Semana 2</h3>
+                        <p>Contenido de la semana 2...</p>
+                    </div>
+                    <div class="week-card scale-up" data-week="3">
+                        <h3>Semana 3</h3>
+                        <p>Contenido de la semana 3...</p>
+                    </div>
                 </div>
-                <div class="week-card" data-week="2">
-                    <h3>Semana 2</h3>
-                    <p>Contenido de la semana 2...</p>
+            </div>
+        </section>
+
+        <section id="skills" class="fade-in">
+            <div class="container">
+                <h2 class="section-title">Habilidades Técnicas</h2>
+                <div class="skills-grid">
+                    <div class="skill">
+                        <span>HTML/CSS</span>
+                        <div class="progress-bar"><div class="progress" style="width: 90%;"></div></div>
+                    </div>
+                    <div class="skill">
+                        <span>JavaScript</span>
+                        <div class="progress-bar"><div class="progress" style="width: 80%;"></div></div>
+                    </div>
+                    <div class="skill">
+                        <span>Base de Datos</span>
+                        <div class="progress-bar"><div class="progress" style="width: 75%;"></div></div>
+                    </div>
+                    </div>
+            </div>
+        </section>
+
+        <section id="projects" class="fade-in">
+            <div class="container">
+                <h2 class="section-title">Proyectos Destacados</h2>
+                <div class="projects-grid">
+                    <div class="project-card scale-up">
+                        <img src="https://via.placeholder.com/300" alt="Proyecto 1">
+                        <h3>Proyecto 1</h3>
+                        <p>Descripción breve del proyecto 1.</p>
+                    </div>
+                    <div class="project-card scale-up">
+                        <img src="https://via.placeholder.com/300" alt="Proyecto 2">
+                        <h3>Proyecto 2</h3>
+                        <p>Descripción breve del proyecto 2.</p>
+                    </div>
                 </div>
-                <div class="week-card" data-week="3">
-                    <h3>Semana 3</h3>
-                    <p>Contenido de la semana 3...</p>
+            </div>
+        </section>
+
+        <section id="testimonials" class="fade-in">
+            <div class="container">
+                <h2 class="section-title">Testimonios</h2>
+                <div class="testimonial-card slide-in">
+                    <p>"¡Tu Nombre es un excelente compañero de equipo y siempre entrega un trabajo de alta calidad!" - Juan Pérez</p>
                 </div>
+                <div class="testimonial-card slide-in">
+                    <p>"Me impresionó la creatividad y el profesionalismo de Tu Nombre." - María Gómez</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="fade-in">
+            <div class="container">
+                <h2 class="section-title">Ponte en Contacto</h2>
+                <p>Si tienes alguna pregunta o quieres colaborar en un proyecto, ¡no dudes en enviarme un mensaje!</p>
+                <a href="mailto:tu.email@example.com" class="btn-primary">Enviar Correo</a>
             </div>
         </section>
     </main>
@@ -62,7 +126,8 @@
         <div class="about-me-content">
             <span class="close-btn">&times;</span>
             <h2>Sobre Mí</h2>
-            <p>Aquí puedes poner tu información personal, foto, habilidades, etc.</p>
+            <p>Hola, soy [Tu Nombre], estudiante de Ingeniería de Sistemas en la UPLA. Me apasiona la tecnología y estoy en constante búsqueda de nuevos desafíos.</p>
+            <a href="tu-cv.pdf" class="btn-secondary" download>Descargar CV <i class="fas fa-file-download"></i></a>
         </div>
     </aside>
 
