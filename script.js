@@ -1,7 +1,10 @@
 let selectedUnit = null;
 let selectedWeek = null;
 
-function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+// Funciones de apertura/cierre básica
+function openLoginModal() { 
+    document.getElementById('loginModal').style.display = 'flex'; 
+}
 
 function openUnitModal(unit) {
     selectedUnit = unit;
@@ -16,8 +19,11 @@ function openTaskZone(week) {
     renderFileList();
 }
 
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function closeModal(id) { 
+    document.getElementById(id).style.display = 'none'; 
+}
 
+// Lógica de archivos (Guardado y descarga)
 function uploadFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -51,7 +57,7 @@ function renderFileList() {
         div.className = 'file-item';
         div.innerHTML = `
             <span class="file-link" onclick="downloadFile(${f.id})">${f.name}</span>
-            <button onclick="deleteFile(${f.id})" style="background:none; border:none; cursor:pointer">🗑️</button>
+            <button onclick="deleteFile(${f.id})" style="background:none; border:none; cursor:pointer; color:white;">🗑️</button>
         `;
         list.appendChild(div);
     });
@@ -74,5 +80,12 @@ function deleteFile(id) {
         files = files.filter(x => x.id !== id);
         localStorage.setItem('tasks_jose', JSON.stringify(files));
         renderFileList();
+    }
+}
+
+// Cerrar modales si se hace clic fuera de la caja
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
     }
 }
