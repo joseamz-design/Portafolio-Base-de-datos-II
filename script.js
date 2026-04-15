@@ -1,99 +1,87 @@
-let currentWeek = null;
-let editingTaskId = null;
+let selectedUnit = null;
+let selectedWeek = null;
 
 // Cargar al iniciar
-document.addEventListener('DOMContentLoaded', loadAllTasks);
+document.addEventListener('DOMContentLoaded', loadFiles);
 
-function triggerInput(week) {
-    currentWeek = week;
-    document.getElementById('globalInput').click();
+function openUnitModal(unit) {
+    selectedUnit = unit;
+    document.getElementById('unitTitle').innerText = "Unidad " + unit;
+    document.getElementById('unitModal').style.display = 'flex';
 }
 
-// SUBIR Y GUARDAR
-function uploadTask(event) {
+function openTaskZone(week) {
+    selectedWeek = week;
+    document.getElementById('taskTitle').innerText = `Unidad ${selectedUnit} - Semana ${week}`;
+    document.getElementById('taskModal').style.display = 'flex';
+    renderFileList();
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+function uploadFile(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        const newTask = {
-            id: "task-" + Date.now(),
-            week: currentWeek,
+        const fileData = {
+            id: Date.now(),
+            unit: selectedUnit,
+            week: selectedWeek,
             name: file.name,
             content: e.target.result
         };
 
-        let tasks = JSON.parse(localStorage.getItem('tasks_pro')) || [];
-        tasks.push(newTask);
-        localStorage.setItem('tasks_pro', JSON.stringify(tasks));
-
-        renderTask(newTask);
+        let files = JSON.parse(localStorage.getItem('portafolio_files')) || [];
+        files.push(fileData);
+        localStorage.setItem('portafolio_files', JSON.stringify(files));
+        renderFileList();
     };
     reader.readAsDataURL(file);
-    event.target.value = ''; 
 }
 
-// DIBUJAR EN PANTALLA
-function renderTask(task) {
-    const list = document.getElementById(`list-${task.week}`);
-    const div = document.createElement('div');
-    div.className = 'task-item';
-    div.id = task.id;
-    div.innerHTML = `
-        <span class="task-name" onclick="downloadTask('${task.id}')" title="Descargar">${task.name}</span>
-        <div class="task-actions">
-            <button onclick="openEditModal('${task.id}', '${task.name}')">✏️</button>
-            <button onclick="deleteTask('${task.id}')">🗑️</button>
-        </div>
-    `;
-    list.appendChild(div);
+function renderFileList() {
+    const listContainer = document.getElementById('fileList');
+    listContainer.innerHTML = "";
+    
+    let files = JSON.parse(localStorage.getItem('portafolio_files')) || [];
+    // Filtrar para mostrar solo los de la unidad y semana actual
+    const filtered = files.filter(f => f.unit === selectedUnit && f.week === selectedWeek);
+
+    filtered.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.innerHTML = `
+            <span class="file-link" onclick="downloadFile(${f.id})">${f.name}</span>
+            <button onclick="deleteFile(${f.id})" style="background:none; border:none; cursor:pointer">🗑️</button>
+        `;
+        listContainer.appendChild(div);
+    });
 }
 
-function loadAllTasks() {
-    const tasks = JSON.parse(localStorage.getItem('tasks_pro')) || [];
-    tasks.forEach(renderTask);
-}
-
-// DESCARGAR
-function downloadTask(id) {
-    const tasks = JSON.parse(localStorage.getItem('tasks_pro')) || [];
-    const t = tasks.find(x => x.id === id);
-    if (t) {
+function downloadFile(id) {
+    let files = JSON.parse(localStorage.getItem('portafolio_files')) || [];
+    const f = files.find(file => file.id === id);
+    if (f) {
         const link = document.createElement('a');
-        link.href = t.content;
-        link.download = t.name;
+        link.href = f.content;
+        link.download = f.name;
         link.click();
     }
 }
 
-// BORRAR
-function deleteTask(id) {
-    if (confirm("¿Borrar este archivo?")) {
-        let tasks = JSON.parse(localStorage.getItem('tasks_pro')) || [];
-        tasks = tasks.filter(x => x.id !== id);
-        localStorage.setItem('tasks_pro', JSON.stringify(tasks));
-        document.getElementById(id).remove();
+function deleteFile(id) {
+    if(confirm("¿Eliminar archivo?")) {
+        let files = JSON.parse(localStorage.getItem('portafolio_files')) || [];
+        files = files.filter(f => f.id !== id);
+        localStorage.setItem('portafolio_files', JSON.stringify(files));
+        renderFileList();
     }
 }
 
-// EDITAR
-function openEditModal(id, name) {
-    editingTaskId = id;
-    document.getElementById('editNameInput').value = name;
-    document.getElementById('editModal').style.display = 'flex';
-}
-
-function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
-
-function saveEdit() {
-    const newName = document.getElementById('editNameInput').value;
-    let tasks = JSON.parse(localStorage.getItem('tasks_pro')) || [];
-    const task = tasks.find(x => x.id === editingTaskId);
-    
-    if (task) {
-        task.name = newName;
-        localStorage.setItem('tasks_pro', JSON.stringify(tasks));
-        // Recargar pantalla para ver cambios
-        location.reload(); 
-    }
+function loadFiles() {
+    // Solo carga la lista cuando se abre la zona de tareas específica
 }
