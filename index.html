@@ -1,35 +1,102 @@
-<header class="main-header">
-    <div class="nav-container">
-        <div class="logo">
-            <span class="upla-text">UPLA</span>
-            <span class="course-text">BD II</span>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio | José Moori Zegarra</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="upla-text">UPLA</span>
+                <span class="course-text">BD II</span>
+            </div>
+            <nav class="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="#inicio" class="nav-item">Inicio</a></li>
+                    <li><a href="#unidades-section" class="nav-item">Unidades</a></li>
+                    <li><a href="#proyectos" class="nav-item">Proyectos</a></li>
+                </ul>
+            </nav>
+            <div class="nav-auth">
+                <button class="btn-login" onclick="openLoginModal()">
+                    <span>👤</span> Iniciar Sesión
+                </button>
+            </div>
         </div>
+    </header>
 
-        <nav class="nav-menu">
-            <ul class="nav-links">
-                <li><a href="#inicio" class="nav-item">Inicio</a></li>
-                <li><a href="#unidades-section" class="nav-item">Unidades</a></li>
-                <li><a href="#proyectos" class="nav-item">Proyectos</a></li>
-            </ul>
-        </nav>
+    <section id="inicio" class="section dark-bg">
+        <div class="hero-content">
+            <div class="profile-circle"></div>
+            <h2>Jose Andres Moori Zegarra</h2>
+            <p class="subtitle">Estudiante de Ingeniería en la <span class="upla">UPLA</span></p>
+            <p>Especialidad: <span class="coral">Base de Datos II</span></p>
+        </div>
+    </section>
 
-        <div class="nav-auth">
-            <button class="btn-login" onclick="openLoginModal()">
-                <span class="icon">👤</span> Iniciar Sesión
-            </button>
+    <section id="unidades-section" class="section dark-bg">
+        <h2 class="section-title">Unidades de Aprendizaje</h2>
+        <div class="unidades-grid">
+            <div class="unidad-card" onclick="openUnitModal(1)">
+                <div class="unidad-icon">📘</div>
+                <h3>Unidad I</h3>
+                <p>Fundamentos y Diseño</p>
+            </div>
+            <div class="unidad-card" onclick="openUnitModal(2)">
+                <div class="unidad-icon">📗</div>
+                <h3>Unidad II</h3>
+                <p>Implementación SQL</p>
+            </div>
+            <div class="unidad-card" onclick="openUnitModal(3)">
+                <div class="unidad-icon">📙</div>
+                <h3>Unidad III</h3>
+                <p>Optimización</p>
+            </div>
+            <div class="unidad-card" onclick="openUnitModal(4)">
+                <div class="unidad-icon">📕</div>
+                <h3>Unidad IV</h3>
+                <p>Seguridad y Backup</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="unitModal" class="modal">
+        <div class="modal-content medium">
+            <span class="close" onclick="closeModal('unitModal')">&times;</span>
+            <h2 id="unitTitle" style="color:var(--coral)">Unidad I</h2>
+            <p>Selecciona una semana para gestionar tus tareas:</p>
+            <div class="modulos-container">
+                <button class="btn-modulo" onclick="openTaskZone(1)">Semana 1</button>
+                <button class="btn-modulo" onclick="openTaskZone(2)">Semana 2</button>
+                <button class="btn-modulo" onclick="openTaskZone(3)">Semana 3</button>
+                <button class="btn-modulo" onclick="openTaskZone(4)">Semana 4</button>
+            </div>
         </div>
     </div>
-</header>
 
-<div id="loginModal" class="modal">
-    <div class="modal-content auth-card">
-        <span class="close" onclick="closeModal('loginModal')">&times;</span>
-        <h2>Bienvenido, José</h2>
-        <p>Ingresa tus credenciales para administrar</p>
-        <form class="login-form">
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('taskModal')">&times;</span>
+            <h3 id="taskTitle">Semana 1</h3>
+            <div class="upload-area" style="margin: 20px 0;">
+                <button class="btn-coral" onclick="document.getElementById('fileIn').click()">+ Subir Tarea desde PC</button>
+                <input type="file" id="fileIn" style="display:none" onchange="uploadFile(event)">
+            </div>
+            <div class="storage-list">
+                <h4 style="border-bottom: 1px solid #333; padding-bottom: 10px;">Mis Tareas (Clic para descargar):</h4>
+                <div id="fileList" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content auth-card">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Iniciar Sesión</h2>
             <input type="email" placeholder="Correo institucional" class="modern-input">
-            <input type="password" placeholder="Contraseña" class="modern-input">
-            <button type="button" class="btn-coral full" onclick="closeModal('loginModal')">Entrar</button>
-        </form>
-    </div>
-</div>
+            <input type="password" placeholder="Contraseña"
