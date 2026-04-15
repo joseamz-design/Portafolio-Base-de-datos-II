@@ -19,13 +19,10 @@
                 <ul class="nav-links">
                     <li><a href="#inicio" class="nav-item">Inicio</a></li>
                     <li><a href="#unidades-section" class="nav-item">Unidades</a></li>
-                    <li><a href="#proyectos" class="nav-item">Proyectos</a></li>
                 </ul>
             </nav>
             <div class="nav-auth">
-                <button class="btn-login" onclick="openLoginModal()">
-                    <span>👤</span> Iniciar Sesión
-                </button>
+                <button class="btn-login" onclick="openLoginModal()">👤 Login</button>
             </div>
         </div>
     </header>
@@ -34,8 +31,7 @@
         <div class="hero-content">
             <div class="profile-circle"></div>
             <h2>Jose Andres Moori Zegarra</h2>
-            <p class="subtitle">Estudiante de Ingeniería en la <span class="upla">UPLA</span></p>
-            <p>Especialidad: <span class="coral">Base de Datos II</span></p>
+            <p>Ingeniería | <span class="coral">Base de Datos II</span></p>
         </div>
     </section>
 
@@ -45,31 +41,26 @@
             <div class="unidad-card" onclick="openUnitModal(1)">
                 <div class="unidad-icon">📘</div>
                 <h3>Unidad I</h3>
-                <p>Fundamentos y Diseño</p>
             </div>
             <div class="unidad-card" onclick="openUnitModal(2)">
                 <div class="unidad-icon">📗</div>
                 <h3>Unidad II</h3>
-                <p>Implementación SQL</p>
             </div>
             <div class="unidad-card" onclick="openUnitModal(3)">
                 <div class="unidad-icon">📙</div>
                 <h3>Unidad III</h3>
-                <p>Optimización</p>
             </div>
             <div class="unidad-card" onclick="openUnitModal(4)">
                 <div class="unidad-icon">📕</div>
                 <h3>Unidad IV</h3>
-                <p>Seguridad y Backup</p>
             </div>
         </div>
     </section>
 
     <div id="unitModal" class="modal">
-        <div class="modal-content medium">
+        <div class="modal-content">
             <span class="close" onclick="closeModal('unitModal')">&times;</span>
-            <h2 id="unitTitle" style="color:var(--coral)">Unidad I</h2>
-            <p>Selecciona una semana para gestionar tus tareas:</p>
+            <h2 id="unitTitle">Unidad I</h2>
             <div class="modulos-container">
                 <button class="btn-modulo" onclick="openTaskZone(1)">Semana 1</button>
                 <button class="btn-modulo" onclick="openTaskZone(2)">Semana 2</button>
@@ -83,20 +74,24 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('taskModal')">&times;</span>
             <h3 id="taskTitle">Semana 1</h3>
-            <div class="upload-area" style="margin: 20px 0;">
-                <button class="btn-coral" onclick="document.getElementById('fileIn').click()">+ Subir Tarea desde PC</button>
+            <div class="upload-area">
+                <button class="btn-coral" onclick="document.getElementById('fileIn').click()">+ Seleccionar de PC</button>
                 <input type="file" id="fileIn" style="display:none" onchange="uploadFile(event)">
             </div>
-            <div class="storage-list">
-                <h4 style="border-bottom: 1px solid #333; padding-bottom: 10px;">Mis Tareas (Clic para descargar):</h4>
-                <div id="fileList" style="margin-top: 15px;"></div>
-            </div>
+            <div id="fileList" class="storage-list"></div>
         </div>
     </div>
 
     <div id="loginModal" class="modal">
         <div class="modal-content auth-card">
             <span class="close" onclick="closeModal('loginModal')">&times;</span>
-            <h2>Iniciar Sesión</h2>
-            <input type="email" placeholder="Correo institucional" class="modern-input">
-            <input type="password" placeholder="Contraseña"
+            <h2>Login</h2>
+            <input type="email" placeholder="Correo" class="modern-input">
+            <input type="password" placeholder="Contraseña" class="modern-input">
+            <button class="btn-coral" onclick="closeModal('loginModal')">Entrar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
