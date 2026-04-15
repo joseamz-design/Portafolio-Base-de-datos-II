@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Pro | José Moori Zegarra</title>
+    <title>Portafolio Pro | José Moori</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -15,75 +15,50 @@
             <nav>
                 <ul class="nav-links">
                     <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="javascript:void(0)" onclick="openWeekModal(1)">Semanas</a></li>
+                    <li><a href="#semanas-section">Semanas</a></li>
                     <li><a href="#proyectos">Proyectos</a></li>
-                    <li><button class="btn-login" onclick="openLoginModal()">Login</button></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main>
-        <section id="inicio" class="section dark-bg">
-            <div class="hero-content">
-                <div class="profile-circle"></div>
-                <h2>Jose Andres Moori Zegarra</h2>
-                <p class="subtitle">Estudiante de Ingeniería en la <span class="upla">UPLA</span></p>
-                <p>Especialidad: <span class="coral">Base de Datos II</span></p>
-                <div class="welcome-bubble">
-                    <p>Bienvenido a mi portafolio. Aquí gestiono mis avances y tareas del ciclo de forma profesional.</p>
-                </div>
+    <section id="semanas-section" class="section dark-bg">
+        <h2 class="section-title">Gestión Académica (Semanas 1-4)</h2>
+        <p style="margin-bottom: 40px; color: #94a3b8;">Haz clic en el nombre para descargar, usa los iconos para editar o borrar.</p>
+        
+        <div class="semanas-grid">
+            <div class="semana-card">
+                <h3>Semana 1</h3>
+                <div class="task-list" id="list-1"></div>
+                <button class="btn-add" onclick="triggerInput(1)">+ Subir Tarea</button>
             </div>
-        </section>
-
-        <section id="proyectos" class="section light-bg">
-            <h2 class="title-dark">Proyectos del Ciclo</h2>
-            <div class="projects-grid">
-                <div class="card" onclick="showProject(1)">
-                    <div class="icon-box">🚀</div>
-                    <h3>Sistema de Ventas</h3>
-                    <p>Click para ver detalles</p>
-                </div>
-                <div class="card" onclick="showProject(2)">
-                    <div class="icon-box">📊</div>
-                    <h3>Gestión de BD</h3>
-                    <p>Click para ver detalles</p>
-                </div>
+            <div class="semana-card">
+                <h3>Semana 2</h3>
+                <div class="task-list" id="list-2"></div>
+                <button class="btn-add" onclick="triggerInput(2)">+ Subir Tarea</button>
             </div>
-            <div id="projectDetail" class="detail-panel hidden sticky-detail">
-                <button class="close-panel" onclick="hideProject()">&times;</button>
-                <h3 id="detailTitle">Detalle del Proyecto</h3>
-                <p id="detailText">Cargando información...</p>
+            <div class="semana-card">
+                <h3>Semana 3</h3>
+                <div class="task-list" id="list-3"></div>
+                <button class="btn-add" onclick="triggerInput(3)">+ Subir Tarea</button>
             </div>
-        </section>
-    </main>
-
-    <div id="weekModal" class="modal">
-        <div class="modal-content large">
-            <span class="close-x" onclick="closeModal('weekModal')">&times;</span>
-            <h2 id="modalTitle">Semana 1</h2>
-            <div class="modal-body">
-                <div class="actions">
-                    <button class="btn-outline" onclick="alert('Descargando guía...')">Descargar Guía</button>
-                    <button class="btn-main" onclick="document.getElementById('fileIn').click()">Subir Tarea</button>
-                    <input type="file" id="fileIn" style="display:none" onchange="uploadTask(event)">
-                </div>
-                <div class="storage-zone">
-                    <h4>Mis Tareas Guardadas (Clic para bajar)</h4>
-                    <div id="taskList" class="task-container">
-                        </div>
-                </div>
+            <div class="semana-card">
+                <h3>Semana 4</h3>
+                <div class="task-list" id="list-4"></div>
+                <button class="btn-add" onclick="triggerInput(4)">+ Subir Tarea</button>
             </div>
         </div>
-    </div>
+        <input type="file" id="globalInput" style="display:none" onchange="uploadTask(event)">
+    </section>
 
-    <div id="loginModal" class="modal">
-        <div class="auth-card">
-            <span class="close-x" onclick="closeModal('loginModal')">&times;</span>
-            <h2>Iniciar Sesión</h2>
-            <input type="email" id="logEmail" placeholder="Correo @xn8.com">
-            <input type="password" id="logPass" placeholder="Contraseña">
-            <button class="btn-main full" onclick="doLogin()">Entrar</button>
+    <div id="editModal" class="modal">
+        <div class="modal-content small">
+            <h3>Editar nombre del archivo</h3>
+            <input type="text" id="editNameInput" class="modern-input">
+            <div style="margin-top:20px">
+                <button class="btn-coral" onclick="saveEdit()">Guardar</button>
+                <button class="btn-outline" onclick="closeEditModal()">Cancelar</button>
+            </div>
         </div>
     </div>
 
