@@ -1,15 +1,7 @@
 let selectedUnit = null;
 let selectedWeek = null;
 
-// Cargar al iniciar
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Portafolio de José Moori listo.");
-});
-
-// MODALES DE NAVEGACIÓN
-function openLoginModal() {
-    document.getElementById('loginModal').style.display = 'flex';
-}
+function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
 
 function openUnitModal(unit) {
     selectedUnit = unit;
@@ -24,18 +16,8 @@ function openTaskZone(week) {
     renderFileList();
 }
 
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-}
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-// CERRAR MODALES AL HACER CLIC FUERA
-window.onclick = function(event) {
-    if (event.target.className === 'modal') {
-        event.target.style.display = "none";
-    }
-}
-
-// LÓGICA DE ARCHIVOS
 function uploadFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -49,10 +31,9 @@ function uploadFile(event) {
             name: file.name,
             content: e.target.result
         };
-
-        let files = JSON.parse(localStorage.getItem('portafolio_jose')) || [];
+        let files = JSON.parse(localStorage.getItem('tasks_jose')) || [];
         files.push(fileData);
-        localStorage.setItem('portafolio_jose', JSON.stringify(files));
+        localStorage.setItem('tasks_jose', JSON.stringify(files));
         renderFileList();
     };
     reader.readAsDataURL(file);
@@ -60,46 +41,38 @@ function uploadFile(event) {
 }
 
 function renderFileList() {
-    const listContainer = document.getElementById('fileList');
-    listContainer.innerHTML = "";
-    
-    let files = JSON.parse(localStorage.getItem('portafolio_jose')) || [];
+    const list = document.getElementById('fileList');
+    list.innerHTML = "";
+    let files = JSON.parse(localStorage.getItem('tasks_jose')) || [];
     const filtered = files.filter(f => f.unit === selectedUnit && f.week === selectedWeek);
-
-    if (filtered.length === 0) {
-        listContainer.innerHTML = "<p style='color:#666; font-size:0.9rem;'>No hay archivos subidos todavía.</p>";
-        return;
-    }
 
     filtered.forEach(f => {
         const div = document.createElement('div');
         div.className = 'file-item';
         div.innerHTML = `
-            <span class="file-link" onclick="downloadFile(${f.id})" title="Clic para descargar">${f.name}</span>
-            <button onclick="deleteFile(${f.id})" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">🗑️</button>
+            <span class="file-link" onclick="downloadFile(${f.id})">${f.name}</span>
+            <button onclick="deleteFile(${f.id})" style="background:none; border:none; cursor:pointer">🗑️</button>
         `;
-        listContainer.appendChild(div);
+        list.appendChild(div);
     });
 }
 
 function downloadFile(id) {
-    let files = JSON.parse(localStorage.getItem('portafolio_jose')) || [];
-    const f = files.find(file => file.id === id);
+    const files = JSON.parse(localStorage.getItem('tasks_jose')) || [];
+    const f = files.find(x => x.id === id);
     if (f) {
         const link = document.createElement('a');
         link.href = f.content;
         link.download = f.name;
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
     }
 }
 
 function deleteFile(id) {
-    if(confirm("¿Seguro que quieres borrar esta tarea?")) {
-        let files = JSON.parse(localStorage.getItem('portafolio_jose')) || [];
-        files = files.filter(f => f.id !== id);
-        localStorage.setItem('portafolio_jose', JSON.stringify(files));
+    if(confirm("¿Borrar tarea?")) {
+        let files = JSON.parse(localStorage.getItem('tasks_jose')) || [];
+        files = files.filter(x => x.id !== id);
+        localStorage.setItem('tasks_jose', JSON.stringify(files));
         renderFileList();
     }
 }
