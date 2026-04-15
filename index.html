@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Pro | José Moori</title>
+    <title>Portafolio | José Moori Zegarra</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
@@ -15,49 +15,63 @@
             <nav>
                 <ul class="nav-links">
                     <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#semanas-section">Semanas</a></li>
+                    <li><a href="#unidades-section">Unidades</a></li>
                     <li><a href="#proyectos">Proyectos</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <section id="semanas-section" class="section dark-bg">
-        <h2 class="section-title">Gestión Académica (Semanas 1-4)</h2>
-        <p style="margin-bottom: 40px; color: #94a3b8;">Haz clic en el nombre para descargar, usa los iconos para editar o borrar.</p>
-        
-        <div class="semanas-grid">
-            <div class="semana-card">
-                <h3>Semana 1</h3>
-                <div class="task-list" id="list-1"></div>
-                <button class="btn-add" onclick="triggerInput(1)">+ Subir Tarea</button>
+    <section id="unidades-section" class="section dark-bg">
+        <h2 class="section-title">Unidades de Aprendizaje</h2>
+        <div class="unidades-grid">
+            <div class="unidad-card" onclick="openUnitModal(1)">
+                <div class="unidad-icon">📘</div>
+                <h3>Unidad I</h3>
+                <p>Fundamentos y Diseño</p>
             </div>
-            <div class="semana-card">
-                <h3>Semana 2</h3>
-                <div class="task-list" id="list-2"></div>
-                <button class="btn-add" onclick="triggerInput(2)">+ Subir Tarea</button>
+            <div class="unidad-card" onclick="openUnitModal(2)">
+                <div class="unidad-icon">📗</div>
+                <h3>Unidad II</h3>
+                <p>Implementación SQL</p>
             </div>
-            <div class="semana-card">
-                <h3>Semana 3</h3>
-                <div class="task-list" id="list-3"></div>
-                <button class="btn-add" onclick="triggerInput(3)">+ Subir Tarea</button>
+            <div class="unidad-card" onclick="openUnitModal(3)">
+                <div class="unidad-icon">📙</div>
+                <h3>Unidad III</h3>
+                <p>Optimización</p>
             </div>
-            <div class="semana-card">
-                <h3>Semana 4</h3>
-                <div class="task-list" id="list-4"></div>
-                <button class="btn-add" onclick="triggerInput(4)">+ Subir Tarea</button>
+            <div class="unidad-card" onclick="openUnitModal(4)">
+                <div class="unidad-icon">📕</div>
+                <h3>Unidad IV</h3>
+                <p>Seguridad y Backup</p>
             </div>
         </div>
-        <input type="file" id="globalInput" style="display:none" onchange="uploadTask(event)">
     </section>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content small">
-            <h3>Editar nombre del archivo</h3>
-            <input type="text" id="editNameInput" class="modern-input">
-            <div style="margin-top:20px">
-                <button class="btn-coral" onclick="saveEdit()">Guardar</button>
-                <button class="btn-outline" onclick="closeEditModal()">Cancelar</button>
+    <div id="unitModal" class="modal">
+        <div class="modal-content medium">
+            <span class="close" onclick="closeModal('unitModal')">&times;</span>
+            <h2 id="unitTitle">Unidad I</h2>
+            <div class="modulos-container">
+                <button class="btn-modulo" onclick="openTaskZone(1)">Semana 1</button>
+                <button class="btn-modulo" onclick="openTaskZone(2)">Semana 2</button>
+                <button class="btn-modulo" onclick="openTaskZone(3)">Semana 3</button>
+                <button class="btn-modulo" onclick="openTaskZone(4)">Semana 4</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('taskModal')">&times;</span>
+            <h3 id="taskTitle">Semana 1</h3>
+            <div class="upload-area">
+                <button class="btn-coral" onclick="document.getElementById('fileIn').click()">+ Seleccionar Archivo</button>
+                <input type="file" id="fileIn" style="display:none" onchange="uploadFile(event)">
+            </div>
+            <div class="storage-list">
+                <h4>Archivos en esta semana:</h4>
+                <div id="fileList"></div>
             </div>
         </div>
     </div>
