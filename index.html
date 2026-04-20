@@ -159,6 +159,30 @@
         </div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.css.js"; 
+        // Nota: Si el link de arriba falla por .css.js usa este: https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcyRW01nCKJ4-6VtqLh52bJw3m7NN5BCg",
+            authDomain: "jose-portafolio-76997.firebaseapp.com",
+            projectId: "jose-portafolio-76997",
+            storageBucket: "jose-portafolio-76997.firebasestorage.app",
+            messagingSenderId: "25029747925",
+            appId: "1:25029747925:web:3a4942aeb7a8eba038ae5c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        window.db = db;
+        window.storage = storage;
+        window.fStore = { doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, deleteDoc, ref, uploadBytes, getDownloadURL, deleteObject };
+    </script>
+    
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
     <script>AOS.init();</script>
