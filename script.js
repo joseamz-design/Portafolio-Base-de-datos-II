@@ -11,24 +11,33 @@ function toggleAuth() {
     document.getElementById('main-btn').innerText = isLogin ? "INITIATE GATE SEQUENCE" : "REGISTER_SYSTEM";
 }
 
-function ejecutarAccion() {
+async function ejecutarAccion() {
     const user = document.getElementById('user').value.trim();
     const pass = document.getElementById('pass').value.trim();
-    const db = JSON.parse(localStorage.getItem('void_hunter_db')) || [];
 
     if (!user || !pass) return alert("CRITICAL ERROR: ACCESS DENIED");
 
     if (isLogin) {
-        const found = db.find(u => u.user === user && u.pass === pass);
-        if (found) loginExitoso(found);
-        else alert("DENIED: INVALID GATE PASS");
+        // Login desde Firebase
+        const docRef = window.fStore.doc(window.db, "usuarios", user);
+        const docSnap = await window.fStore.getDoc(docRef);
+
+        if (docSnap.exists() && docSnap.data().pass === pass) {
+            loginExitoso(docSnap.data());
+        } else {
+            alert("DENIED: INVALID GATE PASS");
+        }
     } else {
         const nombre = document.getElementById('full-name').value.trim();
         const rol = document.getElementById('reg-role').value;
         if (!nombre) return alert("IDENTITY REQUIRED");
-        db.push({ user, pass, nombre, rol });
-        localStorage.setItem('void_hunter_db', JSON.stringify(db));
-        alert("¡Hunter Registrado!"); toggleAuth();
+
+        // Registro en Firebase
+        await window.fStore.setDoc(window.fStore.doc(window.db, "usuarios", user), {
+            user, pass, nombre, rol
+        });
+        alert("¡Hunter Registrado en la Nube!"); 
+        toggleAuth();
     }
 }
 
@@ -60,35 +69,53 @@ function seleccionarSemana(s) {
     actualizarLista();
 }
 
-// CRUD
-function guardarArchivo() {
+// SUBIDA DE ARCHIVOS A CLOUD STORAGE
+async function guardarArchivo() {
     const title = document.getElementById('file-title').value.trim();
     const input = document.getElementById('file-input');
     const file = input.files[0];
 
     if (!title || !file) return alert("ERROR: SELECT_DATA_ERROR");
 
-    const reader = new FileReader();
-    reader.onload = function() {
-        const files = JSON.parse(localStorage.getItem('void_files_db')) || [];
-        files.push({
-            id: Date.now(), unidad: activeUnit, semana: activeWeek,
-            titulo: title, nombreArc: file.name, data: reader.result
+    try {
+        const storageRef = window.fStore.ref(window.storage, `tareas/${Date.now()}_${file.name}`);
+        const snapshot = await window.fStore.uploadBytes(storageRef, file);
+        const downloadURL = await window.fStore.getDownloadURL(snapshot.ref);
+
+        await window.fStore.addDoc(window.fStore.collection(window.db, "archivos"), {
+            unidad: activeUnit,
+            semana: activeWeek,
+            titulo: title,
+            nombreArc: file.name,
+            url: downloadURL,
+            storagePath: storageRef.fullPath
         });
-        localStorage.setItem('void_files_db', JSON.stringify(files));
-        actualizarLista(); actualizarContadores();
-        document.getElementById('file-title').value = ""; input.value = "";
-    };
-    reader.readAsDataURL(file);
+
+        actualizarLista(); 
+        actualizarContadores();
+        document.getElementById('file-title').value = ""; 
+        input.value = "";
+        alert("DATA UPLOADED TO CLOUD");
+    } catch (e) {
+        alert("CRITICAL UPLOAD ERROR");
+        console.error(e);
+    }
 }
 
-function actualizarLista() {
-    const files = JSON.parse(localStorage.getItem('void_files_db')) || [];
-    const filtrados = files.filter(f => f.unidad == activeUnit && f.semana == activeWeek);
+async function actualizarLista() {
+    const q = window.fStore.query(
+        window.fStore.collection(window.db, "archivos"), 
+        window.fStore.where("unidad", "==", activeUnit),
+        window.fStore.where("semana", "==", activeWeek)
+    );
+
+    const querySnapshot = await window.fStore.getDocs(q);
     const body = document.getElementById('unit-files-body');
     body.innerHTML = "";
 
-    filtrados.forEach(f => {
+    querySnapshot.forEach((doc) => {
+        const f = doc.data();
+        const id = doc.id;
         body.innerHTML += `
             <tr class="animate-fade">
                 <td>
@@ -96,35 +123,31 @@ function actualizarLista() {
                     <small class="opacity-50 text-white-50">${f.nombreArc}</small>
                 </td>
                 <td class="text-end">
-                    <button onclick="descargar(${f.id})" class="btn btn-sm btn-outline-info"><i class="fa fa-download"></i></button>
+                    <a href="${f.url}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa fa-download"></i></a>
                     ${currentUser.rol === 'ADMIN' ? `
-                        <button onclick="eliminar(${f.id})" class="btn btn-sm btn-outline-danger ms-1"><i class="fa fa-trash"></i></button>
+                        <button onclick="eliminar('${id}', '${f.storagePath}')" class="btn btn-sm btn-outline-danger ms-1"><i class="fa fa-trash"></i></button>
                     ` : ""}
                 </td>
             </tr>`;
     });
 }
 
-function descargar(id) {
-    const files = JSON.parse(localStorage.getItem('void_files_db'));
-    const f = files.find(x => x.id === id);
-    const a = document.createElement('a');
-    a.href = f.data; a.download = f.nombreArc;
-    a.click();
-}
-
-function eliminar(id) {
+async function eliminar(id, path) {
     if(!confirm("CONFIRM_ERASE_COMMAND?")) return;
-    let files = JSON.parse(localStorage.getItem('void_files_db'));
-    files = files.filter(x => x.id !== id);
-    localStorage.setItem('void_files_db', JSON.stringify(files));
+    await window.fStore.deleteDoc(window.fStore.doc(window.db, "archivos", id));
+    const desertRef = window.fStore.ref(window.storage, path);
+    await window.fStore.deleteObject(desertRef);
     actualizarLista(); actualizarContadores();
 }
 
-function actualizarContadores() {
-    const files = JSON.parse(localStorage.getItem('void_files_db')) || [];
+async function actualizarContadores() {
+    const q = window.fStore.collection(window.db, "archivos");
+    const querySnapshot = await window.fStore.getDocs(q);
+    const allFiles = [];
+    querySnapshot.forEach(doc => allFiles.push(doc.data()));
+
     for(let i=1; i<=4; i++) {
-        const total = files.filter(x => x.unidad == i).length;
+        const total = allFiles.filter(x => x.unidad == i).length;
         document.getElementById('cnt-' + i).innerText = "STATUS: " + total + " RECORDS";
     }
 }
