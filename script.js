@@ -1,156 +1,220 @@
-let isLogin = true;
+// ─────────────────────────────────────────────
+//  MOORI_OS — script.js
+//  Almacenamiento: localStorage
+//  Para compartir entre dispositivos debes subir
+//  los 3 archivos a un hosting (GitHub Pages,
+//  Netlify, Vercel, etc.)
+// ─────────────────────────────────────────────
+
+const USERS_KEY = 'moorios_users';
+const FILES_KEY  = 'moorios_files';
+
 let currentUser = null;
-let activeUnit = null;
-let activeWeek = null;
+let activeUnit  = null;
+let activeWeek  = null;
 
-// GESTIÓN DE ACCESO
-function toggleAuth() {
-    isLogin = !isLogin;
-    document.getElementById('reg-fields').classList.toggle('d-none');
-    document.getElementById('auth-title').innerText = isLogin ? "SYSTEM_INIT" : "NEW_HUNTER";
-    document.getElementById('main-btn').innerText = isLogin ? "INITIATE GATE SEQUENCE" : "REGISTER_SYSTEM";
+// ── HELPERS ──────────────────────────────────
+
+function loadUsers() {
+  return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+}
+function saveUsers(list) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(list));
+}
+function loadFiles() {
+  return JSON.parse(localStorage.getItem(FILES_KEY)) || [];
+}
+function saveFiles(list) {
+  localStorage.setItem(FILES_KEY, JSON.stringify(list));
 }
 
-async function ejecutarAccion() {
-    const user = document.getElementById('user').value.trim();
-    const pass = document.getElementById('pass').value.trim();
+// ── AUTH ──────────────────────────────────────
 
-    if (!user || !pass) return alert("CRITICAL ERROR: ACCESS DENIED");
-
-    if (isLogin) {
-        // Login desde Firebase
-        const docRef = window.fStore.doc(window.db, "usuarios", user);
-        const docSnap = await window.fStore.getDoc(docRef);
-
-        if (docSnap.exists() && docSnap.data().pass === pass) {
-            loginExitoso(docSnap.data());
-        } else {
-            alert("DENIED: INVALID GATE PASS");
-        }
-    } else {
-        const nombre = document.getElementById('full-name').value.trim();
-        const rol = document.getElementById('reg-role').value;
-        if (!nombre) return alert("IDENTITY REQUIRED");
-
-        // Registro en Firebase
-        await window.fStore.setDoc(window.fStore.doc(window.db, "usuarios", user), {
-            user, pass, nombre, rol
-        });
-        alert("¡Hunter Registrado en la Nube!"); 
-        toggleAuth();
-    }
+function switchTab(tab) {
+  document.getElementById('auth-error').textContent = '';
+  if (tab === 'login') {
+    document.getElementById('login-form').style.display = '';
+    document.getElementById('reg-form').style.display   = 'none';
+    document.getElementById('tab-login').classList.add('active');
+    document.getElementById('tab-reg').classList.remove('active');
+  } else {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('reg-form').style.display   = '';
+    document.getElementById('tab-login').classList.remove('active');
+    document.getElementById('tab-reg').classList.add('active');
+  }
 }
 
-function loginExitoso(u) {
-    currentUser = u;
-    document.getElementById('auth-section').classList.add('d-none');
-    document.getElementById('portfolio-section').classList.remove('d-none');
-    document.getElementById('nav-username').innerText = "ID: " + u.nombre.toUpperCase();
-    actualizarContadores();
+function showError(msg) {
+  document.getElementById('auth-error').textContent = msg;
 }
 
-// GESTIÓN DE PORTAFOLIO
-function abrirUnidad(u) {
-    activeUnit = u; activeWeek = null;
-    document.getElementById('modal-unit-title').innerText = "ARCHIVE: UNIT_0" + u;
-    document.getElementById('unit-modal').classList.remove('d-none');
-    document.getElementById('week-content').classList.add('d-none');
-    document.getElementById('select-prompt').classList.remove('d-none');
-    document.querySelectorAll('.btn-week').forEach(b => b.classList.remove('active'));
+function doLogin() {
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value.trim();
+  if (!user || !pass) return showError('Completa todos los campos.');
+  const users = loadUsers();
+  const found  = users.find(u => u.user === user && u.pass === pass);
+  if (!found) return showError('Usuario o contraseña incorrectos.');
+  loginSuccess(found);
 }
 
-function seleccionarSemana(s) {
-    activeWeek = s;
-    document.getElementById('week-content').classList.remove('d-none');
-    document.getElementById('select-prompt').classList.add('d-none');
-    document.querySelectorAll('.btn-week').forEach((b, i) => b.classList.toggle('active', (i+1) === s));
-
-    if (currentUser.rol === "ADMIN") document.getElementById('admin-zone').classList.remove('d-none');
-    actualizarLista();
+function doRegister() {
+  const user = document.getElementById('r-user').value.trim();
+  const pass = document.getElementById('r-pass').value.trim();
+  const name = document.getElementById('r-name').value.trim();
+  const role = document.getElementById('r-role').value;
+  if (!user || !pass || !name) return showError('Completa todos los campos.');
+  const users = loadUsers();
+  if (users.find(u => u.user === user)) return showError('Ese usuario ya existe.');
+  users.push({ user, pass, name, role });
+  saveUsers(users);
+  showError('¡Cuenta creada! Ahora inicia sesión.');
+  switchTab('login');
+  document.getElementById('l-user').value = user;
 }
 
-// SUBIDA DE ARCHIVOS A CLOUD STORAGE
-async function guardarArchivo() {
-    const title = document.getElementById('file-title').value.trim();
-    const input = document.getElementById('file-input');
-    const file = input.files[0];
-
-    if (!title || !file) return alert("ERROR: SELECT_DATA_ERROR");
-
-    try {
-        const storageRef = window.fStore.ref(window.storage, `tareas/${Date.now()}_${file.name}`);
-        const snapshot = await window.fStore.uploadBytes(storageRef, file);
-        const downloadURL = await window.fStore.getDownloadURL(snapshot.ref);
-
-        await window.fStore.addDoc(window.fStore.collection(window.db, "archivos"), {
-            unidad: activeUnit,
-            semana: activeWeek,
-            titulo: title,
-            nombreArc: file.name,
-            url: downloadURL,
-            storagePath: storageRef.fullPath
-        });
-
-        actualizarLista(); 
-        actualizarContadores();
-        document.getElementById('file-title').value = ""; 
-        input.value = "";
-        alert("DATA UPLOADED TO CLOUD");
-    } catch (e) {
-        alert("CRITICAL UPLOAD ERROR");
-        console.error(e);
-    }
+function loginSuccess(u) {
+  currentUser = u;
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('main-screen').classList.add('active');
+  document.getElementById('nav-user').textContent = u.name.toUpperCase();
+  const roleEl = document.getElementById('nav-role');
+  roleEl.textContent = u.role === 'ADMIN' ? 'ADMIN' : 'VIEWER';
+  roleEl.className   = 'role-tag ' + (u.role === 'ADMIN' ? 'admin' : 'viewer');
+  updateCounters();
 }
 
-async function actualizarLista() {
-    const q = window.fStore.query(
-        window.fStore.collection(window.db, "archivos"), 
-        window.fStore.where("unidad", "==", activeUnit),
-        window.fStore.where("semana", "==", activeWeek)
-    );
+function doLogout() {
+  currentUser = null;
+  document.getElementById('main-screen').classList.remove('active');
+  document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+}
 
-    const querySnapshot = await window.fStore.getDocs(q);
-    const body = document.getElementById('unit-files-body');
-    body.innerHTML = "";
+// ── CONTADORES ────────────────────────────────
 
-    querySnapshot.forEach((doc) => {
-        const f = doc.data();
-        const id = doc.id;
-        body.innerHTML += `
-            <tr class="animate-fade">
-                <td>
-                    <div class="text-purpura fw-bold">${f.titulo}</div>
-                    <small class="opacity-50 text-white-50">${f.nombreArc}</small>
-                </td>
-                <td class="text-end">
-                    <a href="${f.url}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa fa-download"></i></a>
-                    ${currentUser.rol === 'ADMIN' ? `
-                        <button onclick="eliminar('${id}', '${f.storagePath}')" class="btn btn-sm btn-outline-danger ms-1"><i class="fa fa-trash"></i></button>
-                    ` : ""}
-                </td>
-            </tr>`;
+function updateCounters() {
+  const files = loadFiles();
+  for (let i = 1; i <= 4; i++) {
+    const count = files.filter(f => f.unit == i).length;
+    document.getElementById('c' + i).textContent = count;
+  }
+}
+
+// ── MODAL ─────────────────────────────────────
+
+const unitNames = ['', 'Análisis de Datos', 'Diseño Relacional', 'Sentencias SQL', 'Protocolos de Seguridad'];
+
+function openUnit(u) {
+  activeUnit = u;
+  activeWeek = null;
+  document.getElementById('modal-title').textContent = 'Unidad 0' + u + ' — ' + unitNames[u];
+  document.getElementById('modal-sub').textContent   = 'Selecciona una semana para ver los archivos';
+  document.querySelectorAll('.btn-week').forEach(b => b.classList.remove('active'));
+  document.getElementById('modal-body').innerHTML    = '<div class="choose-week"><p>← Selecciona una semana para continuar</p></div>';
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function selectWeek(w) {
+  activeWeek = w;
+  document.querySelectorAll('.btn-week').forEach((b, i) => b.classList.toggle('active', i + 1 === w));
+  document.getElementById('modal-sub').textContent = 'Semana ' + w;
+  renderFiles();
+}
+
+// ── RENDER ────────────────────────────────────
+
+function renderFiles() {
+  const body     = document.getElementById('modal-body');
+  const files    = loadFiles();
+  const filtered = files.filter(f => f.unit == activeUnit && f.week == activeWeek);
+
+  let html = '';
+
+  if (currentUser.role === 'ADMIN') {
+    html += `
+      <div class="upload-zone">
+        <span class="upload-label">Subir nuevo archivo</span>
+        <div class="row1">
+          <input type="text" id="f-title" placeholder="Título del trabajo académico">
+        </div>
+        <div class="row2">
+          <input type="file" id="f-file">
+          <button class="btn-upload" onclick="uploadFile()">Subir</button>
+        </div>
+      </div>`;
+  }
+
+  if (filtered.length === 0) {
+    html += `<div class="empty-state"><p>Sin archivos en esta semana.</p></div>`;
+  } else {
+    html += '<div class="file-list">';
+    filtered.forEach(f => {
+      html += `
+        <div class="file-item">
+          <div class="file-info">
+            <div class="file-name">${f.title}</div>
+            <div class="file-meta">${f.filename}</div>
+          </div>
+          <div class="file-actions">
+            <button class="btn-dl" onclick="downloadFile(${f.id})">↓ Descargar</button>
+            ${currentUser.role === 'ADMIN' ? `<button class="btn-del" onclick="deleteFile(${f.id})">✕</button>` : ''}
+          </div>
+        </div>`;
     });
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
 }
 
-async function eliminar(id, path) {
-    if(!confirm("CONFIRM_ERASE_COMMAND?")) return;
-    await window.fStore.deleteDoc(window.fStore.doc(window.db, "archivos", id));
-    const desertRef = window.fStore.ref(window.storage, path);
-    await window.fStore.deleteObject(desertRef);
-    actualizarLista(); actualizarContadores();
+// ── CRUD ──────────────────────────────────────
+
+function uploadFile() {
+  const title     = document.getElementById('f-title').value.trim();
+  const fileInput = document.getElementById('f-file');
+  const file      = fileInput.files[0];
+  if (!title || !file) return alert('Completa el título y selecciona un archivo.');
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    const files = loadFiles();
+    files.push({
+      id: Date.now(),
+      unit: activeUnit,
+      week: activeWeek,
+      title,
+      filename: file.name,
+      data: reader.result
+    });
+    saveFiles(files);
+    updateCounters();
+    renderFiles();
+  };
+  reader.readAsDataURL(file);
 }
 
-async function actualizarContadores() {
-    const q = window.fStore.collection(window.db, "archivos");
-    const querySnapshot = await window.fStore.getDocs(q);
-    const allFiles = [];
-    querySnapshot.forEach(doc => allFiles.push(doc.data()));
-
-    for(let i=1; i<=4; i++) {
-        const total = allFiles.filter(x => x.unidad == i).length;
-        document.getElementById('cnt-' + i).innerText = "STATUS: " + total + " RECORDS";
-    }
+function downloadFile(id) {
+  const files = loadFiles();
+  const f = files.find(x => x.id === id);
+  if (!f) return;
+  const a = document.createElement('a');
+  a.href     = f.data;
+  a.download = f.filename;
+  a.click();
 }
 
-function cerrarUnidad() { document.getElementById('unit-modal').classList.add('d-none'); }
-function logout() { location.reload(); }
+function deleteFile(id) {
+  if (!confirm('¿Eliminar este archivo?')) return;
+  let files = loadFiles();
+  files = files.filter(x => x.id !== id);
+  saveFiles(files);
+  updateCounters();
+  renderFiles();
+}
