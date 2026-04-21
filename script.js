@@ -17,12 +17,13 @@
 // ═══════════════════════════════════════════════════════════
  
 const FIREBASE_CONFIG = {
-  apiKey:            "TU_API_KEY",
-  authDomain:        "TU_PROYECTO.firebaseapp.com",
-  projectId:         "TU_PROYECTO_ID",
-  storageBucket:     "TU_PROYECTO.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId:             "TU_APP_ID"
+  apiKey: "AIzaSyDI5_UhyiFhz7FgELyg49YjvmltPcUfrvk",
+    authDomain: "josejose-49388.firebaseapp.com",
+    projectId: "josejose-49388",
+    storageBucket: "josejose-49388.firebasestorage.app",
+    messagingSenderId: "297650955910",
+    appId: "1:297650955910:web:1867650fe8c3dc492bd307",
+    measurementId: "G-VPF171PYP5"
 };
  
 // ── Carga Firebase desde CDN ──────────────────────────────
