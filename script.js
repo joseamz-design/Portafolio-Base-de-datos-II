@@ -52,7 +52,7 @@ let activeUnit  = null;
 let activeWeek  = null;
 let fbReady     = false;
  
-const unitNames = ['','Análisis de Datos','Diseño Relacional','Sentencias SQL','Protocolos de Seguridad'];
+const unitNames = ['','Unidad I','Unidad II','Unidad III','Unidad IV'];
  
 // ════════════════════════════════════════════════════════════
 //  MASCOTA
