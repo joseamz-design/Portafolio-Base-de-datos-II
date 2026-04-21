@@ -6,113 +6,184 @@ Copiar
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOSE MOORI | MOORI_OS</title>
+  <title>JOSE MOORI | ACADEMIC OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
  
-<!-- AUTH -->
-<div id="auth-screen" class="screen active">
-  <div class="auth-wrap">
-    <div class="auth-logo">
-      <div class="logo-mark">
-        <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
-      </div>
-      <h1>MOORI_OS</h1>
-      <p>UPLA · PERÚ · ACADEMIC ARCHIVE</p>
+<!-- ═══════════════════════════════════════
+     MASCOTA GLOBAL
+════════════════════════════════════════ -->
+<div id="mascot-wrap" class="mascot-wrap hidden">
+  <div class="mascot-bubble" id="mascot-bubble"></div>
+  <svg id="mascot-svg" class="mascot-svg" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="60" cy="125" rx="28" ry="30" fill="#1c1c2e"/>
+    <path class="arm-l" d="M33 108 Q12 118 16 133" stroke="#f97316" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <path class="arm-r" d="M87 108 Q108 118 104 133" stroke="#f97316" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <circle cx="60" cy="72" r="34" fill="#f97316"/>
+    <circle class="eye" cx="50" cy="68" r="6" fill="#1c1c2e"/>
+    <circle class="eye" cx="70" cy="68" r="6" fill="#1c1c2e"/>
+    <circle cx="52" cy="66" r="2.2" fill="white"/>
+    <circle cx="72" cy="66" r="2.2" fill="white"/>
+    <path id="mascot-mouth" d="M50 82 Q60 93 70 82" stroke="#1c1c2e" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <rect x="32" y="43" width="56" height="10" rx="5" fill="#1c1c2e"/>
+    <rect x="43" y="20" width="34" height="27" rx="7" fill="#1c1c2e"/>
+    <circle cx="60" cy="20" r="5" fill="#f97316"/>
+    <rect x="48" y="44" width="24" height="4" rx="2" fill="#f97316" opacity="0.4"/>
+  </svg>
+</div>
+ 
+<!-- ═══════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo">JM</div>
+    <span class="nav-name">Jose Moori</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">UPLA · PERÚ</span>
+    <button id="btn-login-nav" class="btn-nav" onclick="abrirLogin()">Iniciar sesión</button>
+    <div id="user-pill" class="user-pill hidden">
+      <span id="pill-name"></span>
+      <span id="pill-role"></span>
+      <button onclick="doLogout()" class="pill-x">✕</button>
     </div>
-    <div class="auth-card">
-      <div class="tab-row">
-        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
-        <button class="tab-btn" id="tab-reg" onclick="switchTab('register')">Registrarse</button>
-      </div>
-      <div id="login-form">
-        <div class="field-group"><label>Usuario</label><input type="text" id="l-user" placeholder="tu_usuario"></div>
-        <div class="field-group"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••"></div>
-        <button class="btn-primary" onclick="doLogin()">Acceder al sistema</button>
-      </div>
-      <div id="reg-form" style="display:none;">
-        <div class="field-group"><label>Usuario</label><input type="text" id="r-user" placeholder="tu_usuario"></div>
-        <div class="field-group"><label>Contraseña</label><input type="password" id="r-pass" placeholder="••••••••"></div>
-        <div class="field-group"><label>Nombre completo</label><input type="text" id="r-name" placeholder="Jose Moori"></div>
-        <div class="field-group">
-          <label>Rol</label>
-          <select id="r-role">
-            <option value="VISUALIZADOR">Visualizador (invitado)</option>
-            <option value="ADMIN">Administrador</option>
-          </select>
-        </div>
-        <button class="btn-primary" onclick="doRegister()">Crear cuenta</button>
-      </div>
-      <p class="auth-error" id="auth-error"></p>
+  </div>
+</nav>
+ 
+<!-- ═══════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="side-nav">
+    <div class="sn-dot active"></div>
+    <div class="sn-dot"></div>
+    <div class="sn-dot"></div>
+    <div class="sn-dot"></div>
+    <div class="sn-dot"></div>
+    <div class="sn-dot"></div>
+  </div>
+  <div class="hero-text">
+    <div class="hero-eyebrow">PORTAFOLIO ACADÉMICO · SISTEMA DE ARCHIVOS</div>
+    <h1 class="hero-h1">
+      Hola, soy<br>
+      <em class="hero-name">Jose Moori</em>
+    </h1>
+    <p class="hero-desc">Gestión de tareas académicas<br>de la Universidad Peruana Los Andes.</p>
+    <div class="hero-chips">
+      <span class="chip orange">Análisis de Datos</span>
+      <span class="chip cyan">SQL</span>
+      <span class="chip green">Diseño Relacional</span>
+      <span class="chip purple">Seguridad</span>
     </div>
+  </div>
+  <div class="hero-3d">
+    <div class="float-obj fo-a">
+      <div class="fo-inner">🗄️</div>
+      <div class="fo-lbl">BASE DE DATOS</div>
+    </div>
+    <div class="float-obj fo-b">
+      <div class="fo-inner">📊</div>
+      <div class="fo-lbl">ANÁLISIS</div>
+    </div>
+    <div class="float-obj fo-c">
+      <div class="fo-inner">🔐</div>
+      <div class="fo-lbl">SEGURIDAD</div>
+    </div>
+  </div>
+  <div class="scroll-arrow">↓</div>
+</section>
+ 
+<!-- ═══════════════════════════════════════
+     UNIDADES
+════════════════════════════════════════ -->
+<section class="units-sec" id="units-sec">
+  <div class="sec-head">
+    <div class="sec-label">ARCHIVO ACADÉMICO</div>
+    <h2 class="sec-title">Unidades del curso</h2>
+  </div>
+  <div class="units-grid">
+    <div class="ucard" onclick="openUnit(1)">
+      <div class="ucard-line" style="--clr:#f97316"></div>
+      <div class="ucard-num">01</div>
+      <div class="ucard-title">Análisis de Datos</div>
+      <div class="ucard-stat" id="c1">Cargando…</div>
+      <div class="ucard-arrow">→</div>
+    </div>
+    <div class="ucard" onclick="openUnit(2)">
+      <div class="ucard-line" style="--clr:#06b6d4"></div>
+      <div class="ucard-num">02</div>
+      <div class="ucard-title">Diseño Relacional</div>
+      <div class="ucard-stat" id="c2">Cargando…</div>
+      <div class="ucard-arrow">→</div>
+    </div>
+    <div class="ucard" onclick="openUnit(3)">
+      <div class="ucard-line" style="--clr:#22c55e"></div>
+      <div class="ucard-num">03</div>
+      <div class="ucard-title">Sentencias SQL</div>
+      <div class="ucard-stat" id="c3">Cargando…</div>
+      <div class="ucard-arrow">→</div>
+    </div>
+    <div class="ucard" onclick="openUnit(4)">
+      <div class="ucard-line" style="--clr:#a855f7"></div>
+      <div class="ucard-num">04</div>
+      <div class="ucard-title">Protocolos de Seguridad</div>
+      <div class="ucard-stat" id="c4">Cargando…</div>
+      <div class="ucard-arrow">→</div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ═══════════════════════════════════════
+     OVERLAY LOGIN
+════════════════════════════════════════ -->
+<div class="overlay" id="ov-login">
+  <div class="mbox login-box">
+    <button class="mclose" onclick="cerrarLogin()">✕</button>
+    <div class="mtabs">
+      <button class="mtab active" id="t-login" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="mtab" id="t-reg" onclick="switchTab('reg')">Registrarse</button>
+    </div>
+    <div id="f-login">
+      <div class="mfield"><label>Usuario</label><input type="text" id="l-user" placeholder="tu_usuario" autocomplete="off"></div>
+      <div class="mfield"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+      <button class="btn-main" onclick="doLogin()">Acceder al sistema</button>
+    </div>
+    <div id="f-reg" style="display:none">
+      <div class="mfield"><label>Usuario</label><input type="text" id="r-user" placeholder="tu_usuario" autocomplete="off"></div>
+      <div class="mfield"><label>Contraseña</label><input type="password" id="r-pass" placeholder="••••••••"></div>
+      <div class="mfield"><label>Nombre completo</label><input type="text" id="r-name" placeholder="Jose Moori"></div>
+      <button class="btn-main" onclick="doRegister()">Registrarme</button>
+    </div>
+    <p class="merror" id="auth-err"></p>
   </div>
 </div>
  
-<!-- MAIN -->
-<div id="main-screen" class="screen">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-dot"></div>
-      <span class="topbar-logo">MOORI_OS</span>
-    </div>
-    <div class="topbar-right">
-      <span class="user-badge" id="nav-user">—</span>
-      <span class="role-tag" id="nav-role">—</span>
-      <button class="btn-logout" onclick="doLogout()">Salir</button>
-    </div>
-  </div>
- 
-  <div class="main-content">
-    <div class="page-header">
-      <h2>Archivo académico</h2>
-      <p>Selecciona una unidad para gestionar las tareas</p>
-    </div>
-    <div class="unit-grid">
-      <div class="unit-card" onclick="openUnit(1)">
-        <div class="unit-tag">Unidad 01</div>
-        <div class="unit-title">Análisis de Datos</div>
-        <div class="unit-count">Archivos: <span id="c1">—</span></div>
-      </div>
-      <div class="unit-card cyan" onclick="openUnit(2)">
-        <div class="unit-tag">Unidad 02</div>
-        <div class="unit-title">Diseño Relacional</div>
-        <div class="unit-count">Archivos: <span id="c2">—</span></div>
-      </div>
-      <div class="unit-card green" onclick="openUnit(3)">
-        <div class="unit-tag">Unidad 03</div>
-        <div class="unit-title">Sentencias SQL</div>
-        <div class="unit-count">Archivos: <span id="c3">—</span></div>
-      </div>
-      <div class="unit-card amber" onclick="openUnit(4)">
-        <div class="unit-tag">Unidad 04</div>
-        <div class="unit-title">Protocolos de Seguridad</div>
-        <div class="unit-count">Archivos: <span id="c4">—</span></div>
+<!-- ═══════════════════════════════════════
+     OVERLAY UNIDAD
+════════════════════════════════════════ -->
+<div class="overlay" id="ov-unit">
+  <div class="mbox unit-box">
+    <button class="mclose" onclick="cerrarUnidad()">✕</button>
+    <div class="umhead">
+      <div class="umhead-num" id="um-num">01</div>
+      <div>
+        <h3 id="um-title">Unidad</h3>
+        <p id="um-sub" class="um-sub">Semana —</p>
       </div>
     </div>
-  </div>
-</div>
- 
-<!-- MODAL -->
-<div class="modal-wrap" id="modal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title-wrap">
-        <h3 id="modal-title">Unidad</h3>
-        <p id="modal-sub">Selecciona una semana</p>
-      </div>
-      <button class="btn-close" onclick="closeModal()">✕</button>
+    <div class="week-row">
+      <button class="wbtn" onclick="selectWeek(1)">Semana 1</button>
+      <button class="wbtn" onclick="selectWeek(2)">Semana 2</button>
+      <button class="wbtn" onclick="selectWeek(3)">Semana 3</button>
+      <button class="wbtn" onclick="selectWeek(4)">Semana 4</button>
     </div>
-    <div class="week-bar">
-      <button class="btn-week" onclick="selectWeek(1)">Semana 1</button>
-      <button class="btn-week" onclick="selectWeek(2)">Semana 2</button>
-      <button class="btn-week" onclick="selectWeek(3)">Semana 3</button>
-      <button class="btn-week" onclick="selectWeek(4)">Semana 4</button>
-    </div>
-    <div class="modal-body" id="modal-body">
-      <div class="choose-week"><p>← Selecciona una semana para continuar</p></div>
+    <div id="unit-body" class="unit-body">
+      <div class="pick-hint">Selecciona una semana para ver los archivos</div>
     </div>
   </div>
 </div>
