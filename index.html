@@ -1,6 +1,3 @@
-Index · HTML
-Copiar
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,31 +10,127 @@ Copiar
 </head>
 <body>
  
-<!-- ═══════════════════════════════════════
-     MASCOTA GLOBAL
-════════════════════════════════════════ -->
+<!-- ═══════════════ MASCOTA ═══════════════ -->
 <div id="mascot-wrap" class="mascot-wrap hidden">
   <div class="mascot-bubble" id="mascot-bubble"></div>
-  <svg id="mascot-svg" class="mascot-svg" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="60" cy="125" rx="28" ry="30" fill="#1c1c2e"/>
-    <path class="arm-l" d="M33 108 Q12 118 16 133" stroke="#f97316" stroke-width="8" stroke-linecap="round" fill="none"/>
-    <path class="arm-r" d="M87 108 Q108 118 104 133" stroke="#f97316" stroke-width="8" stroke-linecap="round" fill="none"/>
-    <circle cx="60" cy="72" r="34" fill="#f97316"/>
-    <circle class="eye" cx="50" cy="68" r="6" fill="#1c1c2e"/>
-    <circle class="eye" cx="70" cy="68" r="6" fill="#1c1c2e"/>
-    <circle cx="52" cy="66" r="2.2" fill="white"/>
-    <circle cx="72" cy="66" r="2.2" fill="white"/>
-    <path id="mascot-mouth" d="M50 82 Q60 93 70 82" stroke="#1c1c2e" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-    <rect x="32" y="43" width="56" height="10" rx="5" fill="#1c1c2e"/>
-    <rect x="43" y="20" width="34" height="27" rx="7" fill="#1c1c2e"/>
-    <circle cx="60" cy="20" r="5" fill="#f97316"/>
-    <rect x="48" y="44" width="24" height="4" rx="2" fill="#f97316" opacity="0.4"/>
-  </svg>
+  <div class="mascot-body-wrap" id="mascot-body">
+ 
+    <!-- SOMBRA BAJO EL MUÑECO -->
+    <div class="mascot-shadow"></div>
+ 
+    <svg id="mascot-svg" class="mascot-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+ 
+      <!-- CUERPO -->
+      <ellipse cx="100" cy="220" rx="48" ry="44" fill="url(#bodyGrad)"/>
+      <!-- Detalle cuello -->
+      <rect x="82" y="178" width="36" height="16" rx="8" fill="#e05c00"/>
+ 
+      <!-- BRAZO IZQUIERDO -->
+      <g class="arm-l" style="transform-origin:58px 185px">
+        <path d="M58 185 Q22 200 18 228" stroke="url(#armGrad)" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <!-- Mano izq -->
+        <circle cx="17" cy="232" r="10" fill="#f97316"/>
+        <circle cx="10" cy="228" r="5" fill="#f97316"/>
+        <circle cx="17" cy="222" r="5" fill="#f97316"/>
+        <circle cx="24" cy="226" r="5" fill="#f97316"/>
+      </g>
+ 
+      <!-- BRAZO DERECHO -->
+      <g class="arm-r" style="transform-origin:142px 185px">
+        <path d="M142 185 Q178 200 182 228" stroke="url(#armGrad)" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <!-- Mano der -->
+        <circle cx="183" cy="232" r="10" fill="#f97316"/>
+        <circle cx="190" cy="228" r="5" fill="#f97316"/>
+        <circle cx="183" cy="222" r="5" fill="#f97316"/>
+        <circle cx="176" cy="226" r="5" fill="#f97316"/>
+      </g>
+ 
+      <!-- PIERNAS -->
+      <path d="M84 255 Q78 272 72 280" stroke="#e05c00" stroke-width="12" stroke-linecap="round" fill="none" class="leg-l"/>
+      <path d="M116 255 Q122 272 128 280" stroke="#e05c00" stroke-width="12" stroke-linecap="round" fill="none" class="leg-r"/>
+      <!-- Zapatos -->
+      <ellipse cx="68" cy="280" rx="14" ry="6" fill="#1a1a2e"/>
+      <ellipse cx="132" cy="280" rx="14" ry="6" fill="#1a1a2e"/>
+ 
+      <!-- CUELLO/HOMBROS -->
+      <path d="M56 185 Q100 200 144 185" stroke="#e05c00" stroke-width="6" fill="none" stroke-linecap="round"/>
+ 
+      <!-- CABEZA -->
+      <circle cx="100" cy="110" r="62" fill="url(#headGrad)"/>
+      <!-- Brillo cabeza -->
+      <ellipse cx="80" cy="84" rx="22" ry="14" fill="rgba(255,255,255,0.12)" transform="rotate(-20,80,84)"/>
+ 
+      <!-- OREJAS -->
+      <ellipse cx="39" cy="110" rx="12" ry="16" fill="#e05c00"/>
+      <ellipse cx="39" cy="110" rx="7" ry="10" fill="#ff9a5c"/>
+      <ellipse cx="161" cy="110" rx="12" ry="16" fill="#e05c00"/>
+      <ellipse cx="161" cy="110" rx="7" ry="10" fill="#ff9a5c"/>
+ 
+      <!-- OJOS -->
+      <g class="eye-group-l">
+        <ellipse cx="80" cy="104" rx="14" ry="15" fill="white"/>
+        <ellipse cx="80" cy="106" rx="9" ry="10" fill="#1a1a2e"/>
+        <ellipse cx="80" cy="106" rx="6" ry="7" fill="#2d2d5e"/>
+        <circle  cx="83" cy="103" r="3" fill="white"/>
+        <!-- Ceja izq -->
+        <path d="M68 88 Q80 82 92 88" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" fill="none" class="eyebrow-l"/>
+      </g>
+      <g class="eye-group-r">
+        <ellipse cx="120" cy="104" rx="14" ry="15" fill="white"/>
+        <ellipse cx="120" cy="106" rx="9" ry="10" fill="#1a1a2e"/>
+        <ellipse cx="120" cy="106" rx="6" ry="7" fill="#2d2d5e"/>
+        <circle  cx="123" cy="103" r="3" fill="white"/>
+        <!-- Ceja der -->
+        <path d="M108 88 Q120 82 132 88" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" fill="none" class="eyebrow-r"/>
+      </g>
+ 
+      <!-- NARIZ -->
+      <ellipse cx="100" cy="120" rx="5" ry="3" fill="#e05c00" opacity="0.6"/>
+ 
+      <!-- BOCA -->
+      <path id="mascot-mouth" d="M82 133 Q100 148 118 133" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <!-- Dientes -->
+      <path d="M88 134 Q100 144 112 134 L112 140 Q100 150 88 140 Z" fill="white" opacity="0.85"/>
+ 
+      <!-- GORRO ACADÉMICO -->
+      <ellipse cx="100" cy="52" rx="40" ry="8" fill="#1a1a2e"/>
+      <path d="M60 52 L100 20 L140 52 Z" fill="#1a1a2e"/>
+      <rect x="62" y="48" width="76" height="10" rx="5" fill="#2a2a4e"/>
+      <!-- Borla del gorro -->
+      <line x1="140" y1="20" x2="155" y2="45" stroke="#f97316" stroke-width="3"/>
+      <circle cx="157" cy="48" r="6" fill="#f97316"/>
+      <!-- Cruz en gorro -->
+      <text x="86" y="46" font-family="monospace" font-size="14" fill="#f97316" font-weight="bold">DB</text>
+ 
+      <!-- DEGRADADOS -->
+      <defs>
+        <radialGradient id="headGrad" cx="40%" cy="35%">
+          <stop offset="0%"   stop-color="#ff9a4c"/>
+          <stop offset="100%" stop-color="#e55a00"/>
+        </radialGradient>
+        <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stop-color="#2a2a4e"/>
+          <stop offset="100%" stop-color="#1a1a2e"/>
+        </linearGradient>
+        <linearGradient id="armGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#f97316"/>
+          <stop offset="100%" stop-color="#e05c00"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
 </div>
  
-<!-- ═══════════════════════════════════════
-     NAVBAR
-════════════════════════════════════════ -->
+<!-- OVERLAY BYE -->
+<div id="bye-overlay" class="bye-overlay hidden">
+  <div class="bye-content">
+    <div class="bye-text" id="bye-text">BYE BYE 👋</div>
+    <div class="bye-sub">¡Hasta la próxima, señorón!</div>
+  </div>
+  <div class="bye-mascot-zone" id="bye-mascot-zone"></div>
+</div>
+ 
+<!-- ═══════════════ NAVBAR ═══════════════ -->
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="nav-logo">JM</div>
@@ -47,18 +140,22 @@ Copiar
     <span class="nav-tag">UPLA · PERÚ</span>
     <button id="btn-login-nav" class="btn-nav" onclick="abrirLogin()">Iniciar sesión</button>
     <div id="user-pill" class="user-pill hidden">
-      <span id="pill-name"></span>
-      <span id="pill-role"></span>
-      <button onclick="doLogout()" class="pill-x">✕</button>
+      <div class="pill-avatar" id="pill-avatar">JM</div>
+      <div class="pill-info">
+        <span id="pill-name"></span>
+        <span id="pill-role"></span>
+      </div>
+      <button onclick="doLogout()" class="pill-x" title="Cerrar sesión">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
     </div>
   </div>
 </nav>
  
-<!-- ═══════════════════════════════════════
-     HERO
-════════════════════════════════════════ -->
+<!-- ═══════════════ HERO ═══════════════ -->
 <section class="hero">
   <div class="hero-glow"></div>
+  <div class="hero-grid-bg"></div>
   <div class="side-nav">
     <div class="sn-dot active"></div>
     <div class="sn-dot"></div>
@@ -68,7 +165,10 @@ Copiar
     <div class="sn-dot"></div>
   </div>
   <div class="hero-text">
-    <div class="hero-eyebrow">PORTAFOLIO ACADÉMICO · SISTEMA DE ARCHIVOS</div>
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      PORTAFOLIO ACADÉMICO · SISTEMA DE ARCHIVOS
+    </div>
     <h1 class="hero-h1">
       Hola, soy<br>
       <em class="hero-name">Jose Moori</em>
@@ -98,74 +198,143 @@ Copiar
   <div class="scroll-arrow">↓</div>
 </section>
  
-<!-- ═══════════════════════════════════════
-     UNIDADES
-════════════════════════════════════════ -->
+<!-- ═══════════════ UNIDADES ═══════════════ -->
 <section class="units-sec" id="units-sec">
   <div class="sec-head">
     <div class="sec-label">ARCHIVO ACADÉMICO</div>
     <h2 class="sec-title">Unidades del curso</h2>
+    <p class="sec-desc">Haz clic en una unidad para ver o descargar los archivos</p>
   </div>
   <div class="units-grid">
     <div class="ucard" onclick="openUnit(1)">
       <div class="ucard-line" style="--clr:#f97316"></div>
+      <div class="ucard-glow" style="--clr:rgba(249,115,22,0.15)"></div>
       <div class="ucard-num">01</div>
       <div class="ucard-title">Análisis de Datos</div>
-      <div class="ucard-stat" id="c1">Cargando…</div>
+      <div class="ucard-stat" id="c1">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
     <div class="ucard" onclick="openUnit(2)">
       <div class="ucard-line" style="--clr:#06b6d4"></div>
+      <div class="ucard-glow" style="--clr:rgba(6,182,212,0.15)"></div>
       <div class="ucard-num">02</div>
       <div class="ucard-title">Diseño Relacional</div>
-      <div class="ucard-stat" id="c2">Cargando…</div>
+      <div class="ucard-stat" id="c2">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
     <div class="ucard" onclick="openUnit(3)">
       <div class="ucard-line" style="--clr:#22c55e"></div>
+      <div class="ucard-glow" style="--clr:rgba(34,197,94,0.15)"></div>
       <div class="ucard-num">03</div>
       <div class="ucard-title">Sentencias SQL</div>
-      <div class="ucard-stat" id="c3">Cargando…</div>
+      <div class="ucard-stat" id="c3">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
     <div class="ucard" onclick="openUnit(4)">
       <div class="ucard-line" style="--clr:#a855f7"></div>
+      <div class="ucard-glow" style="--clr:rgba(168,85,247,0.15)"></div>
       <div class="ucard-num">04</div>
       <div class="ucard-title">Protocolos de Seguridad</div>
-      <div class="ucard-stat" id="c4">Cargando…</div>
+      <div class="ucard-stat" id="c4">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
   </div>
 </section>
  
-<!-- ═══════════════════════════════════════
-     OVERLAY LOGIN
-════════════════════════════════════════ -->
+<!-- ═══════════════ OVERLAY LOGIN ═══════════════ -->
 <div class="overlay" id="ov-login">
   <div class="mbox login-box">
+ 
+    <!-- Decoración superior -->
+    <div class="login-deco">
+      <div class="login-logo">JM</div>
+      <div class="login-logo-text">
+        <span>ACADEMIC OS</span>
+        <small>Jose Moori · UPLA</small>
+      </div>
+    </div>
+ 
     <button class="mclose" onclick="cerrarLogin()">✕</button>
+ 
     <div class="mtabs">
-      <button class="mtab active" id="t-login" onclick="switchTab('login')">Iniciar sesión</button>
-      <button class="mtab" id="t-reg" onclick="switchTab('reg')">Registrarse</button>
+      <button class="mtab active" id="t-login" onclick="switchTab('login')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        Iniciar sesión
+      </button>
+      <button class="mtab" id="t-reg" onclick="switchTab('reg')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6"/></svg>
+        Registrarse
+      </button>
     </div>
+ 
+    <!-- FORM LOGIN -->
     <div id="f-login">
-      <div class="mfield"><label>Usuario</label><input type="text" id="l-user" placeholder="tu_usuario" autocomplete="off"></div>
-      <div class="mfield"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••"></div>
-      <button class="btn-main" onclick="doLogin()">Acceder al sistema</button>
+      <div class="mfield">
+        <label>Usuario</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <input type="text" id="l-user" placeholder="tu_usuario" autocomplete="off">
+        </div>
+      </div>
+      <div class="mfield">
+        <label>Contraseña</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <input type="password" id="l-pass" placeholder="••••••••">
+          <button class="eye-btn" onclick="togglePass('l-pass',this)" type="button" tabindex="-1">
+            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-main" onclick="doLogin()">
+        <span>Acceder al sistema</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
     </div>
+ 
+    <!-- FORM REGISTRO -->
     <div id="f-reg" style="display:none">
-      <div class="mfield"><label>Usuario</label><input type="text" id="r-user" placeholder="tu_usuario" autocomplete="off"></div>
-      <div class="mfield"><label>Contraseña</label><input type="password" id="r-pass" placeholder="••••••••"></div>
-      <div class="mfield"><label>Nombre completo</label><input type="text" id="r-name" placeholder="Jose Moori"></div>
-      <button class="btn-main" onclick="doRegister()">Registrarme</button>
+      <div class="mfield">
+        <label>Usuario</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <input type="text" id="r-user" placeholder="tu_usuario" autocomplete="off">
+        </div>
+      </div>
+      <div class="mfield">
+        <label>Contraseña</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <input type="password" id="r-pass" placeholder="••••••••">
+          <button class="eye-btn" onclick="togglePass('r-pass',this)" type="button" tabindex="-1">
+            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="mfield">
+        <label>Nombre completo</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="r-name" placeholder="Jose Moori">
+        </div>
+      </div>
+      <div class="reg-admin-notice">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Tu cuenta se creará con permisos de <strong>ADMIN</strong>
+      </div>
+      <button class="btn-main" onclick="doRegister()">
+        <span>Crear mi cuenta</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6"/></svg>
+      </button>
     </div>
+ 
     <p class="merror" id="auth-err"></p>
   </div>
 </div>
  
-<!-- ═══════════════════════════════════════
-     OVERLAY UNIDAD
-════════════════════════════════════════ -->
+<!-- ═══════════════ OVERLAY UNIDAD ═══════════════ -->
 <div class="overlay" id="ov-unit">
   <div class="mbox unit-box">
     <button class="mclose" onclick="cerrarUnidad()">✕</button>
@@ -190,4 +359,5 @@ Copiar
  
 <script src="script.js"></script>
 </body>
+</html>
 </html>
