@@ -1,73 +1,100 @@
 // ═══════════════════════════════════════════════════════════
-//  MOORI_OS — script.js
-//  Firebase Firestore: almacenamiento real en la nube
-//  ─────────────────────────────────────────────────────────
-//  SETUP: ve a https://console.firebase.google.com
-//  1. Crea un proyecto
-//  2. Agrega una app web  →  copia tu firebaseConfig
-//  3. Ve a Firestore Database → Crear base de datos
-//  4. En Reglas pon:
-//     rules_version = '2';
-//     service cloud.firestore {
-//       match /databases/{database}/documents {
-//         match /{document=**} { allow read, write: if true; }
-//       }
-//     }
-//  5. Reemplaza el objeto FIREBASE_CONFIG de abajo
+//  MOORI_OS — script.js  v3
+//  ─────────────────────────────────────────────
+//  CAMBIOS:
+//  ✅ Navbar limpia al iniciar (sin nombre hasta login)
+//  ✅ Registro = ADMIN directo
+//  ✅ Botón subir archivo arreglado (validación de rol correcta)
+//  ✅ Ojito para mostrar/ocultar contraseña
+//  ✅ BYE overlay con mascota grande
+//  ✅ Sin sesión → solo ver y descargar archivos
 // ═══════════════════════════════════════════════════════════
  
+/* ══════════ FIREBASE CONFIG ══════════ */
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDI5_UhyiFhz7FgELyg49YjvmltPcUfrvk",
-    authDomain: "josejose-49388.firebaseapp.com",
-    projectId: "josejose-49388",
-    storageBucket: "josejose-49388.firebasestorage.app",
-    messagingSenderId: "297650955910",
-    appId: "1:297650955910:web:1867650fe8c3dc492bd307",
-    measurementId: "G-VPF171PYP5"
+  apiKey:            "AIzaSyDI5_UhyiFhz7FgELyg49YjvmltPcUfrvk",
+  authDomain:        "josejose-49388.firebaseapp.com",
+  projectId:         "josejose-49388",
+  storageBucket:     "josejose-49388.firebasestorage.app",
+  messagingSenderId: "297650955910",
+  appId:             "1:297650955910:web:1867650fe8c3dc492bd307",
+  measurementId:     "G-VPF171PYP5"
 };
  
-// ── Carga Firebase desde CDN ──────────────────────────────
-const fbScript  = document.createElement('script');
-fbScript.type   = 'module';
-fbScript.textContent = `
-  import { initializeApp }                          from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getFirestore, collection, getDocs,
-           addDoc, deleteDoc, doc, query,
-           where, getDoc }                          from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
- 
+/* ══════════ CARGAR FIREBASE ══════════ */
+const _s = document.createElement('script');
+_s.type = 'module';
+_s.textContent = `
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getFirestore, collection, getDocs, addDoc,
+           deleteDoc, doc, query, where }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
   const app = initializeApp(${JSON.stringify(FIREBASE_CONFIG)});
   const db  = getFirestore(app);
- 
-  // Exponer al scope global para que el código de abajo lo use
-  window._fb = { collection, getDocs, addDoc, deleteDoc, doc, query, where, db, getDoc };
+  window._fb = { db, collection, getDocs, addDoc, deleteDoc, doc, query, where };
   window.dispatchEvent(new Event('firebase-ready'));
 `;
-document.head.appendChild(fbScript);
+document.head.appendChild(_s);
  
-// ════════════════════════════════════════════════════════════
-//  ESTADO GLOBAL
-// ════════════════════════════════════════════════════════════
-let currentUser = null;
+/* ══════════ ESTADO GLOBAL ══════════ */
+let currentUser = null;   // null = no hay sesión
 let activeUnit  = null;
 let activeWeek  = null;
 let fbReady     = false;
  
-const unitNames = ['','Unidad I','Unidad II','Unidad III','Unidad IV'];
+const unitNames = [
+  '',
+  'Análisis de Datos',
+  'Diseño Relacional',
+  'Sentencias SQL',
+  'Protocolos de Seguridad'
+];
  
-// ════════════════════════════════════════════════════════════
-//  MASCOTA
-// ════════════════════════════════════════════════════════════
+/* ══════════ INIT ══════════ */
+// Asegurar que la navbar empieza limpia (sin nombre)
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('user-pill').classList.add('hidden');
+  document.getElementById('btn-login-nav').classList.remove('hidden');
+});
+ 
+window.addEventListener('firebase-ready', async () => {
+  fbReady = true;
+  await updateCounters();
+});
+ 
+/* ══════════ FIREBASE HELPERS ══════════ */
+async function fbGetAll(col, filters = []) {
+  if (!fbReady) throw new Error('Firebase no listo');
+  const { db, collection, getDocs, query, where } = window._fb;
+  let q = collection(db, col);
+  if (filters.length)
+    q = query(q, ...filters.map(([f, op, v]) => where(f, op, v)));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function fbAdd(col, data) {
+  if (!fbReady) throw new Error('Firebase no listo');
+  const { db, collection, addDoc } = window._fb;
+  const ref = await addDoc(collection(db, col), data);
+  return ref.id;
+}
+async function fbDelete(col, id) {
+  if (!fbReady) throw new Error('Firebase no listo');
+  const { db, doc, deleteDoc } = window._fb;
+  await deleteDoc(doc(db, col, id));
+}
+ 
+/* ══════════ MASCOTA ══════════ */
 const FRASES_BIENVENIDA = [
   "¡Volviste, señorón! 👑",
-  "Eso es responsabilidad, campéon 💪",
+  "Eso es responsabilidad, campeón 💪",
   "El que no falla, no para de crecer 🚀",
   "Tus tareas no se van a subir solas... ¡dale! 😄",
-  "Presencia en el sistema confirmada ✅",
+  "Presencia confirmada en el sistema ✅",
   "El estudiante ha regresado. El profe tiembla 😎",
   "La constancia hace al maestro, sigue así 🏆",
   "Eres de los que sí llegan, no de los que dicen que llegan 💯",
 ];
- 
 const FRASES_SUBIDA = [
   "¡Lo hiciste a tiempo, buen trabajo campeón! 🎉",
   "Tarea entregada. La responsabilidad te define 💼",
@@ -82,65 +109,73 @@ let mascotTimer = null;
 function mostrarMascota(frase) {
   const wrap   = document.getElementById('mascot-wrap');
   const bubble = document.getElementById('mascot-bubble');
- 
-  // Cancelar timer previo
   if (mascotTimer) { clearTimeout(mascotTimer); mascotTimer = null; }
- 
   bubble.textContent = frase;
   wrap.classList.remove('hidden');
-  // Pequeño delay para que el slide-in esté primero
   setTimeout(() => bubble.classList.add('show'), 80);
- 
   mascotTimer = setTimeout(() => {
     bubble.classList.remove('show');
-    setTimeout(() => wrap.classList.add('hidden'), 350);
-  }, 4500);
+    setTimeout(() => wrap.classList.add('hidden'), 400);
+  }, 4800);
 }
  
-function fraseAleatoria(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function ocultarMascota() {
+  const wrap   = document.getElementById('mascot-wrap');
+  const bubble = document.getElementById('mascot-bubble');
+  bubble.classList.remove('show');
+  wrap.classList.add('hidden');
+  if (mascotTimer) { clearTimeout(mascotTimer); mascotTimer = null; }
 }
  
-// ════════════════════════════════════════════════════════════
-//  FIREBASE HELPERS
-// ════════════════════════════════════════════════════════════
-async function fbGetAll(colName, filters = []) {
-  if (!fbReady) throw new Error('Firebase no está listo');
-  const { db, collection, getDocs, query, where } = window._fb;
-  let q = collection(db, colName);
-  if (filters.length) {
-    q = query(q, ...filters.map(([field, op, val]) => where(field, op, val)));
+function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+ 
+/* ══════════ BYE OVERLAY ══════════ */
+function mostrarBye() {
+  ocultarMascota();
+ 
+  const overlay = document.getElementById('bye-overlay');
+  const zone    = document.getElementById('bye-mascot-zone');
+ 
+  // Clonar SVG de la mascota para el overlay
+  const originalSvg = document.getElementById('mascot-svg');
+  const cloned = originalSvg.cloneNode(true);
+  cloned.style.width  = '260px';
+  cloned.style.height = '364px';
+  cloned.style.filter = 'drop-shadow(0 0 40px rgba(249,115,22,0.6))';
+  zone.innerHTML = '';
+  zone.appendChild(cloned);
+ 
+  overlay.classList.remove('hidden');
+ 
+  // Cerrar después de 2.8s y limpiar navbar
+  setTimeout(() => {
+    overlay.classList.add('hidden');
+    // Limpiar navbar
+    document.getElementById('btn-login-nav').classList.remove('hidden');
+    document.getElementById('user-pill').classList.add('hidden');
+  }, 2800);
+}
+ 
+/* ══════════ OJITO (mostrar/ocultar contraseña) ══════════ */
+function togglePass(inputId, btn) {
+  const input    = document.getElementById(inputId);
+  const eyeOpen  = btn.querySelector('.eye-open');
+  const eyeClosed = btn.querySelector('.eye-closed');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eyeOpen.classList.add('hidden');
+    eyeClosed.classList.remove('hidden');
+  } else {
+    input.type = 'password';
+    eyeOpen.classList.remove('hidden');
+    eyeClosed.classList.add('hidden');
   }
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
  
-async function fbAdd(colName, data) {
-  if (!fbReady) throw new Error('Firebase no está listo');
-  const { db, collection, addDoc } = window._fb;
-  const ref = await addDoc(collection(db, colName), data);
-  return ref.id;
-}
- 
-async function fbDelete(colName, id) {
-  if (!fbReady) throw new Error('Firebase no está listo');
-  const { db, doc, deleteDoc } = window._fb;
-  await deleteDoc(doc(db, colName, id));
-}
- 
-// ════════════════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════════════════
-window.addEventListener('firebase-ready', async () => {
-  fbReady = true;
-  await updateCounters();
-});
- 
-// ════════════════════════════════════════════════════════════
-//  AUTH
-// ════════════════════════════════════════════════════════════
+/* ══════════ AUTH ══════════ */
 function abrirLogin() {
   document.getElementById('ov-login').classList.add('open');
+  document.getElementById('auth-err').textContent = '';
 }
 function cerrarLogin() {
   document.getElementById('ov-login').classList.remove('open');
@@ -180,11 +215,9 @@ async function doRegister() {
   try {
     const existing = await fbGetAll('users', [['user','==',user]]);
     if (existing.length) return showErr('Ese usuario ya existe.');
-    // Primer usuario = ADMIN, los demás = VIEWER
-    const allUsers = await fbGetAll('users');
-    const role = allUsers.length === 0 ? 'ADMIN' : 'VIEWER';
-    await fbAdd('users', { user, pass, name, role });
-    showErr('¡Cuenta creada! Inicia sesión.');
+    // ✅ SIEMPRE ADMIN al registrarse
+    await fbAdd('users', { user, pass, name, role: 'ADMIN' });
+    showErr('✅ ¡Cuenta ADMIN creada! Inicia sesión.');
     switchTab('login');
     document.getElementById('l-user').value = user;
   } catch(e) {
@@ -201,45 +234,48 @@ function loginSuccess(u) {
   document.getElementById('btn-login-nav').classList.add('hidden');
   const pill = document.getElementById('user-pill');
   pill.classList.remove('hidden');
-  document.getElementById('pill-name').textContent = u.name.toUpperCase();
+ 
+  // Iniciales para el avatar
+  const initials = u.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('pill-avatar').textContent = initials;
+  document.getElementById('pill-name').textContent   = u.name.toUpperCase();
+ 
   const roleEl = document.getElementById('pill-role');
   roleEl.textContent = u.role;
-  roleEl.style.cssText = u.role === 'ADMIN'
-    ? 'background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);border-radius:4px;padding:2px 7px;font-family:var(--mono);font-size:10px;font-weight:600;'
-    : 'background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);border-radius:4px;padding:2px 7px;font-family:var(--mono);font-size:10px;font-weight:600;';
+  if (u.role === 'ADMIN') {
+    roleEl.style.cssText = 'background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);';
+  } else {
+    roleEl.style.cssText = 'background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);';
+  }
+  roleEl.style.cssText += 'font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;';
  
-  // Mascota
-  mostrarMascota(fraseAleatoria(FRASES_BIENVENIDA));
+  mostrarMascota(rnd(FRASES_BIENVENIDA));
 }
  
 function doLogout() {
   currentUser = null;
-  document.getElementById('btn-login-nav').classList.remove('hidden');
-  document.getElementById('user-pill').classList.add('hidden');
+  mostrarBye();
+  // ─ La navbar se limpia dentro de mostrarBye() después de 2.8s ─
 }
  
-// ════════════════════════════════════════════════════════════
-//  CONTADORES
-// ════════════════════════════════════════════════════════════
+/* ══════════ CONTADORES ══════════ */
 async function updateCounters() {
   try {
     const files = await fbGetAll('files');
     for (let i = 1; i <= 4; i++) {
-      const count = files.filter(f => f.unit == i).length;
+      const n  = files.filter(f => f.unit == i).length;
       const el = document.getElementById('c' + i);
-      if (el) el.textContent = count + (count === 1 ? ' archivo' : ' archivos');
+      if (el) el.textContent = n + (n === 1 ? ' archivo' : ' archivos');
     }
-  } catch(e) {
+  } catch {
     for (let i = 1; i <= 4; i++) {
       const el = document.getElementById('c' + i);
-      if (el) el.textContent = '—';
+      if (el) el.textContent = '— archivos';
     }
   }
 }
  
-// ════════════════════════════════════════════════════════════
-//  MODAL UNIDAD
-// ════════════════════════════════════════════════════════════
+/* ══════════ MODAL UNIDAD ══════════ */
 function openUnit(u) {
   activeUnit = u;
   activeWeek = null;
@@ -247,7 +283,8 @@ function openUnit(u) {
   document.getElementById('um-title').textContent = unitNames[u];
   document.getElementById('um-sub').textContent   = 'Selecciona una semana';
   document.querySelectorAll('.wbtn').forEach(b => b.classList.remove('active'));
-  document.getElementById('unit-body').innerHTML  = '<div class="pick-hint">Selecciona una semana para ver los archivos</div>';
+  document.getElementById('unit-body').innerHTML  =
+    '<div class="pick-hint">Selecciona una semana para ver los archivos</div>';
   document.getElementById('ov-unit').classList.add('open');
 }
 function cerrarUnidad() {
@@ -255,14 +292,14 @@ function cerrarUnidad() {
 }
 function selectWeek(w) {
   activeWeek = w;
-  document.querySelectorAll('.wbtn').forEach((b, i) => b.classList.toggle('active', i + 1 === w));
+  document.querySelectorAll('.wbtn').forEach((b, i) =>
+    b.classList.toggle('active', i + 1 === w)
+  );
   document.getElementById('um-sub').textContent = 'Semana ' + w;
   renderFiles();
 }
  
-// ════════════════════════════════════════════════════════════
-//  RENDER ARCHIVOS
-// ════════════════════════════════════════════════════════════
+/* ══════════ RENDER ARCHIVOS ══════════ */
 async function renderFiles() {
   const body = document.getElementById('unit-body');
   body.innerHTML = '<div class="loading-row"><div class="spin"></div> Cargando archivos…</div>';
@@ -270,21 +307,22 @@ async function renderFiles() {
   let files = [];
   try {
     files = await fbGetAll('files', [
-      ['unit','==', activeUnit],
-      ['week','==', activeWeek]
+      ['unit', '==', activeUnit],
+      ['week', '==', activeWeek]
     ]);
   } catch(e) {
-    body.innerHTML = '<div class="empty-msg">Error al conectar con Firebase. Revisa tu configuración.</div>';
+    body.innerHTML = '<div class="empty-msg">Error al conectar con Firebase.</div>';
     return;
   }
  
   let html = '';
  
-  // Zona de subida — solo ADMIN
-  if (currentUser && currentUser.role === 'ADMIN') {
+  // ✅ ZONA DE SUBIDA: solo si hay sesión Y es ADMIN
+  // currentUser puede ser null (sin sesión) o tener role ADMIN o VIEWER
+  if (currentUser !== null && currentUser.role === 'ADMIN') {
     html += `
       <div class="upload-zone">
-        <span class="upload-label">Subir archivo</span>
+        <span class="upload-label">↑ Subir archivo</span>
         <div class="upload-row1">
           <input type="text" id="f-title" placeholder="Título del trabajo académico">
         </div>
@@ -300,6 +338,8 @@ async function renderFiles() {
   } else {
     html += '<div class="file-list">';
     files.forEach(f => {
+      // Botón eliminar solo para ADMIN con sesión
+      const canDelete = currentUser !== null && currentUser.role === 'ADMIN';
       html += `
         <div class="fitem">
           <div class="finfo">
@@ -308,9 +348,7 @@ async function renderFiles() {
           </div>
           <div class="factions">
             <button class="btn-dl" onclick="downloadFile('${f.id}')">↓ Descargar</button>
-            ${currentUser && currentUser.role === 'ADMIN'
-              ? `<button class="btn-del" onclick="deleteFile('${f.id}')">✕</button>`
-              : ''}
+            ${canDelete ? `<button class="btn-del" onclick="deleteFile('${f.id}')">✕</button>` : ''}
           </div>
         </div>`;
     });
@@ -320,18 +358,16 @@ async function renderFiles() {
   body.innerHTML = html;
 }
  
-// ════════════════════════════════════════════════════════════
-//  CRUD ARCHIVOS
-// ════════════════════════════════════════════════════════════
+/* ══════════ CRUD ══════════ */
 async function uploadFile() {
-  const title     = document.getElementById('f-title').value.trim();
+  const titleEl = document.getElementById('f-title');
   const fileInput = document.getElementById('f-file');
-  const file      = fileInput.files[0];
+  const title = titleEl ? titleEl.value.trim() : '';
+  const file  = fileInput ? fileInput.files[0] : null;
   if (!title || !file) return alert('Escribe un título y selecciona un archivo.');
  
   const btn = document.querySelector('.btn-upload');
-  btn.textContent = 'Subiendo…';
-  btn.disabled = true;
+  if (btn) { btn.textContent = 'Subiendo…'; btn.disabled = true; }
  
   const reader = new FileReader();
   reader.onload = async function () {
@@ -346,12 +382,10 @@ async function uploadFile() {
       });
       await updateCounters();
       renderFiles();
-      // Mascota feliz
-      mostrarMascota(fraseAleatoria(FRASES_SUBIDA));
+      mostrarMascota(rnd(FRASES_SUBIDA));
     } catch(e) {
       alert('Error al subir. Revisa la conexión con Firebase.');
-      btn.textContent = 'Subir';
-      btn.disabled = false;
+      if (btn) { btn.textContent = 'Subir'; btn.disabled = false; }
       console.error(e);
     }
   };
@@ -360,7 +394,7 @@ async function uploadFile() {
  
 async function downloadFile(id) {
   try {
-    const files = await fbGetAll('files', []);
+    const files = await fbGetAll('files');
     const f = files.find(x => x.id === id);
     if (!f) return alert('Archivo no encontrado.');
     const a = document.createElement('a');
@@ -382,4 +416,3 @@ async function deleteFile(id) {
     alert('Error al eliminar.');
   }
 }
- 
