@@ -1,15 +1,15 @@
 /* ═══════════════════════════════════════════════
-   MOORI_OS — script.js v5
+   MOORI_OS — script.js v6
    ─────────────────────────────────────────────
-   ✅ Cursor = cabeza del muñeco
-   ✅ Cuerpo aparece solo tras 2.5s estático en data-tip
-   ✅ Animaciones: sorpresa (login), cocinando, colgando
-   ✅ Al encogerse → se transforma en cursor
-   ✅ Registro: VIEWER / ADMIN con código 999600911
-   ✅ Campos se limpian al cerrar sesión
-   ✅ Info cards expandibles horizontales
-   ✅ Progreso por unidad + aviso si falta subir
-   ✅ Subir archivos Y vínculos/URLs
+   ✅ Canvas fondo con partículas y grid 3D
+   ✅ Cursor personalizado con efecto hover
+   ✅ Robot metálico con animaciones
+   ✅ Terminal de frases animadas
+   ✅ 3D tilt en tarjetas
+   ✅ Firebase Firestore
+   ✅ Registro VIEWER / ADMIN (código 999600911)
+   ✅ Limpieza de campos al logout/login
+   ✅ Subir archivos Y vínculos
 ═══════════════════════════════════════════════ */
  
 /* ══════ FIREBASE ══════ */
@@ -23,9 +23,9 @@ const FIREBASE_CONFIG = {
 };
 const ADMIN_SECRET = "999600911";
  
-const _s = document.createElement('script');
-_s.type = 'module';
-_s.textContent = `
+const _fb = document.createElement('script');
+_fb.type = 'module';
+_fb.textContent = `
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, where }
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -34,23 +34,29 @@ _s.textContent = `
   window._fb = { db, collection, getDocs, addDoc, deleteDoc, doc, query, where };
   window.dispatchEvent(new Event('firebase-ready'));
 `;
-document.head.appendChild(_s);
+document.head.appendChild(_fb);
  
 /* ══════ ESTADO ══════ */
-let currentUser  = null;
-let activeUnit   = null;
-let activeWeek   = null;
-let fbReady      = false;
-let uploadMode   = 'file'; // 'file' | 'link'
-const unitNames  = ['','Análisis de Datos','Diseño Relacional','Sentencias SQL','Protocolos de Seguridad'];
-const WEEKS_PER_UNIT = 4; // semanas por unidad
-const FILES_PER_WEEK = 2; // archivos esperados por semana
+let currentUser = null;
+let activeUnit  = null;
+let activeWeek  = null;
+let fbReady     = false;
+let uploadMode  = 'file';
+let mouseX = 0, mouseY = 0;
+const unitNames = ['','Análisis de Datos','Diseño Relacional','Sentencias SQL','Protocolos de Seguridad'];
+const WEEKS_PER_UNIT = 4, FILES_PER_WEEK = 2;
  
 /* ══════ INIT ══════ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('user-pill').classList.add('hidden');
   document.getElementById('btn-login-nav').classList.remove('hidden');
-  initCursorMascot();
+ 
+  initBgCanvas();
+  initCursor();
+  initRobot();
+  initTerminal();
+  initTilt();
+  initScrollAnimations();
 });
  
 window.addEventListener('firebase-ready', async () => {
@@ -60,225 +66,311 @@ window.addEventListener('firebase-ready', async () => {
  
 /* ══════ FIREBASE HELPERS ══════ */
 async function fbGetAll(col, filters = []) {
-  if (!fbReady) throw new Error('Firebase no listo');
+  if (!fbReady) throw new Error('FB no listo');
   const { db, collection, getDocs, query, where } = window._fb;
   let q = collection(db, col);
-  if (filters.length)
-    q = query(q, ...filters.map(([f,op,v]) => where(f,op,v)));
+  if (filters.length) q = query(q, ...filters.map(([f,op,v]) => where(f,op,v)));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 async function fbAdd(col, data) {
-  if (!fbReady) throw new Error('Firebase no listo');
+  if (!fbReady) throw new Error('FB no listo');
   const { db, collection, addDoc } = window._fb;
   return (await addDoc(collection(db, col), data)).id;
 }
 async function fbDelete(col, id) {
-  if (!fbReady) throw new Error('Firebase no listo');
+  if (!fbReady) throw new Error('FB no listo');
   const { db, doc, deleteDoc } = window._fb;
   await deleteDoc(doc(db, col, id));
 }
  
 /* ══════════════════════════════════════════════
-   CURSOR MASCOTA
-   - La cabeza siempre sigue el cursor
-   - El cuerpo + tip aparecen solo tras 2.5s estático en data-tip
+   CANVAS FONDO — partículas + grid
 ══════════════════════════════════════════════ */
-let cursorX = 200, cursorY = 200;
-let tipTimer  = null;
-let bodyShown = false;
+function initBgCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [], lines = [];
+  const PARTICLE_COUNT = 80;
  
-function initCursorMascot() {
-  const cm     = document.getElementById('cursor-mascot');
-  const tipEl  = document.getElementById('cursor-tip');
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
  
-  // Mover cabeza con el cursor
-  document.addEventListener('mousemove', (e) => {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-    cm.style.left = (cursorX - 18) + 'px';
-    cm.style.top  = (cursorY - 18) + 'px';
+  // Inicializar partículas
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push({
+      x: Math.random() * 2000,
+      y: Math.random() * 2000,
+      r: 0.5 + Math.random() * 1.5,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      alpha: 0.2 + Math.random() * 0.5,
+      color: Math.random() > 0.5 ? '#0088ff' : (Math.random() > 0.5 ? '#00ff88' : '#ff0080')
+    });
+  }
  
-    // Si el cuerpo está mostrándose, reiniciar el timer
-    if (tipTimer) {
-      clearTimeout(tipTimer);
-      tipTimer = null;
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+ 
+    // Fondo base con gradiente radial
+    const grd = ctx.createRadialGradient(W*0.5, H*0.4, 0, W*0.5, H*0.4, W*0.7);
+    grd.addColorStop(0,   'rgba(0,40,80,0.3)');
+    grd.addColorStop(0.5, 'rgba(0,10,30,0.2)');
+    grd.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+ 
+    // Partículas
+    particles.forEach(p => {
+      p.x += p.vx + Math.sin(t * 0.01 + p.y * 0.01) * 0.1;
+      p.y += p.vy + Math.cos(t * 0.01 + p.x * 0.01) * 0.1;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+ 
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+ 
+    // Conectar partículas cercanas
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i+1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,136,255,${0.06 * (1 - dist/120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
     }
-    // Si ya estaba el cuerpo visible, ocultarlo al mover
-    if (bodyShown) {
-      hideCursorBody();
-    }
-  });
  
-  // Hover en elementos con data-tip
-  document.addEventListener('mouseover', (e) => {
-    const el = e.target.closest('[data-tip]');
-    if (!el) return;
-    const tip = el.getAttribute('data-tip');
-    if (!tip) return;
+    // Línea de horizonte glow
+    const grdH = ctx.createLinearGradient(0, H*0.55, W, H*0.55);
+    grdH.addColorStop(0,    'transparent');
+    grdH.addColorStop(0.3,  'rgba(0,136,255,0.08)');
+    grdH.addColorStop(0.5,  'rgba(0,136,255,0.15)');
+    grdH.addColorStop(0.7,  'rgba(0,136,255,0.08)');
+    grdH.addColorStop(1,    'transparent');
+    ctx.fillStyle = grdH;
+    ctx.fillRect(0, H*0.53, W, 4);
  
-    cm.classList.add('hover');
- 
-    // Iniciar timer de 2.5s
-    if (tipTimer) clearTimeout(tipTimer);
-    tipTimer = setTimeout(() => {
-      tipEl.textContent = tip;
-      cm.classList.add('tip-active');
-      bodyShown = true;
-      tipTimer = null;
-    }, 2500);
-  });
- 
-  document.addEventListener('mouseout', (e) => {
-    const el = e.target.closest('[data-tip]');
-    if (!el) return;
-    const to = e.relatedTarget;
-    if (to && el.contains(to)) return;
- 
-    cm.classList.remove('hover');
-    if (tipTimer) { clearTimeout(tipTimer); tipTimer = null; }
-    if (bodyShown) hideCursorBody();
-  });
- 
-  // Click = pequeña reacción
-  document.addEventListener('mousedown', () => {
-    cm.style.transition = 'transform 0.1s';
-    cm.querySelector('.cursor-head').style.transform = 'scale(0.85)';
-    setTimeout(() => {
-      cm.querySelector('.cursor-head').style.transform = '';
-    }, 150);
-  });
-}
- 
-function hideCursorBody() {
-  const cm = document.getElementById('cursor-mascot');
-  cm.classList.remove('tip-active');
-  bodyShown = false;
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
  
 /* ══════════════════════════════════════════════
-   MASCOTA ESCENA GRANDE
-   Animaciones disponibles: peek | surprise | cook | hang
+   CURSOR PERSONALIZADO
+══════════════════════════════════════════════ */
+function initCursor() {
+  const dot  = document.getElementById('custom-cursor');
+  const ring = document.getElementById('cursor-ring');
+  let rx = 0, ry = 0;
+ 
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
+  });
+ 
+  // Ring con lag suave
+  function animRing() {
+    rx += (mouseX - rx) * 0.12;
+    ry += (mouseY - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+ 
+  // Hover en interactivos
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('button,a,[onclick],[data-tip],.ucard-3d,.info-card-3d,.module-item')) {
+      ring.classList.add('hovering');
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('button,a,[onclick],[data-tip],.ucard-3d,.info-card-3d,.module-item')) {
+      ring.classList.remove('hovering');
+    }
+  });
+  document.addEventListener('mousedown', () => ring.classList.add('clicking'));
+  document.addEventListener('mouseup',   () => ring.classList.remove('clicking'));
+}
+ 
+/* ══════════════════════════════════════════════
+   ROBOT — aparece, habla, animaciones
 ══════════════════════════════════════════════ */
 const FRASES_BIENVENIDA = [
-  "¡Volviste, señorón! 👑",
-  "Eso es responsabilidad, campeón 💪",
-  "El que no falla, no para de crecer 🚀",
-  "Tus tareas no se van a subir solas... ¡dale! 😄",
-  "Presencia confirmada en el sistema ✅",
+  "¡Volviste, señorón! Sistema en línea 👾",
+  "Acceso concedido. Bienvenido, campeón 💪",
+  "Identificación verificada. ¡Qué responsabilidad! 🤖",
   "El estudiante ha regresado. El profe tiembla 😎",
   "La constancia hace al maestro 🏆",
   "Eres de los que sí llegan 💯",
 ];
 const FRASES_SUBIDA = [
-  "¡Lo hiciste a tiempo, buen trabajo campeón! 🎉",
-  "Tarea entregada. La responsabilidad te define 💼",
-  "Así se hace, sin excusas ni pretextos 🔥",
-  "¡Eso es disciplina pura! Sigue adelante 💪",
-  "Archivo guardado. Eres un ejemplo a seguir 🏅",
-  "La entrega puntual es el primer paso del éxito 📚",
+  "¡Archivo cargado! Buen trabajo, campeón 🎉",
+  "Tarea registrada. La disciplina te define 💼",
+  "¡Sin excusas, sin pretextos! Así se hace 🔥",
+  "Upload completado. Eres un ejemplo 🏅",
+  "La entrega puntual es el primer paso 📚",
 ];
-const ANIMACIONES = ['peek','cook','hang'];
  
-let sceneTimer = null;
-let sceneActive = false;
+let robotTimer = null;
  
-function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
- 
-function mostrarMascotaEscena(frase, forcedAnim) {
-  if (sceneTimer) { clearTimeout(sceneTimer); sceneTimer = null; }
- 
-  const mascot = document.getElementById('scene-mascot');
-  const bubble = document.getElementById('scene-bubble');
- 
-  // Resetear
-  mascot.className = 'scene-mascot scene-hidden';
-  mascot.style.cssText = '';
+function mostrarRobot(frase, delay = 0) {
+  if (robotTimer) { clearTimeout(robotTimer); robotTimer = null; }
+  const wrap   = document.getElementById('robot-wrap');
+  const bubble = document.getElementById('robot-bubble');
   bubble.classList.remove('show');
-  bubble.textContent = '';
  
-  // Pequeño delay para que el reset se aplique
   setTimeout(() => {
-    const anim = forcedAnim || rnd(ANIMACIONES);
+    wrap.classList.add('visible');
+    wrap.classList.remove('bye-exit');
  
-    // Resetear posición según animación
-    if (anim === 'hang') {
-      mascot.style.bottom = 'auto';
-      mascot.style.top = '80px';
-      mascot.style.right = '60px';
-    } else {
-      mascot.style.top = '';
-      mascot.style.bottom = '0';
-      mascot.style.right = '40px';
-    }
- 
-    mascot.className = 'scene-mascot anim-' + anim;
-    sceneActive = true;
- 
-    // Mostrar burbuja después de que la animación de entrada termine
-    const bubbleDelay = anim === 'cook' ? 1400 : anim === 'hang' ? 1200 : 900;
     setTimeout(() => {
-      // Si es cook: primero gira como mirando, luego habla
       bubble.textContent = frase;
       bubble.classList.add('show');
  
-      // Después de la frase, encoger hacia el cursor
-      sceneTimer = setTimeout(() => {
+      robotTimer = setTimeout(() => {
         bubble.classList.remove('show');
-        setTimeout(() => encogerseHaciaCursor(), 400);
-      }, 4500);
-    }, bubbleDelay);
-  }, 80);
+        setTimeout(() => {
+          wrap.classList.remove('visible');
+        }, 400);
+      }, 5000);
+    }, 600);
+  }, delay);
 }
  
-function encogerseHaciaCursor() {
-  const mascot = document.getElementById('scene-mascot');
-  const rect   = mascot.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top  + rect.height / 2;
-  const dx = cursorX - cx;
-  const dy = cursorY - cy;
- 
-  mascot.style.transition = 'transform 0.85s cubic-bezier(0.55,0,1,0.45), opacity 0.6s ease';
-  mascot.style.transform  = `translate(${dx}px,${dy}px) scale(0.03)`;
-  mascot.style.opacity    = '0';
- 
-  setTimeout(() => {
-    mascot.style.transition = '';
-    mascot.style.transform  = '';
-    mascot.style.opacity    = '';
-    mascot.className = 'scene-mascot scene-hidden';
-    sceneActive = false;
-  }, 900);
-}
- 
-function ocultarMascotaEscena() {
-  const mascot = document.getElementById('scene-mascot');
-  const bubble = document.getElementById('scene-bubble');
+function ocultarRobot() {
+  const wrap   = document.getElementById('robot-wrap');
+  const bubble = document.getElementById('robot-bubble');
   bubble.classList.remove('show');
-  mascot.className = 'scene-mascot scene-hidden';
-  if (sceneTimer) { clearTimeout(sceneTimer); sceneTimer = null; }
-  sceneActive = false;
+  wrap.classList.remove('visible');
+  if (robotTimer) { clearTimeout(robotTimer); robotTimer = null; }
+}
+ 
+function initRobot() {
+  // El robot sigue ligeramente el mouse (parallax)
+  document.addEventListener('mousemove', e => {
+    const svg = document.getElementById('robot-svg');
+    if (!svg) return;
+    const cx = window.innerWidth - 160;
+    const cy = window.innerHeight - 200;
+    const dx = (e.clientX - cx) / window.innerWidth * 8;
+    const dy = (e.clientY - cy) / window.innerHeight * 6;
+    svg.style.transform = `translateX(${dx}px) translateY(${dy}px)`;
+  });
+}
+ 
+function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+ 
+/* ══════════════════════════════════════════════
+   TERMINAL DE FRASES (hero)
+══════════════════════════════════════════════ */
+function initTerminal() {
+  const lines = document.querySelectorAll('.terminal-line');
+  let current = 0;
+  setInterval(() => {
+    lines.forEach((l, i) => {
+      l.classList.remove('active','dim');
+      if (i === current) l.classList.add('active');
+      else if (i < current) l.classList.add('dim');
+    });
+    current = (current + 1) % lines.length;
+  }, 2200);
+}
+ 
+/* ══════════════════════════════════════════════
+   EFECTO TILT 3D en tarjetas
+══════════════════════════════════════════════ */
+function initTilt() {
+  document.querySelectorAll('.ucard-3d, .info-card-3d').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width  / 2;
+      const cy = rect.top  + rect.height / 2;
+      const rx = ((e.clientY - cy) / rect.height) * 8;
+      const ry = ((e.clientX - cx) / rect.width)  * -8;
+      card.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+ 
+/* ══════════════════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════════════════ */
+function initScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity    = '1';
+        e.target.style.transform  = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+ 
+  document.querySelectorAll('.ucard-3d, .info-card-3d, .section-header').forEach(el => {
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateY(30px)';
+    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    observer.observe(el);
+  });
 }
  
 /* ══════ BYE ══════ */
 function mostrarBye() {
   generarParticulas();
-  const overlay  = document.getElementById('bye-overlay');
-  const zone     = document.getElementById('bye-mascot-zone');
-  const svg      = document.getElementById('scene-svg').cloneNode(true);
-  svg.style.cssText = 'width:200px;height:350px;';
-  zone.innerHTML = '';
-  zone.appendChild(svg);
-  overlay.classList.remove('bye-hidden');
+  const ov = document.getElementById('bye-overlay');
+  ov.classList.remove('bye-hidden');
+ 
+  // Canvas de ondas en bye
+  const c = document.getElementById('bye-canvas');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  let t = 0;
+  const drawBye = () => {
+    if (ov.classList.contains('bye-hidden')) return;
+    ctx.clearRect(0, 0, c.width, c.height);
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(0,136,255,${0.08 - i*0.02})`;
+      ctx.lineWidth = 1.5 - i*0.3;
+      for (let x = 0; x < c.width; x += 3) {
+        const y = c.height/2 + Math.sin((x + t + i*50) * 0.015) * (60 + i*20);
+        x === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+    t += 2;
+    requestAnimationFrame(drawBye);
+  };
+  drawBye();
  
   setTimeout(() => {
-    overlay.style.transition = 'opacity 0.8s ease';
-    overlay.style.opacity    = '0';
+    ov.style.transition = 'opacity 0.8s ease';
+    ov.style.opacity    = '0';
     setTimeout(() => {
-      overlay.style.opacity    = '';
-      overlay.style.transition = '';
-      overlay.classList.add('bye-hidden');
+      ov.style.opacity = ''; ov.style.transition = '';
+      ov.classList.add('bye-hidden');
       document.getElementById('btn-login-nav').classList.remove('hidden');
       document.getElementById('user-pill').classList.add('hidden');
     }, 850);
@@ -288,19 +380,19 @@ function mostrarBye() {
 function generarParticulas() {
   const c = document.getElementById('bye-particles');
   c.innerHTML = '';
-  for (let i = 0; i < 35; i++) {
+  for (let i = 0; i < 40; i++) {
     const p = document.createElement('div');
     p.className = 'bye-particle';
     const angle = Math.random() * 360;
-    const dist  = 80 + Math.random() * 220;
+    const dist  = 100 + Math.random() * 250;
+    const colors = ['#0088ff','#00ff88','#ff0080','#ffffff','#f97316'];
     p.style.cssText = `
-      left:${15+Math.random()*70}%;top:${15+Math.random()*70}%;
-      width:${3+Math.random()*8}px;height:${3+Math.random()*8}px;
-      background:${Math.random()>0.5?'#f97316':Math.random()>0.5?'#fff':'#ffb347'};
-      border-radius:${Math.random()>0.4?'50%':'3px'};
+      left:${10+Math.random()*80}%;top:${10+Math.random()*80}%;
+      width:${3+Math.random()*7}px;height:${3+Math.random()*7}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
       --tx:${Math.cos(angle*Math.PI/180)*dist}px;
       --ty:${Math.sin(angle*Math.PI/180)*dist}px;
-      --dur:${1.5+Math.random()*1.8}s;
+      --dur:${1.5+Math.random()*2}s;
       --delay:${Math.random()*0.4}s;
     `;
     c.appendChild(p);
@@ -309,23 +401,20 @@ function generarParticulas() {
  
 /* ══════ OJITO ══════ */
 function togglePass(inputId, btn) {
-  const input  = document.getElementById(inputId);
-  const open   = btn.querySelector('.eye-open');
-  const closed = btn.querySelector('.eye-closed');
-  if (input.type === 'password') {
-    input.type = 'text'; open.classList.add('hidden'); closed.classList.remove('hidden');
-  } else {
-    input.type = 'password'; open.classList.remove('hidden'); closed.classList.add('hidden');
-  }
+  const i  = document.getElementById(inputId);
+  const o  = btn.querySelector('.eye-open');
+  const cl = btn.querySelector('.eye-closed');
+  if (i.type === 'password') { i.type='text'; o.classList.add('hidden'); cl.classList.remove('hidden'); }
+  else { i.type='password'; o.classList.remove('hidden'); cl.classList.add('hidden'); }
 }
  
 /* ══════ ADMIN TOGGLE ══════ */
-let adminFieldVisible = false;
+let adminVisible = false;
 function toggleAdminField() {
-  adminFieldVisible = !adminFieldVisible;
-  document.getElementById('admin-code-field').style.display = adminFieldVisible ? '' : 'none';
+  adminVisible = !adminVisible;
+  document.getElementById('admin-code-field').style.display = adminVisible ? '' : 'none';
   const btn = document.getElementById('admin-toggle-btn');
-  btn.style.cssText = adminFieldVisible ? 'border-color:var(--orange);color:var(--orange);' : '';
+  btn.style.cssText = adminVisible ? 'border-color:rgba(0,136,255,0.4);color:var(--accent);' : '';
 }
  
 /* ══════ AUTH ══════ */
@@ -346,18 +435,18 @@ function switchTab(tab) {
   document.getElementById('f-reg').style.display   = isL ? 'none' : '';
   document.getElementById('t-login').classList.toggle('active', isL);
   document.getElementById('t-reg').classList.toggle('active', !isL);
-  if (!isL) { adminFieldVisible = false; document.getElementById('admin-code-field').style.display = 'none'; }
+  if (!isL) { adminVisible = false; document.getElementById('admin-code-field').style.display = 'none'; }
 }
  
 async function doLogin() {
   const user = document.getElementById('l-user').value.trim();
   const pass = document.getElementById('l-pass').value.trim();
-  if (!user || !pass) return showErr('Completa todos los campos.');
+  if (!user || !pass) return showErr('COMPLETA TODOS LOS CAMPOS');
   try {
     const users = await fbGetAll('users', [['user','==',user],['pass','==',pass]]);
-    if (!users.length) return showErr('Usuario o contraseña incorrectos.');
+    if (!users.length) return showErr('USUARIO O CONTRASEÑA INCORRECTOS');
     loginSuccess(users[0]);
-  } catch(e) { showErr('Error de conexión. Verifica Firebase.'); console.error(e); }
+  } catch(e) { showErr('ERROR DE CONEXIÓN · VERIFICA FIREBASE'); }
 }
  
 async function doRegister() {
@@ -365,47 +454,47 @@ async function doRegister() {
   const pass = document.getElementById('r-pass').value.trim();
   const name = document.getElementById('r-name').value.trim();
   const code = (document.getElementById('r-code')?.value || '').trim();
-  if (!user || !pass || !name) return showErr('Completa todos los campos.');
+  if (!user || !pass || !name) return showErr('COMPLETA TODOS LOS CAMPOS');
   const role = code === ADMIN_SECRET ? 'ADMIN' : 'VIEWER';
   try {
-    const existing = await fbGetAll('users', [['user','==',user]]);
-    if (existing.length) return showErr('Ese usuario ya existe.');
+    const ex = await fbGetAll('users', [['user','==',user]]);
+    if (ex.length) return showErr('ESE USUARIO YA EXISTE');
     await fbAdd('users', { user, pass, name, role });
-    showErr(role === 'ADMIN' ? '✅ Cuenta ADMIN creada. Inicia sesión.' : '✅ Cuenta Viewer creada. Inicia sesión.');
+    showErr(role==='ADMIN' ? '✅ CUENTA ADMIN CREADA · INICIA SESIÓN' : '✅ CUENTA CREADA · INICIA SESIÓN');
     switchTab('login');
     document.getElementById('l-user').value = user;
-  } catch(e) { showErr('Error al registrar. Verifica Firebase.'); }
+  } catch { showErr('ERROR AL REGISTRAR · VERIFICA FIREBASE'); }
 }
  
 function loginSuccess(u) {
   currentUser = u;
   cerrarLogin();
-  // Limpiar campos ✅
+  // ✅ Limpiar campos
   document.getElementById('l-user').value = '';
   document.getElementById('l-pass').value = '';
  
   document.getElementById('btn-login-nav').classList.add('hidden');
   const pill = document.getElementById('user-pill');
   pill.classList.remove('hidden');
-  const initials = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('pill-avatar').textContent = initials;
+  const ini = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('pill-avatar').textContent = ini;
   document.getElementById('pill-name').textContent   = u.name.toUpperCase();
-  const roleEl = document.getElementById('pill-role');
-  roleEl.textContent = u.role;
-  roleEl.style.cssText = u.role === 'ADMIN'
-    ? 'background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;'
-    : 'background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;';
+  const re = document.getElementById('pill-role');
+  re.textContent = u.role;
+  re.style.cssText = u.role === 'ADMIN'
+    ? 'background:rgba(0,255,136,0.12);color:#00ff88;border:1px solid rgba(0,255,136,0.3);'
+    : 'background:rgba(0,136,255,0.1);color:#0088ff;border:1px solid rgba(0,136,255,0.25);';
+  re.style.cssText += 'font-family:var(--mono);font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:1px;width:fit-content;';
  
-  // Animación sorpresa al login, luego las otras aleatoriamente
-  mostrarMascotaEscena(rnd(FRASES_BIENVENIDA), 'surprise');
+  mostrarRobot(rnd(FRASES_BIENVENIDA));
 }
  
 function doLogout() {
   currentUser = null;
-  // Limpiar campos también al cerrar sesión ✅
+  // ✅ Limpiar campos
   document.getElementById('l-user').value = '';
   document.getElementById('l-pass').value = '';
-  ocultarMascotaEscena();
+  ocultarRobot();
   setTimeout(() => mostrarBye(), 100);
 }
  
@@ -413,11 +502,15 @@ function doLogout() {
 async function updateCounters() {
   try {
     const files = await fbGetAll('files');
+    let total = 0;
     for (let i = 1; i <= 4; i++) {
       const n = files.filter(f => f.unit == i).length;
+      total += n;
       const el = document.getElementById('c' + i);
       if (el) el.textContent = n + (n === 1 ? ' archivo' : ' archivos');
     }
+    const se = document.getElementById('stat-files');
+    if (se) se.textContent = total;
   } catch {
     for (let i = 1; i <= 4; i++) {
       const el = document.getElementById('c' + i);
@@ -426,19 +519,13 @@ async function updateCounters() {
   }
 }
  
-/* ══════════════════════════════════════════════
-   INFO CARDS
-══════════════════════════════════════════════ */
+/* ══════ INFO CARDS ══════ */
 function toggleInfoCard(id) {
-  const body  = document.getElementById('icb-' + id);
-  const card  = document.getElementById('ic-' + id);
+  const body = document.getElementById('icb-' + id);
+  const card = document.getElementById('ic-' + id);
+  const chev = document.getElementById('chev-' + id);
   const isOpen = !body.classList.contains('hidden');
- 
-  if (id === 'progreso' && !isOpen) {
-    // Cargar progreso dinámicamente
-    renderProgress();
-  }
- 
+  if (id === 'progreso' && !isOpen) renderProgress();
   body.classList.toggle('hidden', isOpen);
   card.classList.toggle('open', !isOpen);
 }
@@ -446,20 +533,18 @@ function toggleInfoCard(id) {
 async function renderProgress() {
   const bars   = document.getElementById('progress-bars');
   const tipMsg = document.getElementById('ic-tip-msg');
-  bars.innerHTML = '<div class="prog-loading">Calculando…</div>';
- 
+  bars.innerHTML = '<div class="prog-loading">CALCULANDO…</div>';
   let allFiles = [];
-  try { allFiles = await fbGetAll('files'); } catch { bars.innerHTML = '<div class="prog-loading">Error de conexión</div>'; return; }
+  try { allFiles = await fbGetAll('files'); } catch { bars.innerHTML = '<div class="prog-loading">ERROR DE CONEXIÓN</div>'; return; }
  
-  const colors = ['','','u2','u3','u4'];
-  const MAX = WEEKS_PER_UNIT * FILES_PER_WEEK; // 4 semanas * 2 archivos = 8 por unidad
-  let missingUnit = null;
-  let html = '';
+  const MAX = WEEKS_PER_UNIT * FILES_PER_WEEK;
+  let missing = null, html = '';
+  const clrs = ['','','u2','u3','u4'];
  
   for (let u = 1; u <= 4; u++) {
     const count = allFiles.filter(f => f.unit == u).length;
-    const pct   = Math.min(100, Math.round((count / MAX) * 100));
-    if (count === 0 && missingUnit === null) missingUnit = u;
+    const pct   = Math.min(100, Math.round(count / MAX * 100));
+    if (count === 0 && missing === null) missing = u;
     html += `
       <div class="prog-unit">
         <div class="prog-head">
@@ -467,31 +552,26 @@ async function renderProgress() {
           <span class="prog-pct">${pct}% · ${count}/${MAX}</span>
         </div>
         <div class="prog-bar-bg">
-          <div class="prog-bar-fill ${colors[u]}" id="pb${u}" style="width:0%"></div>
+          <div class="prog-bar-fill ${clrs[u]}" id="pb${u}" style="width:0%"></div>
         </div>
       </div>`;
   }
- 
   bars.innerHTML = html;
- 
-  // Animar barras
   requestAnimationFrame(() => {
     for (let u = 1; u <= 4; u++) {
       const count = allFiles.filter(f => f.unit == u).length;
-      const pct   = Math.min(100, Math.round((count / MAX) * 100));
+      const pct   = Math.min(100, Math.round(count / MAX * 100));
       setTimeout(() => {
-        const bar = document.getElementById('pb' + u);
-        if (bar) bar.style.width = pct + '%';
+        const b = document.getElementById('pb' + u);
+        if (b) b.style.width = pct + '%';
       }, u * 120);
     }
   });
- 
-  // Aviso si hay unidad vacía
-  if (missingUnit !== null) {
-    tipMsg.textContent = `⚠️ La ${unitNames[missingUnit]} aún no tiene archivos. ¡Es momento de subir tus tareas!`;
-    tipMsg.classList.add('show');
+  if (missing !== null) {
+    tipMsg.textContent = `⚠️ ${unitNames[missing]} no tiene archivos. ¡Es momento de subir tus tareas!`;
+    tipMsg.classList.remove('hidden');
   } else {
-    tipMsg.classList.remove('show');
+    tipMsg.classList.add('hidden');
   }
 }
  
@@ -511,108 +591,91 @@ function cerrarUnidad() { document.getElementById('ov-unit').classList.remove('o
 function selectWeek(w) {
   activeWeek = w;
   document.querySelectorAll('.wbtn').forEach((b,i) => b.classList.toggle('active', i+1===w));
-  document.getElementById('um-sub').textContent = 'Semana ' + w;
+  document.getElementById('um-sub').textContent = 'SEMANA ' + w;
   renderFiles();
 }
  
-/* ══════════════════════════════════════════════
-   RENDER ARCHIVOS + OPCIÓN VÍNCULO/URL
-══════════════════════════════════════════════ */
+/* ══════ RENDER ARCHIVOS ══════ */
 async function renderFiles() {
   const body = document.getElementById('unit-body');
-  body.innerHTML = '<div class="loading-row"><div class="spin"></div> Cargando archivos…</div>';
- 
+  body.innerHTML = '<div class="loading-row"><div class="spin"></div> CARGANDO…</div>';
   let files = [];
   try { files = await fbGetAll('files',[['unit','==',activeUnit],['week','==',activeWeek]]); }
-  catch { body.innerHTML = '<div class="empty-msg">Error al conectar con Firebase.</div>'; return; }
+  catch { body.innerHTML = '<div class="empty-msg">ERROR DE CONEXIÓN</div>'; return; }
  
   let html = '';
- 
-  if (currentUser !== null && currentUser.role === 'ADMIN') {
+  if (currentUser?.role === 'ADMIN') {
     html += `
       <div class="upload-zone">
-        <span class="upload-label">↑ Agregar contenido</span>
+        <span class="upload-label">↑ AGREGAR CONTENIDO</span>
         <div class="upload-tabs">
-          <button class="utab ${uploadMode==='file'?'active':''}" onclick="setUploadMode('file')">📄 Archivo</button>
-          <button class="utab ${uploadMode==='link'?'active':''}" onclick="setUploadMode('link')">🔗 Vínculo / URL</button>
+          <button class="utab ${uploadMode==='file'?'active':''}" onclick="setUploadMode('file')">📄 ARCHIVO</button>
+          <button class="utab ${uploadMode==='link'?'active':''}" onclick="setUploadMode('link')">🔗 VÍNCULO</button>
         </div>
         <div class="upload-row1">
           <input type="text" id="f-title" placeholder="Título del contenido">
         </div>
         <div id="upload-file-zone" class="upload-row2" style="display:${uploadMode==='file'?'flex':'none'}">
           <input type="file" id="f-file">
-          <button class="btn-upload" onclick="uploadFile()">Subir</button>
+          <button class="btn-upload" onclick="uploadFile()">SUBIR</button>
         </div>
         <div id="upload-link-zone" class="upload-row3" style="display:${uploadMode==='link'?'flex':'none'}">
           <input type="text" id="f-url" placeholder="https://...">
-          <button class="btn-upload" onclick="uploadLink()">Guardar</button>
+          <button class="btn-upload" onclick="uploadLink()">GUARDAR</button>
         </div>
       </div>`;
   }
  
   if (files.length === 0) {
-    html += '<div class="empty-msg">Sin archivos en esta semana.</div>';
+    html += '<div class="empty-msg">SIN ARCHIVOS EN ESTA SEMANA</div>';
   } else {
     html += '<div class="file-list">';
     files.forEach(f => {
       const isLink   = f.type === 'link';
       const canAdmin = currentUser?.role === 'ADMIN';
       html += `
-        <div class="fitem ${isLink ? 'is-link' : ''}">
+        <div class="fitem ${isLink?'is-link':''}">
           <div class="finfo">
-            <div class="fname">${isLink ? '🔗 ' : '📄 '}${f.title}</div>
+            <div class="fname">${isLink?'🔗 ':'📄 '}${f.title}</div>
             <div class="fmeta">${isLink ? f.url : f.filename}</div>
           </div>
           <div class="factions">
             ${isLink
-              ? `<button class="btn-open-link" onclick="openLink('${f.url}')">↗ Abrir</button>`
-              : `<button class="btn-dl" onclick="downloadFile('${f.id}')">↓ Descargar</button>`
-            }
+              ? `<button class="btn-open-link" onclick="openLink('${f.url}')">↗ ABRIR</button>`
+              : `<button class="btn-dl" onclick="downloadFile('${f.id}')">↓ DESCARGAR</button>`}
             ${canAdmin ? `<button class="btn-del" onclick="deleteFile('${f.id}')">✕</button>` : ''}
           </div>
         </div>`;
     });
     html += '</div>';
   }
- 
   body.innerHTML = html;
 }
  
 function setUploadMode(mode) {
   uploadMode = mode;
-  // Re-render zona de subida sin recargar toda la lista
-  const fileZ = document.getElementById('upload-file-zone');
-  const linkZ = document.getElementById('upload-link-zone');
-  if (fileZ) fileZ.style.display = mode === 'file' ? 'flex' : 'none';
-  if (linkZ) linkZ.style.display = mode === 'link' ? 'flex' : 'none';
+  const fz = document.getElementById('upload-file-zone');
+  const lz = document.getElementById('upload-link-zone');
+  if (fz) fz.style.display = mode==='file' ? 'flex' : 'none';
+  if (lz) lz.style.display = mode==='link' ? 'flex' : 'none';
   document.querySelectorAll('.utab').forEach((t,i) => {
-    t.classList.toggle('active', (i===0 && mode==='file') || (i===1 && mode==='link'));
+    t.classList.toggle('active', (i===0&&mode==='file')||(i===1&&mode==='link'));
   });
 }
  
-/* ══════ CRUD ══════ */
 async function uploadFile() {
   const title = document.getElementById('f-title')?.value.trim() || '';
   const file  = document.getElementById('f-file')?.files[0];
   if (!title || !file) return alert('Escribe un título y selecciona un archivo.');
- 
   const btn = document.querySelector('.btn-upload');
-  if (btn) { btn.textContent = 'Subiendo…'; btn.disabled = true; }
- 
+  if (btn) { btn.textContent = 'SUBIENDO…'; btn.disabled = true; }
   const reader = new FileReader();
-  reader.onload = async function () {
+  reader.onload = async () => {
     try {
-      await fbAdd('files',{
-        type:'file', unit:activeUnit, week:activeWeek,
-        title, filename:file.name, data:reader.result, ts:Date.now()
-      });
-      await updateCounters();
-      renderFiles();
-      mostrarMascotaEscena(rnd(FRASES_SUBIDA));
-    } catch(e) {
-      alert('Error al subir. Revisa Firebase.');
-      if (btn) { btn.textContent = 'Subir'; btn.disabled = false; }
-    }
+      await fbAdd('files',{type:'file',unit:activeUnit,week:activeWeek,title,filename:file.name,data:reader.result,ts:Date.now()});
+      await updateCounters(); renderFiles();
+      mostrarRobot(rnd(FRASES_SUBIDA));
+    } catch { alert('Error al subir.'); if(btn){btn.textContent='SUBIR';btn.disabled=false;} }
   };
   reader.readAsDataURL(file);
 }
@@ -622,42 +685,30 @@ async function uploadLink() {
   const url   = document.getElementById('f-url')?.value.trim() || '';
   if (!title || !url) return alert('Escribe un título y la URL.');
   if (!url.startsWith('http')) return alert('La URL debe empezar con http:// o https://');
- 
   const btn = document.querySelector('.btn-upload');
-  if (btn) { btn.textContent = 'Guardando…'; btn.disabled = true; }
+  if (btn) { btn.textContent = 'GUARDANDO…'; btn.disabled = true; }
   try {
-    await fbAdd('files',{
-      type:'link', unit:activeUnit, week:activeWeek,
-      title, url, ts:Date.now()
-    });
-    await updateCounters();
-    renderFiles();
-    mostrarMascotaEscena(rnd(FRASES_SUBIDA));
-  } catch(e) {
-    alert('Error al guardar. Revisa Firebase.');
-    if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
-  }
+    await fbAdd('files',{type:'link',unit:activeUnit,week:activeWeek,title,url,ts:Date.now()});
+    await updateCounters(); renderFiles();
+    mostrarRobot(rnd(FRASES_SUBIDA));
+  } catch { alert('Error al guardar.'); if(btn){btn.textContent='GUARDAR';btn.disabled=false;} }
 }
  
-function openLink(url) {
-  window.open(url, '_blank', 'noopener');
-}
+function openLink(url) { window.open(url,'_blank','noopener'); }
  
 async function downloadFile(id) {
   try {
     const files = await fbGetAll('files');
-    const f = files.find(x => x.id === id);
+    const f = files.find(x => x.id===id);
     if (!f) return alert('Archivo no encontrado.');
     const a = document.createElement('a');
-    a.href = f.data; a.download = f.filename; a.click();
+    a.href=f.data; a.download=f.filename; a.click();
   } catch { alert('Error al descargar.'); }
 }
  
 async function deleteFile(id) {
-  if (!confirm('¿Eliminar este contenido permanentemente?')) return;
-  try {
-    await fbDelete('files', id);
-    await updateCounters();
-    renderFiles();
-  } catch { alert('Error al eliminar.'); }
+  if (!confirm('¿Eliminar permanentemente?')) return;
+  try { await fbDelete('files',id); await updateCounters(); renderFiles(); }
+  catch { alert('Error al eliminar.'); }
 }
+ 
