@@ -1,3 +1,6 @@
+
+Copiar
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,356 +8,428 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JOSE MOORI | ACADEMIC OS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
  
-<!-- ═══════════ CURSOR MASCOTA ═══════════ -->
-<div id="cursor-mascot" class="cursor-mascot">
-  <!-- Cabeza como cursor -->
-  <svg class="cursor-head" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="ch" cx="38%" cy="32%">
-        <stop offset="0%" stop-color="#ffb347"/>
-        <stop offset="100%" stop-color="#f97316"/>
-      </radialGradient>
-    </defs>
-    <circle cx="20" cy="20" r="18" fill="url(#ch)"/>
-    <!-- Brillo -->
-    <ellipse cx="14" cy="13" rx="7" ry="4.5" fill="rgba(255,255,255,0.2)" transform="rotate(-20,14,13)"/>
-    <!-- Ojos -->
-    <ellipse class="cur-eye-l" cx="14" cy="18" rx="4.5" ry="5" fill="white"/>
-    <ellipse class="cur-eye-r" cx="26" cy="18" rx="4.5" ry="5" fill="white"/>
-    <ellipse cx="14" cy="19" rx="3" ry="3.5" fill="#0f0f20"/>
-    <ellipse cx="26" cy="19" rx="3" ry="3.5" fill="#0f0f20"/>
-    <circle cx="15" cy="17.5" r="1.2" fill="white"/>
-    <circle cx="27" cy="17.5" r="1.2" fill="white"/>
-    <!-- Boca pequeña -->
-    <path id="cur-mouth" d="M15 27 Q20 31 25 27" stroke="#0f0f20" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <!-- Gorrito mini -->
-    <ellipse cx="20" cy="5" rx="11" ry="2.5" fill="#0f0f20"/>
-    <path d="M9 5 L20 -2 L31 5 Z" fill="#0f0f20"/>
-    <circle cx="20" cy="-2" r="2" fill="#f97316"/>
-  </svg>
+<!-- ═══════════ CURSOR PERSONALIZADO ═══════════ -->
+<div id="custom-cursor" class="custom-cursor"></div>
+<div id="cursor-ring" class="cursor-ring"></div>
  
-  <!-- Cuerpo completo que sale cuando hay tooltip (normalmente oculto) -->
-  <div class="cursor-body" id="cursor-body">
-    <svg class="cursor-body-svg" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="cbg" cx="38%" cy="32%">
-          <stop offset="0%" stop-color="#ffb347"/>
-          <stop offset="100%" stop-color="#f97316"/>
-        </radialGradient>
-        <radialGradient id="cbody" cx="40%" cy="30%">
-          <stop offset="0%" stop-color="#2e2e50"/>
-          <stop offset="100%" stop-color="#14142a"/>
-        </radialGradient>
-      </defs>
-      <!-- Piernas -->
-      <path d="M30 95 Q26 107 22 114" stroke="#c45a00" stroke-width="6" stroke-linecap="round" fill="none"/>
-      <path d="M50 95 Q54 107 58 114" stroke="#c45a00" stroke-width="6" stroke-linecap="round" fill="none"/>
-      <ellipse cx="19" cy="115" rx="8" ry="3.5" fill="#0f0f20"/>
-      <ellipse cx="61" cy="115" rx="8" ry="3.5" fill="#0f0f20"/>
-      <!-- Cuerpo -->
-      <ellipse cx="40" cy="80" rx="24" ry="22" fill="url(#cbody)"/>
-      <!-- Cuello -->
-      <rect x="32" y="64" width="16" height="9" rx="4.5" fill="#c45a00"/>
-      <!-- Brazo izq -->
-      <path d="M18 72 Q6 80 4 92" stroke="#f97316" stroke-width="7" stroke-linecap="round" fill="none"/>
-      <circle cx="3" cy="95" r="5" fill="#f97316"/>
-      <!-- Brazo der -->
-      <path d="M62 72 Q74 80 76 92" stroke="#f97316" stroke-width="7" stroke-linecap="round" fill="none"/>
-      <circle cx="77" cy="95" r="5" fill="#f97316"/>
-      <!-- Cabeza -->
-      <circle cx="40" cy="34" r="28" fill="url(#cbg)"/>
-      <ellipse cx="28" cy="27" rx="10" ry="6" fill="rgba(255,255,255,0.15)" transform="rotate(-20,28,27)"/>
-      <!-- Orejas -->
-      <ellipse cx="13" cy="34" rx="7" ry="9" fill="#c45a00"/>
-      <ellipse cx="67" cy="34" rx="7" ry="9" fill="#c45a00"/>
-      <!-- Ojos -->
-      <ellipse cx="30" cy="31" rx="7.5" ry="8" fill="white"/>
-      <ellipse cx="50" cy="31" rx="7.5" ry="8" fill="white"/>
-      <ellipse cx="30" cy="32" rx="5" ry="5.5" fill="#0f0f20"/>
-      <ellipse cx="50" cy="32" rx="5" ry="5.5" fill="#0f0f20"/>
-      <circle cx="32" cy="29.5" r="2" fill="white"/>
-      <circle cx="52" cy="29.5" r="2" fill="white"/>
-      <!-- Cejas -->
-      <path d="M23 21 Q30 17 37 21" stroke="#0f0f20" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <path d="M43 21 Q50 17 57 21" stroke="#0f0f20" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <!-- Nariz -->
-      <ellipse cx="40" cy="40" rx="3" ry="2" fill="#c45a00" opacity="0.7"/>
-      <!-- Boca -->
-      <path d="M30 49 Q40 57 50 49" stroke="#0f0f20" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <path d="M32 49.5 Q40 56 48 49.5 L48 54 Q40 61 32 54 Z" fill="white" opacity="0.85"/>
-      <!-- Gorro -->
-      <ellipse cx="40" cy="10" rx="22" ry="5" fill="#0f0f20"/>
-      <path d="M18 10 L40 -4 L62 10 Z" fill="#0f0f20"/>
-      <line x1="62" y1="-4" x2="70" y2="8" stroke="#f97316" stroke-width="2"/>
-      <circle cx="72" cy="10" r="4" fill="#f97316"/>
-      <text x="32" y="8" font-family="monospace" font-size="7" fill="#f97316" font-weight="bold">DB</text>
-    </svg>
-    <div class="cursor-tip" id="cursor-tip"></div>
-  </div>
-</div>
+<!-- ═══════════ CANVAS PARTÍCULAS ═══════════ -->
+<canvas id="bg-canvas"></canvas>
  
-<!-- ═══════════ MASCOTA GRANDE (para escenas) ═══════════ -->
-<div id="scene-mascot" class="scene-mascot scene-hidden">
-  <div class="scene-bubble" id="scene-bubble"></div>
-  <div class="scene-svg-wrap" id="scene-svg-wrap">
-    <!-- SVG detallado humanoide -->
-    <svg id="scene-svg" class="scene-svg" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg">
+<!-- ═══════════ NOISE OVERLAY ═══════════ -->
+<div class="noise-overlay"></div>
+ 
+<!-- ═══════════ ROBOT 3D ═══════════ -->
+<div id="robot-wrap" class="robot-wrap">
+  <div id="robot-body" class="robot-body">
+    <!-- ROBOT SVG estilo ChainGPT -->
+    <svg id="robot-svg" class="robot-svg" viewBox="0 0 260 420" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="shg" cx="38%" cy="32%"><stop offset="0%" stop-color="#ffb347"/><stop offset="60%" stop-color="#f97316"/><stop offset="100%" stop-color="#c45a00"/></radialGradient>
-        <radialGradient id="sbg" cx="40%" cy="30%"><stop offset="0%" stop-color="#2e2e50"/><stop offset="100%" stop-color="#14142a"/></radialGradient>
-        <linearGradient id="sag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c45a00"/></linearGradient>
-        <filter id="sglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <!-- Gradientes metálicos -->
+        <linearGradient id="metal1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#c8c8d0"/>
+          <stop offset="40%" stop-color="#e8e8f0"/>
+          <stop offset="100%" stop-color="#8888a0"/>
+        </linearGradient>
+        <linearGradient id="metal2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d0d0dc"/>
+          <stop offset="100%" stop-color="#7878a0"/>
+        </linearGradient>
+        <linearGradient id="metalDark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a4a6a"/>
+          <stop offset="100%" stop-color="#1a1a2e"/>
+        </linearGradient>
+        <!-- RGB glow para la cabeza -->
+        <linearGradient id="rgbGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#ff0080"/>
+          <stop offset="25%"  stop-color="#ff8c00"/>
+          <stop offset="50%"  stop-color="#00ff88"/>
+          <stop offset="75%"  stop-color="#0088ff"/>
+          <stop offset="100%" stop-color="#ff0080"/>
+        </linearGradient>
+        <linearGradient id="rgbGrad2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#0088ff"/>
+          <stop offset="33%"  stop-color="#ff0080"/>
+          <stop offset="66%"  stop-color="#00ff88"/>
+          <stop offset="100%" stop-color="#ff8c00"/>
+        </linearGradient>
+        <!-- Glow filter -->
+        <filter id="glow-blue">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-rgb">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="metal-shadow">
+          <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.5)"/>
+        </filter>
       </defs>
-      <!-- Sombra -->
-      <ellipse cx="80" cy="274" rx="38" ry="8" fill="rgba(249,115,22,0.2)"/>
-      <!-- Piernas -->
-      <path class="sl-leg" d="M62 222 Q55 245 48 260" stroke="#c45a00" stroke-width="12" stroke-linecap="round" fill="none"/>
-      <path class="sr-leg" d="M98 222 Q105 245 112 260" stroke="#c45a00" stroke-width="12" stroke-linecap="round" fill="none"/>
-      <ellipse cx="44" cy="262" rx="14" ry="6" fill="#0f0f20"/>
-      <ellipse cx="116" cy="262" rx="14" ry="6" fill="#0f0f20"/>
-      <!-- Cuerpo -->
-      <ellipse cx="80" cy="190" rx="44" ry="40" fill="url(#sbg)"/>
-      <!-- Detalles ropa -->
-      <path d="M40 190 Q80 205 120 190" stroke="rgba(249,115,22,0.2)" stroke-width="5" fill="none"/>
-      <rect x="75" y="178" width="10" height="6" rx="3" fill="rgba(249,115,22,0.4)"/>
-      <!-- Cuello -->
-      <rect x="65" y="152" width="30" height="16" rx="8" fill="#c45a00"/>
-      <!-- Hombros -->
-      <ellipse cx="40" cy="162" rx="14" ry="12" fill="#1e1e38"/>
-      <ellipse cx="120" cy="162" rx="14" ry="12" fill="#1e1e38"/>
-      <!-- Brazo izq -->
-      <g class="sl-arm" style="transform-origin:40px 162px">
-        <path d="M40 162 Q12 178 8 204" stroke="url(#sag)" stroke-width="13" stroke-linecap="round" fill="none"/>
-        <circle cx="7" cy="208" r="10" fill="#f97316"/>
-        <circle cx="0" cy="203" r="5.5" fill="#f97316"/>
-        <circle cx="7" cy="196" r="5.5" fill="#f97316"/>
-        <circle cx="14" cy="201" r="5.5" fill="#f97316"/>
+ 
+      <!-- ── PIERNAS ── -->
+      <!-- Pierna izq -->
+      <rect x="72" y="320" width="40" height="68" rx="8" fill="url(#metal2)" filter="url(#metal-shadow)"/>
+      <rect x="72" y="320" width="40" height="8" rx="4" fill="#b0b0c8"/>
+      <rect x="74" y="330" width="6" height="50" rx="3" fill="rgba(255,255,255,0.15)"/>
+      <!-- Pie izq -->
+      <rect x="64" y="380" width="52" height="18" rx="9" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+      <rect x="64" y="380" width="52" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+ 
+      <!-- Pierna der -->
+      <rect x="148" y="320" width="40" height="68" rx="8" fill="url(#metal2)" filter="url(#metal-shadow)"/>
+      <rect x="148" y="320" width="40" height="8" rx="4" fill="#b0b0c8"/>
+      <rect x="150" y="330" width="6" height="50" rx="3" fill="rgba(255,255,255,0.15)"/>
+      <!-- Pie der -->
+      <rect x="144" y="380" width="52" height="18" rx="9" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+      <rect x="144" y="380" width="52" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+ 
+      <!-- ── CUERPO TORSO ── -->
+      <rect x="56" y="220" width="148" height="108" rx="20" fill="url(#metal2)" filter="url(#metal-shadow)"/>
+      <!-- Panel frontal del torso -->
+      <rect x="70" y="234" width="120" height="80" rx="10" fill="url(#metalDark)"/>
+      <!-- Luces LED en el torso -->
+      <circle cx="100" cy="258" r="5" fill="#00ff88" filter="url(#glow-blue)" class="led-blink-1"/>
+      <circle cx="120" cy="258" r="5" fill="#0088ff" filter="url(#glow-blue)" class="led-blink-2"/>
+      <circle cx="140" cy="258" r="5" fill="#ff0080" filter="url(#glow-blue)" class="led-blink-3"/>
+      <!-- Rejilla ventilación -->
+      <line x1="80" y1="278" x2="180" y2="278" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+      <line x1="80" y1="285" x2="180" y2="285" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+      <line x1="80" y1="292" x2="180" y2="292" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+      <line x1="80" y1="299" x2="180" y2="299" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+      <!-- Emblema central -->
+      <circle cx="130" cy="268" r="14" fill="none" stroke="rgba(0,136,255,0.6)" stroke-width="2" filter="url(#glow-blue)"/>
+      <text x="130" y="273" text-anchor="middle" font-family="monospace" font-size="9" fill="#0088ff" font-weight="bold">DB</text>
+      <!-- Línea RGB torso inferior -->
+      <rect x="56" y="318" width="148" height="6" rx="3" fill="url(#rgbGrad)" opacity="0.85" filter="url(#glow-rgb)"/>
+ 
+      <!-- ── HOMBROS ── -->
+      <ellipse cx="56" cy="245" rx="22" ry="20" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+      <ellipse cx="204" cy="245" rx="22" ry="20" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+      <ellipse cx="56" cy="245" rx="14" ry="12" fill="rgba(255,255,255,0.1)"/>
+      <ellipse cx="204" cy="245" rx="14" ry="12" fill="rgba(255,255,255,0.1)"/>
+ 
+      <!-- ── BRAZO IZQ ── -->
+      <g class="robot-arm-l" style="transform-origin:56px 245px">
+        <rect x="28" y="250" width="32" height="72" rx="10" fill="url(#metal2)" filter="url(#metal-shadow)"/>
+        <rect x="28" y="250" width="32" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
+        <rect x="30" y="262" width="6" height="52" rx="3" fill="rgba(255,255,255,0.1)"/>
+        <!-- Mano izq -->
+        <rect x="22" y="316" width="44" height="24" rx="12" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+        <!-- Dedos -->
+        <rect x="24" y="338" width="10" height="16" rx="5" fill="url(#metal2)"/>
+        <rect x="37" y="338" width="10" height="18" rx="5" fill="url(#metal2)"/>
+        <rect x="50" y="338" width="10" height="14" rx="5" fill="url(#metal2)"/>
       </g>
-      <!-- Brazo der -->
-      <g class="sr-arm" style="transform-origin:120px 162px">
-        <path d="M120 162 Q148 178 152 204" stroke="url(#sag)" stroke-width="13" stroke-linecap="round" fill="none"/>
-        <circle cx="153" cy="208" r="10" fill="#f97316"/>
-        <circle cx="160" cy="203" r="5.5" fill="#f97316"/>
-        <circle cx="153" cy="196" r="5.5" fill="#f97316"/>
-        <circle cx="146" cy="201" r="5.5" fill="#f97316"/>
+ 
+      <!-- ── BRAZO DER ── -->
+      <g class="robot-arm-r" style="transform-origin:204px 245px">
+        <rect x="200" y="250" width="32" height="72" rx="10" fill="url(#metal2)" filter="url(#metal-shadow)"/>
+        <rect x="200" y="250" width="32" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
+        <rect x="202" y="262" width="6" height="52" rx="3" fill="rgba(255,255,255,0.1)"/>
+        <!-- Mano der -->
+        <rect x="194" y="316" width="44" height="24" rx="12" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+        <!-- Dedos -->
+        <rect x="196" y="338" width="10" height="16" rx="5" fill="url(#metal2)"/>
+        <rect x="209" y="338" width="10" height="18" rx="5" fill="url(#metal2)"/>
+        <rect x="222" y="338" width="10" height="14" rx="5" fill="url(#metal2)"/>
       </g>
-      <!-- Cabeza -->
-      <circle cx="80" cy="88" r="60" fill="url(#shg)" filter="url(#sglow)"/>
-      <!-- Brillo cabeza -->
-      <ellipse cx="58" cy="62" rx="22" ry="13" fill="rgba(255,255,255,0.14)" transform="rotate(-22,58,62)"/>
-      <!-- Orejas -->
-      <ellipse cx="22" cy="88" rx="12" ry="16" fill="#c45a00"/>
-      <ellipse cx="22" cy="88" rx="7" ry="10" fill="#e8752a"/>
-      <ellipse cx="138" cy="88" rx="12" ry="16" fill="#c45a00"/>
-      <ellipse cx="138" cy="88" rx="7" ry="10" fill="#e8752a"/>
-      <!-- Ojos blancos -->
-      <ellipse cx="60" cy="82" rx="15" ry="16" fill="white"/>
-      <ellipse cx="100" cy="82" rx="15" ry="16" fill="white"/>
-      <!-- Pupilas -->
-      <g class="se-l" style="transform-origin:60px 83px">
-        <ellipse cx="60" cy="83" rx="9.5" ry="10.5" fill="#0f0f20"/>
-        <ellipse cx="60" cy="83" rx="6.5" ry="7.5" fill="#2d2d60"/>
-        <circle cx="64" cy="79.5" r="3.5" fill="white"/>
-        <circle cx="57" cy="88" r="1.5" fill="rgba(255,255,255,0.3)"/>
-      </g>
-      <g class="se-r" style="transform-origin:100px 83px">
-        <ellipse cx="100" cy="83" rx="9.5" ry="10.5" fill="#0f0f20"/>
-        <ellipse cx="100" cy="83" rx="6.5" ry="7.5" fill="#2d2d60"/>
-        <circle cx="104" cy="79.5" r="3.5" fill="white"/>
-        <circle cx="97" cy="88" r="1.5" fill="rgba(255,255,255,0.3)"/>
-      </g>
-      <!-- Cejas -->
-      <path class="sb-l" d="M46 65 Q60 57 74 65" stroke="#0f0f20" stroke-width="4" stroke-linecap="round" fill="none"/>
-      <path class="sb-r" d="M86 65 Q100 57 114 65" stroke="#0f0f20" stroke-width="4" stroke-linecap="round" fill="none"/>
-      <!-- Nariz -->
-      <ellipse cx="80" cy="98" rx="5.5" ry="3.5" fill="#c45a00" opacity="0.7"/>
-      <!-- Boca -->
-      <path id="scene-mouth" d="M64 112 Q80 126 96 112" stroke="#0f0f20" stroke-width="4" stroke-linecap="round" fill="none"/>
-      <path d="M67 113 Q80 124 93 113 L93 120 Q80 131 67 120 Z" fill="white" opacity="0.88"/>
-      <ellipse cx="80" cy="124" rx="7" ry="4.5" fill="#e05c8a" opacity="0.65"/>
-      <!-- Gorro -->
-      <ellipse cx="80" cy="32" rx="40" ry="8" fill="#0f0f20"/>
-      <path d="M40 32 L80 4 L120 32 Z" fill="#0f0f20"/>
-      <rect x="41" y="28" width="78" height="10" rx="5" fill="#1e1e38"/>
-      <line x1="120" y1="4" x2="134" y2="28" stroke="#f97316" stroke-width="3"/>
-      <circle cx="136" cy="32" r="6.5" fill="#f97316"/>
-      <text x="62" y="27" font-family="monospace" font-size="12" fill="#f97316" font-weight="bold">DB</text>
+ 
+      <!-- ── CUELLO ── -->
+      <rect x="108" y="204" width="44" height="22" rx="8" fill="url(#metal2)"/>
+      <rect x="112" y="207" width="36" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
+      <rect x="112" y="214" width="36" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+ 
+      <!-- ── CABEZA ── -->
+      <!-- Cuerpo cabeza -->
+      <rect x="50" y="80" width="160" height="128" rx="24" fill="url(#metal1)" filter="url(#metal-shadow)"/>
+      <!-- Panel oscuro frente -->
+      <rect x="62" y="90" width="136" height="108" rx="16" fill="url(#metalDark)"/>
+      <!-- Strip RGB parte superior cabeza -->
+      <rect x="50" y="78" width="160" height="8" rx="4" fill="url(#rgbGrad)" opacity="0.9" filter="url(#glow-rgb)" class="rgb-anim"/>
+      <!-- Strip RGB parte inferior cabeza -->
+      <rect x="50" y="200" width="160" height="6" rx="3" fill="url(#rgbGrad2)" opacity="0.8" filter="url(#glow-rgb)" class="rgb-anim2"/>
+ 
+      <!-- ── OJOS PANTALLA ── -->
+      <!-- Ojo izquierdo — cuadrado redondeado como el robot -->
+      <rect x="76" y="108" rx="12" ry="12" width="44" height="44" fill="#0a0a1e"/>
+      <rect x="78" y="110" rx="10" ry="10" width="40" height="40" fill="#050510"/>
+      <!-- Brillo ojo izq -->
+      <circle cx="98" cy="130" r="14" fill="white" class="eye-glow-l"/>
+      <circle cx="98" cy="130" r="10" fill="#0088ff" filter="url(#glow-blue)"/>
+      <circle cx="98" cy="130" r="6"  fill="white"/>
+      <circle cx="104" cy="124" r="3" fill="rgba(255,255,255,0.9)"/>
+ 
+      <!-- Ojo derecho -->
+      <rect x="140" y="108" rx="12" ry="12" width="44" height="44" fill="#0a0a1e"/>
+      <rect x="142" y="110" rx="10" ry="10" width="40" height="40" fill="#050510"/>
+      <circle cx="162" cy="130" r="14" fill="white" class="eye-glow-r"/>
+      <circle cx="162" cy="130" r="10" fill="#0088ff" filter="url(#glow-blue)"/>
+      <circle cx="162" cy="130" r="6"  fill="white"/>
+      <circle cx="168" cy="124" r="3" fill="rgba(255,255,255,0.9)"/>
+ 
+      <!-- Boca / display panel -->
+      <rect x="82" y="162" width="96" height="22" rx="8" fill="#050510"/>
+      <rect id="robot-mouth-bar" x="84" y="164" width="30" height="18" rx="6" fill="#00ff88" opacity="0.8" class="mouth-anim"/>
+      <rect x="118" y="164" width="20" height="18" rx="6" fill="#0088ff" opacity="0.6" class="mouth-anim2"/>
+      <rect x="142" y="164" width="14" height="18" rx="6" fill="#ff0080" opacity="0.5" class="mouth-anim3"/>
+      <rect x="160" y="164" width="16" height="18" rx="6" fill="#ff8c00" opacity="0.4" class="mouth-anim4"/>
+ 
+      <!-- ── ANTENAS ── -->
+      <line x1="100" y1="80" x2="86" y2="36" stroke="#c8c8d8" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="86" cy="32" r="8" fill="#0088ff" filter="url(#glow-blue)" class="antenna-pulse-l"/>
+      <circle cx="86" cy="32" r="4" fill="white"/>
+ 
+      <line x1="160" y1="80" x2="174" y2="36" stroke="#c8c8d8" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="174" cy="32" r="8" fill="#ff0080" filter="url(#glow-blue)" class="antenna-pulse-r"/>
+      <circle cx="174" cy="32" r="4" fill="white"/>
+ 
+      <!-- ── DETALLES LATERALES CABEZA ── -->
+      <rect x="34" y="100" width="18" height="40" rx="9" fill="url(#metal2)"/>
+      <rect x="208" y="100" width="18" height="40" rx="9" fill="url(#metal2)"/>
+      <rect x="36" y="118" width="14" height="6" rx="3" fill="#0088ff" opacity="0.6" filter="url(#glow-blue)"/>
+      <rect x="210" y="118" width="14" height="6" rx="3" fill="#0088ff" opacity="0.6" filter="url(#glow-blue)"/>
     </svg>
-    <!-- Prop de cocina (para animación cocinando) -->
-    <div class="scene-prop cooking-prop" id="cooking-prop">🍳</div>
-    <!-- Ropa atrapada (para animación colgando) -->
-    <div class="scene-prop hook-prop" id="hook-prop">🪝</div>
   </div>
+  <!-- Burbuja del robot -->
+  <div class="robot-bubble" id="robot-bubble"></div>
 </div>
  
 <!-- ═══════════ BYE OVERLAY ═══════════ -->
 <div id="bye-overlay" class="bye-overlay bye-hidden">
   <div class="bye-particles" id="bye-particles"></div>
+  <canvas id="bye-canvas" class="bye-canvas"></canvas>
   <div class="bye-content">
-    <div class="bye-text">BYE BYE 👋</div>
+    <div class="bye-text">BYE BYE</div>
     <div class="bye-sub">¡Hasta la próxima, señorón!</div>
   </div>
-  <div class="bye-mascot-zone" id="bye-mascot-zone"></div>
 </div>
  
 <!-- ═══════════ NAVBAR ═══════════ -->
 <nav class="navbar" id="navbar">
-  <div class="nav-brand" data-tip="Inicio del portafolio de Jose Moori">
-    <div class="nav-logo">JM</div>
+  <div class="nav-brand" data-tip="Portafolio de Jose Moori 🤖">
+    <div class="nav-logo-3d">
+      <span>JM</span>
+      <div class="logo-glow"></div>
+    </div>
     <span class="nav-name">Jose Moori</span>
+    <span class="nav-dot"></span>
+    <span class="nav-status">SYSTEM ONLINE</span>
+  </div>
+  <div class="nav-center">
+    <a href="#hero-sec" class="nav-link" data-tip="Inicio 🏠">Home</a>
+    <a href="#info-cards-sec" class="nav-link" data-tip="Mi información 📋">Perfil</a>
+    <a href="#units-sec" class="nav-link" data-tip="Mis tareas académicas 📚">Unidades</a>
   </div>
   <div class="nav-right">
-    <span class="nav-tag">UPLA · PERÚ</span>
-    <button id="btn-login-nav" class="btn-nav" onclick="abrirLogin()" data-tip="¡Aquí te conectas, animate! 🔑">Iniciar sesión</button>
+    <button id="btn-login-nav" class="btn-launch" onclick="abrirLogin()" data-tip="¡Inicia sesión aquí! 🔑">
+      <span class="btn-dots">●●●</span> INICIAR SESIÓN
+    </button>
     <div id="user-pill" class="user-pill hidden">
       <div class="pill-avatar" id="pill-avatar">JM</div>
       <div class="pill-info">
         <span id="pill-name"></span>
         <span id="pill-role"></span>
       </div>
-      <button onclick="doLogout()" class="pill-x" data-tip="Cerrar sesión 👋">
-        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
+      <button onclick="doLogout()" class="pill-x" data-tip="Cerrar sesión 👋">✕</button>
     </div>
   </div>
 </nav>
  
 <!-- ═══════════ HERO ═══════════ -->
-<section class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-grid-bg"></div>
-  <div class="side-nav">
-    <div class="sn-dot active"></div><div class="sn-dot"></div>
-    <div class="sn-dot"></div><div class="sn-dot"></div>
-    <div class="sn-dot"></div><div class="sn-dot"></div>
-  </div>
-  <div class="hero-text">
-    <div class="hero-eyebrow"><span class="eyebrow-dot"></span>PORTAFOLIO ACADÉMICO · SISTEMA DE ARCHIVOS</div>
-    <h1 class="hero-h1">Hola, soy<br><em class="hero-name">Jose Moori</em></h1>
-    <p class="hero-desc">Gestión de tareas académicas<br>de la Universidad Peruana Los Andes.</p>
-    <div class="hero-chips">
-      <span class="chip orange" data-tip="Unidad 1 · Análisis y estadística 📊">Análisis de Datos</span>
-      <span class="chip cyan"   data-tip="Unidad 3 · Consultas SQL avanzadas 🗃️">SQL</span>
-      <span class="chip green"  data-tip="Unidad 2 · Modelos relacionales 🔗">Diseño Relacional</span>
-      <span class="chip purple" data-tip="Unidad 4 · Seguridad en BD 🔐">Seguridad</span>
+<section class="hero-sec" id="hero-sec">
+  <div class="hero-grid"></div>
+ 
+  <!-- Texto izquierda -->
+  <div class="hero-left">
+    <div class="hero-label">
+      <span class="label-dot"></span>
+      PORTAFOLIO ACADÉMICO · UPLA PERÚ
+    </div>
+ 
+    <!-- Frases animadas estilo ChainGPT -->
+    <div class="hero-terminal">
+      <div class="terminal-line active" id="tl-1">
+        <span class="tl-q">›</span>
+        <span class="tl-text">Análisis de bases de datos relacionales.</span>
+      </div>
+      <div class="terminal-line" id="tl-2">
+        <span class="tl-q">›</span>
+        <span class="tl-text">Diseño de modelos entidad–relación.</span>
+      </div>
+      <div class="terminal-line dim" id="tl-3">
+        <span class="tl-q">›</span>
+        <span class="tl-text">Sentencias SQL avanzadas con joins y subqueries.</span>
+      </div>
+    </div>
+ 
+    <h1 class="hero-h1">
+      PORTAFOLIO<br>
+      <span class="hero-h1-accent">ACADÉMICO</span>
+    </h1>
+ 
+    <p class="hero-desc">Sistema de gestión de tareas · Base de Datos II · UPLA</p>
+ 
+    <div class="hero-actions">
+      <button class="btn-primary-3d" onclick="document.getElementById('units-sec').scrollIntoView({behavior:'smooth'})" data-tip="Ver mis unidades académicas 📚">
+        VER UNIDADES ↓
+      </button>
+      <button class="btn-ghost-3d" onclick="abrirLogin()" data-tip="Ingresa al sistema 🔐">
+        INGRESAR AL SISTEMA
+      </button>
+    </div>
+ 
+    <!-- Stats -->
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-num" id="stat-files">—</div>
+        <div class="hstat-lbl">ARCHIVOS</div>
+      </div>
+      <div class="hstat-sep"></div>
+      <div class="hstat">
+        <div class="hstat-num">4</div>
+        <div class="hstat-lbl">UNIDADES</div>
+      </div>
+      <div class="hstat-sep"></div>
+      <div class="hstat">
+        <div class="hstat-num">16</div>
+        <div class="hstat-lbl">SEMANAS</div>
+      </div>
     </div>
   </div>
-  <div class="hero-3d" id="hero-3d">
-    <!-- Tarjeta decorativa estática derecha -->
-    <div class="float-obj fo-a" style="animation:float-a 6s ease-in-out infinite;">
-      <div class="fo-inner">🗄️</div><div class="fo-lbl">BASE DE DATOS</div>
-    </div>
-    <div class="float-obj fo-b" style="animation:float-b 5s ease-in-out infinite 1s;">
-      <div class="fo-inner">📊</div><div class="fo-lbl">ANÁLISIS</div>
-    </div>
-    <div class="float-obj fo-c" style="animation:float-c 7s ease-in-out infinite 0.5s;">
-      <div class="fo-inner">🔐</div><div class="fo-lbl">SEGURIDAD</div>
+ 
+  <!-- Derecha: lista de módulos estilo ChainGPT -->
+  <div class="hero-right">
+    <div class="module-list">
+      <div class="module-item" onclick="openUnit(1)" data-tip="Abrir Unidad 1 📊">
+        <span class="mi-arrow">◄</span>
+        <span class="mi-label">ANÁLISIS DE DATOS</span>
+      </div>
+      <div class="module-item" onclick="openUnit(2)" data-tip="Abrir Unidad 2 🔗">
+        <span class="mi-arrow">◄</span>
+        <span class="mi-label">DISEÑO RELACIONAL</span>
+      </div>
+      <div class="module-item" onclick="openUnit(3)" data-tip="Abrir Unidad 3 🗃️">
+        <span class="mi-arrow">◄</span>
+        <span class="mi-label">SENTENCIAS SQL</span>
+      </div>
+      <div class="module-item" onclick="openUnit(4)" data-tip="Abrir Unidad 4 🔐">
+        <span class="mi-arrow">◄</span>
+        <span class="mi-label">SEGURIDAD</span>
+      </div>
+      <div class="module-item dim-item">
+        <span class="mi-label" style="opacity:0.3">Y MUCHO MÁS...</span>
+      </div>
     </div>
   </div>
-  <div class="scroll-arrow" data-tip="Desplázate para ver las unidades ↓">↓</div>
+ 
+  <!-- Barra inferior de scroll -->
+  <div class="hero-bottom">
+    <div class="scroll-line">
+      <div class="scroll-line-fill"></div>
+    </div>
+    <span class="scroll-lbl" data-tip="Desplázate hacia abajo ↓">SCROLL DOWN ↓</span>
+  </div>
 </section>
  
-<!-- ═══════════ INFO CARDS (entre hero y unidades) ═══════════ -->
+<!-- ═══════════ INFO CARDS ═══════════ -->
 <section class="info-cards-sec" id="info-cards-sec">
+  <div class="section-header">
+    <div class="sec-tag">● INFORMACIÓN</div>
+    <h2 class="sec-h2">Sistema de datos</h2>
+  </div>
   <div class="info-cards-grid">
- 
-    <!-- TARJETA PERFIL -->
-    <div class="info-card" id="ic-perfil" onclick="toggleInfoCard('perfil')">
-      <div class="ic-header">
-        <div class="ic-icon">👤</div>
-        <div class="ic-title">Perfil académico</div>
-        <div class="ic-chevron" id="chev-perfil">›</div>
+    <div class="info-card-3d" id="ic-perfil" onclick="toggleInfoCard('perfil')">
+      <div class="ic3-top">
+        <span class="ic3-icon">👤</span>
+        <span class="ic3-title">Perfil académico</span>
+        <span class="ic3-chev" id="chev-perfil">+</span>
       </div>
-      <div class="ic-body hidden" id="icb-perfil">
-        <div class="ic-row"><span class="ic-emoji">🎓</span><div><strong>Jose Moori</strong><br><span>Ingeniería de Sistemas e Informática</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">🏛️</span><div><strong>Universidad</strong><br><span>Universidad Peruana Los Andes · UPLA</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">📍</span><div><strong>Ubicación</strong><br><span>Huancayo, Junín, Perú</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">📅</span><div><strong>Ciclo académico</strong><br><span>2025 · Semestre I</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">📚</span><div><strong>Curso</strong><br><span>Base de Datos II · Portafolio digital</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">⚡</span><div><strong>Especialización</strong><br><span>Bases de datos, SQL, seguridad informática</span></div></div>
+      <div class="ic3-body hidden" id="icb-perfil">
+        <div class="ic3-row"><span class="ic3-key">Nombre</span><span class="ic3-val">Jose Moori</span></div>
+        <div class="ic3-row"><span class="ic3-key">Carrera</span><span class="ic3-val">Ing. de Sistemas e Informática</span></div>
+        <div class="ic3-row"><span class="ic3-key">Universidad</span><span class="ic3-val">UPLA · Huancayo, Perú</span></div>
+        <div class="ic3-row"><span class="ic3-key">Ciclo</span><span class="ic3-val">2025 · Semestre I</span></div>
+        <div class="ic3-row"><span class="ic3-key">Curso</span><span class="ic3-val">Base de Datos II</span></div>
+        <div class="ic3-row"><span class="ic3-key">Especialidad</span><span class="ic3-val">SQL · Diseño Relacional · Seguridad</span></div>
       </div>
     </div>
  
-    <!-- TARJETA CONTACTO -->
-    <div class="info-card" id="ic-contacto" onclick="toggleInfoCard('contacto')">
-      <div class="ic-header">
-        <div class="ic-icon">📱</div>
-        <div class="ic-title">Contacto</div>
-        <div class="ic-chevron" id="chev-contacto">›</div>
+    <div class="info-card-3d" id="ic-contacto" onclick="toggleInfoCard('contacto')">
+      <div class="ic3-top">
+        <span class="ic3-icon">📡</span>
+        <span class="ic3-title">Contacto</span>
+        <span class="ic3-chev" id="chev-contacto">+</span>
       </div>
-      <div class="ic-body hidden" id="icb-contacto">
-        <div class="ic-row"><span class="ic-emoji">📞</span><div><strong>Teléfono</strong><br><span>+51 999 600 911</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">📧</span><div><strong>Correo</strong><br><span>jose.moori@upla.edu.pe</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">💬</span><div><strong>WhatsApp</strong><br><span>Disponible · Lun–Vie 8am–10pm</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">🐙</span><div><strong>GitHub</strong><br><span>github.com/joseamz</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">💼</span><div><strong>LinkedIn</strong><br><span>linkedin.com/in/josemoori</span></div></div>
-        <div class="ic-row"><span class="ic-emoji">🌐</span><div><strong>Portfolio web</strong><br><span>joseamz-design.github.io</span></div></div>
+      <div class="ic3-body hidden" id="icb-contacto">
+        <div class="ic3-row"><span class="ic3-key">Teléfono</span><span class="ic3-val">+51 999 600 911</span></div>
+        <div class="ic3-row"><span class="ic3-key">Email</span><span class="ic3-val">jose.moori@upla.edu.pe</span></div>
+        <div class="ic3-row"><span class="ic3-key">WhatsApp</span><span class="ic3-val">Disponible Lun–Vie 8am–10pm</span></div>
+        <div class="ic3-row"><span class="ic3-key">GitHub</span><span class="ic3-val">github.com/joseamz-design</span></div>
+        <div class="ic3-row"><span class="ic3-key">Portfolio</span><span class="ic3-val">joseamz-design.github.io</span></div>
       </div>
     </div>
  
-    <!-- TARJETA PROGRESO -->
-    <div class="info-card" id="ic-progreso" onclick="toggleInfoCard('progreso')">
-      <div class="ic-header">
-        <div class="ic-icon">📈</div>
-        <div class="ic-title">Progreso del portafolio</div>
-        <div class="ic-chevron" id="chev-progreso">›</div>
+    <div class="info-card-3d" id="ic-progreso" onclick="toggleInfoCard('progreso')">
+      <div class="ic3-top">
+        <span class="ic3-icon">📊</span>
+        <span class="ic3-title">Progreso del portafolio</span>
+        <span class="ic3-chev" id="chev-progreso">+</span>
       </div>
-      <div class="ic-body hidden" id="icb-progreso">
-        <div class="progress-bars" id="progress-bars">
-          <!-- Se generan dinámicamente -->
-          <div class="prog-loading">Calculando progreso…</div>
-        </div>
-        <div class="ic-tip-msg" id="ic-tip-msg"></div>
+      <div class="ic3-body hidden" id="icb-progreso">
+        <div id="progress-bars"><div class="prog-loading">Cargando…</div></div>
+        <div class="ic-tip-msg hidden" id="ic-tip-msg"></div>
       </div>
     </div>
- 
   </div>
 </section>
  
 <!-- ═══════════ UNIDADES ═══════════ -->
 <section class="units-sec" id="units-sec">
-  <div class="sec-head">
-    <div class="sec-label">ARCHIVO ACADÉMICO</div>
-    <h2 class="sec-title">Unidades del curso</h2>
-    <p class="sec-desc">Haz clic en una unidad para ver o descargar archivos</p>
+  <div class="section-header">
+    <div class="sec-tag">● ARCHIVOS ACADÉMICOS</div>
+    <h2 class="sec-h2">Unidades del curso</h2>
   </div>
-  <div class="units-grid">
-    <div class="ucard" onclick="openUnit(1)" data-tip="Abrir Unidad 1 · Análisis de Datos 📊">
-      <div class="ucard-line" style="--clr:#f97316"></div>
-      <div class="ucard-glow" style="--clr:rgba(249,115,22,0.15)"></div>
-      <div class="ucard-num">01</div>
-      <div class="ucard-title">Análisis de Datos</div>
-      <div class="ucard-stat" id="c1">— archivos</div>
-      <div class="ucard-arrow">→</div>
+  <div class="units-grid-3d">
+    <div class="ucard-3d" onclick="openUnit(1)" data-tip="Abrir Unidad 1 · Análisis de Datos 📊">
+      <div class="ucard-3d-inner">
+        <div class="ucard-accent" style="--ac:#f97316"></div>
+        <div class="ucard-3d-num">01</div>
+        <div class="ucard-3d-title">Análisis de<br>Datos</div>
+        <div class="ucard-3d-stat" id="c1">— archivos</div>
+        <div class="ucard-3d-cta">ABRIR →</div>
+      </div>
     </div>
-    <div class="ucard" onclick="openUnit(2)" data-tip="Abrir Unidad 2 · Diseño Relacional 🔗">
-      <div class="ucard-line" style="--clr:#06b6d4"></div>
-      <div class="ucard-glow" style="--clr:rgba(6,182,212,0.15)"></div>
-      <div class="ucard-num">02</div>
-      <div class="ucard-title">Diseño Relacional</div>
-      <div class="ucard-stat" id="c2">— archivos</div>
-      <div class="ucard-arrow">→</div>
+    <div class="ucard-3d" onclick="openUnit(2)" data-tip="Abrir Unidad 2 · Diseño Relacional 🔗">
+      <div class="ucard-3d-inner">
+        <div class="ucard-accent" style="--ac:#06b6d4"></div>
+        <div class="ucard-3d-num">02</div>
+        <div class="ucard-3d-title">Diseño<br>Relacional</div>
+        <div class="ucard-3d-stat" id="c2">— archivos</div>
+        <div class="ucard-3d-cta">ABRIR →</div>
+      </div>
     </div>
-    <div class="ucard" onclick="openUnit(3)" data-tip="Abrir Unidad 3 · Sentencias SQL 🗃️">
-      <div class="ucard-line" style="--clr:#22c55e"></div>
-      <div class="ucard-glow" style="--clr:rgba(34,197,94,0.15)"></div>
-      <div class="ucard-num">03</div>
-      <div class="ucard-title">Sentencias SQL</div>
-      <div class="ucard-stat" id="c3">— archivos</div>
-      <div class="ucard-arrow">→</div>
+    <div class="ucard-3d" onclick="openUnit(3)" data-tip="Abrir Unidad 3 · Sentencias SQL 🗃️">
+      <div class="ucard-3d-inner">
+        <div class="ucard-accent" style="--ac:#22c55e"></div>
+        <div class="ucard-3d-num">03</div>
+        <div class="ucard-3d-title">Sentencias<br>SQL</div>
+        <div class="ucard-3d-stat" id="c3">— archivos</div>
+        <div class="ucard-3d-cta">ABRIR →</div>
+      </div>
     </div>
-    <div class="ucard" onclick="openUnit(4)" data-tip="Abrir Unidad 4 · Protocolos de Seguridad 🔐">
-      <div class="ucard-line" style="--clr:#a855f7"></div>
-      <div class="ucard-glow" style="--clr:rgba(168,85,247,0.15)"></div>
-      <div class="ucard-num">04</div>
-      <div class="ucard-title">Protocolos de Seguridad</div>
-      <div class="ucard-stat" id="c4">— archivos</div>
-      <div class="ucard-arrow">→</div>
+    <div class="ucard-3d" onclick="openUnit(4)" data-tip="Abrir Unidad 4 · Seguridad 🔐">
+      <div class="ucard-3d-inner">
+        <div class="ucard-accent" style="--ac:#a855f7"></div>
+        <div class="ucard-3d-num">04</div>
+        <div class="ucard-3d-title">Protocolos de<br>Seguridad</div>
+        <div class="ucard-3d-stat" id="c4">— archivos</div>
+        <div class="ucard-3d-cta">ABRIR →</div>
+      </div>
     </div>
   </div>
 </section>
@@ -368,14 +443,8 @@
     </div>
     <button class="mclose" onclick="cerrarLogin()">✕</button>
     <div class="mtabs">
-      <button class="mtab active" id="t-login" onclick="switchTab('login')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-        Iniciar sesión
-      </button>
-      <button class="mtab" id="t-reg" onclick="switchTab('reg')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6"/></svg>
-        Registrarse
-      </button>
+      <button class="mtab active" id="t-login" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="mtab" id="t-reg" onclick="switchTab('reg')">Registrarse</button>
     </div>
     <div id="f-login">
       <div class="mfield"><label>Usuario</label>
@@ -394,10 +463,7 @@
           </button>
         </div>
       </div>
-      <button class="btn-main" onclick="doLogin()">
-        <span>Acceder al sistema</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
+      <button class="btn-main" onclick="doLogin()">Acceder al sistema →</button>
     </div>
     <div id="f-reg" style="display:none">
       <div class="mfield"><label>Usuario</label>
@@ -423,7 +489,7 @@
         </div>
       </div>
       <div class="mfield" id="admin-code-field" style="display:none">
-        <label>Código de administrador <span style="color:var(--orange)">(opcional)</span></label>
+        <label>Código de admin <span style="color:#f97316">(opcional)</span></label>
         <div class="input-wrap">
           <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <input type="password" id="r-code" placeholder="••••••••••">
@@ -433,16 +499,10 @@
           </button>
         </div>
       </div>
-      <div class="admin-toggle-wrap">
-        <button class="admin-toggle-btn" onclick="toggleAdminField()" id="admin-toggle-btn" type="button">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          ¿Tienes código de administrador?
-        </button>
-      </div>
-      <button class="btn-main" onclick="doRegister()">
-        <span>Crear mi cuenta</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <button class="admin-toggle-btn" onclick="toggleAdminField()" id="admin-toggle-btn" type="button">
+        🔐 ¿Tienes código de administrador?
       </button>
+      <button class="btn-main" onclick="doRegister()">Crear cuenta →</button>
     </div>
     <p class="merror" id="auth-err"></p>
   </div>
@@ -460,10 +520,10 @@
       </div>
     </div>
     <div class="week-row">
-      <button class="wbtn" onclick="selectWeek(1)" data-tip="Semana 1 📂">Semana 1</button>
-      <button class="wbtn" onclick="selectWeek(2)" data-tip="Semana 2 📂">Semana 2</button>
-      <button class="wbtn" onclick="selectWeek(3)" data-tip="Semana 3 📂">Semana 3</button>
-      <button class="wbtn" onclick="selectWeek(4)" data-tip="Semana 4 📂">Semana 4</button>
+      <button class="wbtn" onclick="selectWeek(1)">Semana 1</button>
+      <button class="wbtn" onclick="selectWeek(2)">Semana 2</button>
+      <button class="wbtn" onclick="selectWeek(3)">Semana 3</button>
+      <button class="wbtn" onclick="selectWeek(4)">Semana 4</button>
     </div>
     <div id="unit-body" class="unit-body">
       <div class="pick-hint">Selecciona una semana para ver los archivos</div>
@@ -474,4 +534,3 @@
 <script src="script.js"></script>
 </body>
 </html>
- 
