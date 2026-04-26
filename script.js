@@ -1,10 +1,19 @@
-/* ═══════════════════════════════════════════
-   MOORI_OS — script.js v7
-   Firebase · Robot · Cursor · Auth · CRUD
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   MOORI_OS — script.js v5
+   ─────────────────────────────────────────────
+   ✅ Cursor = cabeza del muñeco
+   ✅ Cuerpo aparece solo tras 2.5s estático en data-tip
+   ✅ Animaciones: sorpresa (login), cocinando, colgando
+   ✅ Al encogerse → se transforma en cursor
+   ✅ Registro: VIEWER / ADMIN con código 999600911
+   ✅ Campos se limpian al cerrar sesión
+   ✅ Info cards expandibles horizontales
+   ✅ Progreso por unidad + aviso si falta subir
+   ✅ Subir archivos Y vínculos/URLs
+═══════════════════════════════════════════════ */
  
-/* ── FIREBASE ── */
-const FB_CFG = {
+/* ══════ FIREBASE ══════ */
+const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyDI5_UhyiFhz7FgELyg49YjvmltPcUfrvk",
   authDomain:        "josejose-49388.firebaseapp.com",
   projectId:         "josejose-49388",
@@ -12,520 +21,643 @@ const FB_CFG = {
   messagingSenderId: "297650955910",
   appId:             "1:297650955910:web:1867650fe8c3dc492bd307"
 };
-const ADMIN_CODE = "999600911";
-const MAX_FILES  = 8; // 4 semanas × 2 archivos por unidad
+const ADMIN_SECRET = "999600911";
  
 const _s = document.createElement('script');
-_s.type  = 'module';
+_s.type = 'module';
 _s.textContent = `
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, where }
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  const app = initializeApp(${JSON.stringify(FB_CFG)});
+  const app = initializeApp(${JSON.stringify(FIREBASE_CONFIG)});
   const db  = getFirestore(app);
-  window._db = { db, collection, getDocs, addDoc, deleteDoc, doc, query, where };
-  window.dispatchEvent(new Event('fb-ready'));
+  window._fb = { db, collection, getDocs, addDoc, deleteDoc, doc, query, where };
+  window.dispatchEvent(new Event('firebase-ready'));
 `;
 document.head.appendChild(_s);
  
-/* ── ESTADO ── */
-let user      = null;
-let fbOk      = false;
-let unitActive = null;
-let weekActive = null;
-let uploadMode = 'file';
+/* ══════ ESTADO ══════ */
+let currentUser  = null;
+let activeUnit   = null;
+let activeWeek   = null;
+let fbReady      = false;
+let uploadMode   = 'file'; // 'file' | 'link'
+const unitNames  = ['','Análisis de Datos','Diseño Relacional','Sentencias SQL','Protocolos de Seguridad'];
+const WEEKS_PER_UNIT = 4; // semanas por unidad
+const FILES_PER_WEEK = 2; // archivos esperados por semana
  
-const unitNames = ['','Análisis de Datos','Diseño Relacional','Sentencias SQL','Protocolos de Seguridad'];
-const unitColors = ['','#6366f1','#8b5cf6','#06b6d4','#10b981'];
- 
-/* ── INIT ── */
+/* ══════ INIT ══════ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('user-pill').classList.add('hidden');
-  initCursor();
-  initRobot();
-  initScrollFade();
+  document.getElementById('btn-login-nav').classList.remove('hidden');
+  initCursorMascot();
 });
  
-window.addEventListener('fb-ready', async () => {
-  fbOk = true;
-  await refreshCounters();
+window.addEventListener('firebase-ready', async () => {
+  fbReady = true;
+  await updateCounters();
 });
  
-/* ── FIREBASE HELPERS ── */
-async function dbGet(col, filters = []) {
-  if (!fbOk) throw 0;
-  const { db, collection, getDocs, query, where } = window._db;
+/* ══════ FIREBASE HELPERS ══════ */
+async function fbGetAll(col, filters = []) {
+  if (!fbReady) throw new Error('Firebase no listo');
+  const { db, collection, getDocs, query, where } = window._fb;
   let q = collection(db, col);
-  if (filters.length) q = query(q, ...filters.map(([f,o,v]) => where(f,o,v)));
-  return (await getDocs(q)).docs.map(d => ({ id: d.id, ...d.data() }));
+  if (filters.length)
+    q = query(q, ...filters.map(([f,op,v]) => where(f,op,v)));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
-async function dbAdd(col, data) {
-  if (!fbOk) throw 0;
-  const { db, collection, addDoc } = window._db;
+async function fbAdd(col, data) {
+  if (!fbReady) throw new Error('Firebase no listo');
+  const { db, collection, addDoc } = window._fb;
   return (await addDoc(collection(db, col), data)).id;
 }
-async function dbDel(col, id) {
-  if (!fbOk) throw 0;
-  const { db, doc, deleteDoc } = window._db;
+async function fbDelete(col, id) {
+  if (!fbReady) throw new Error('Firebase no listo');
+  const { db, doc, deleteDoc } = window._fb;
   await deleteDoc(doc(db, col, id));
 }
  
-/* ═══════════════════════════════════════════
-   CURSOR
-═══════════════════════════════════════════ */
-function initCursor() {
-  const el = document.getElementById('cur');
-  document.addEventListener('mousemove', e => {
-    el.style.left = e.clientX + 'px';
-    el.style.top  = e.clientY + 'px';
+/* ══════════════════════════════════════════════
+   CURSOR MASCOTA
+   - La cabeza siempre sigue el cursor
+   - El cuerpo + tip aparecen solo tras 2.5s estático en data-tip
+══════════════════════════════════════════════ */
+let cursorX = 200, cursorY = 200;
+let tipTimer  = null;
+let bodyShown = false;
+ 
+function initCursorMascot() {
+  const cm     = document.getElementById('cursor-mascot');
+  const tipEl  = document.getElementById('cursor-tip');
+ 
+  // Mover cabeza con el cursor
+  document.addEventListener('mousemove', (e) => {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+    cm.style.left = (cursorX - 18) + 'px';
+    cm.style.top  = (cursorY - 18) + 'px';
+ 
+    // Si el cuerpo está mostrándose, reiniciar el timer
+    if (tipTimer) {
+      clearTimeout(tipTimer);
+      tipTimer = null;
+    }
+    // Si ya estaba el cuerpo visible, ocultarlo al mover
+    if (bodyShown) {
+      hideCursorBody();
+    }
   });
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest('button,a,[onclick]')) el.classList.add('big');
+ 
+  // Hover en elementos con data-tip
+  document.addEventListener('mouseover', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (!el) return;
+    const tip = el.getAttribute('data-tip');
+    if (!tip) return;
+ 
+    cm.classList.add('hover');
+ 
+    // Iniciar timer de 2.5s
+    if (tipTimer) clearTimeout(tipTimer);
+    tipTimer = setTimeout(() => {
+      tipEl.textContent = tip;
+      cm.classList.add('tip-active');
+      bodyShown = true;
+      tipTimer = null;
+    }, 2500);
   });
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest('button,a,[onclick]')) el.classList.remove('big');
+ 
+  document.addEventListener('mouseout', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (!el) return;
+    const to = e.relatedTarget;
+    if (to && el.contains(to)) return;
+ 
+    cm.classList.remove('hover');
+    if (tipTimer) { clearTimeout(tipTimer); tipTimer = null; }
+    if (bodyShown) hideCursorBody();
+  });
+ 
+  // Click = pequeña reacción
+  document.addEventListener('mousedown', () => {
+    cm.style.transition = 'transform 0.1s';
+    cm.querySelector('.cursor-head').style.transform = 'scale(0.85)';
+    setTimeout(() => {
+      cm.querySelector('.cursor-head').style.transform = '';
+    }, 150);
   });
 }
  
-/* ═══════════════════════════════════════════
-   ROBOT
-   - Siempre está en la esquina inferior derecha
-   - Por defecto: solo la cabeza visible (robot-peek)
-   - Al iniciar sesión: sale completo (robot-show), habla, luego vuelve a peek
-   - Al subir archivo: asoma brevemente
-═══════════════════════════════════════════ */
-const HELLO_PHRASES = [
-  "¡Volviste, señorón! 👋",
-  "Acceso concedido. ¡Bienvenido! 🤖",
-  "Sistema en línea. ¡Qué puntualidad! ✅",
-  "El estudiante ha regresado. 🎓",
-  "La constancia hace al maestro. 💪",
-];
-const UPLOAD_PHRASES = [
-  "¡Archivo guardado! Buen trabajo. 🎉",
-  "Tarea entregada. ¡Así se hace! 🔥",
-  "Upload exitoso. Eres un crack. 💼",
-  "Disciplina pura. ¡Sigue así! 🏅",
-];
+function hideCursorBody() {
+  const cm = document.getElementById('cursor-mascot');
+  cm.classList.remove('tip-active');
+  bodyShown = false;
+}
  
-let robotTimer = null;
+/* ══════════════════════════════════════════════
+   MASCOTA ESCENA GRANDE
+   Animaciones disponibles: peek | surprise | cook | hang
+══════════════════════════════════════════════ */
+const FRASES_BIENVENIDA = [
+  "¡Volviste, señorón! 👑",
+  "Eso es responsabilidad, campeón 💪",
+  "El que no falla, no para de crecer 🚀",
+  "Tus tareas no se van a subir solas... ¡dale! 😄",
+  "Presencia confirmada en el sistema ✅",
+  "El estudiante ha regresado. El profe tiembla 😎",
+  "La constancia hace al maestro 🏆",
+  "Eres de los que sí llegan 💯",
+];
+const FRASES_SUBIDA = [
+  "¡Lo hiciste a tiempo, buen trabajo campeón! 🎉",
+  "Tarea entregada. La responsabilidad te define 💼",
+  "Así se hace, sin excusas ni pretextos 🔥",
+  "¡Eso es disciplina pura! Sigue adelante 💪",
+  "Archivo guardado. Eres un ejemplo a seguir 🏅",
+  "La entrega puntual es el primer paso del éxito 📚",
+];
+const ANIMACIONES = ['peek','cook','hang'];
+ 
+let sceneTimer = null;
+let sceneActive = false;
  
 function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
  
-function initRobot() {
-  // El robot siempre empieza en peek (solo cabeza visible)
-  // Nada más que hacer en init.
+function mostrarMascotaEscena(frase, forcedAnim) {
+  if (sceneTimer) { clearTimeout(sceneTimer); sceneTimer = null; }
+ 
+  const mascot = document.getElementById('scene-mascot');
+  const bubble = document.getElementById('scene-bubble');
+ 
+  // Resetear
+  mascot.className = 'scene-mascot scene-hidden';
+  mascot.style.cssText = '';
+  bubble.classList.remove('show');
+  bubble.textContent = '';
+ 
+  // Pequeño delay para que el reset se aplique
+  setTimeout(() => {
+    const anim = forcedAnim || rnd(ANIMACIONES);
+ 
+    // Resetear posición según animación
+    if (anim === 'hang') {
+      mascot.style.bottom = 'auto';
+      mascot.style.top = '80px';
+      mascot.style.right = '60px';
+    } else {
+      mascot.style.top = '';
+      mascot.style.bottom = '0';
+      mascot.style.right = '40px';
+    }
+ 
+    mascot.className = 'scene-mascot anim-' + anim;
+    sceneActive = true;
+ 
+    // Mostrar burbuja después de que la animación de entrada termine
+    const bubbleDelay = anim === 'cook' ? 1400 : anim === 'hang' ? 1200 : 900;
+    setTimeout(() => {
+      // Si es cook: primero gira como mirando, luego habla
+      bubble.textContent = frase;
+      bubble.classList.add('show');
+ 
+      // Después de la frase, encoger hacia el cursor
+      sceneTimer = setTimeout(() => {
+        bubble.classList.remove('show');
+        setTimeout(() => encogerseHaciaCursor(), 400);
+      }, 4500);
+    }, bubbleDelay);
+  }, 80);
 }
  
-function robotSpeak(phrase, fullBody = false) {
-  const robot   = document.getElementById('robot');
-  const speech  = document.getElementById('robot-speech');
-  if (robotTimer) { clearTimeout(robotTimer); robotTimer = null; }
+function encogerseHaciaCursor() {
+  const mascot = document.getElementById('scene-mascot');
+  const rect   = mascot.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top  + rect.height / 2;
+  const dx = cursorX - cx;
+  const dy = cursorY - cy;
  
-  speech.classList.remove('show');
- 
-  // Primero salir
-  robot.classList.remove('robot-peek','robot-show','robot-hide');
-  robot.classList.add(fullBody ? 'robot-show' : 'robot-peek');
+  mascot.style.transition = 'transform 0.85s cubic-bezier(0.55,0,1,0.45), opacity 0.6s ease';
+  mascot.style.transform  = `translate(${dx}px,${dy}px) scale(0.03)`;
+  mascot.style.opacity    = '0';
  
   setTimeout(() => {
-    speech.textContent = phrase;
-    speech.classList.add('show');
- 
-    robotTimer = setTimeout(() => {
-      speech.classList.remove('show');
-      setTimeout(() => {
-        // Volver a peek (solo cabeza)
-        robot.classList.remove('robot-show');
-        robot.classList.add('robot-peek');
-      }, 300);
-    }, 4800);
-  }, fullBody ? 700 : 400);
+    mascot.style.transition = '';
+    mascot.style.transform  = '';
+    mascot.style.opacity    = '';
+    mascot.className = 'scene-mascot scene-hidden';
+    sceneActive = false;
+  }, 900);
 }
  
-function robotHide() {
-  const robot  = document.getElementById('robot');
-  const speech = document.getElementById('robot-speech');
-  speech.classList.remove('show');
-  robot.classList.remove('robot-peek','robot-show');
-  robot.classList.add('robot-hide');
-  if (robotTimer) { clearTimeout(robotTimer); robotTimer = null; }
+function ocultarMascotaEscena() {
+  const mascot = document.getElementById('scene-mascot');
+  const bubble = document.getElementById('scene-bubble');
+  bubble.classList.remove('show');
+  mascot.className = 'scene-mascot scene-hidden';
+  if (sceneTimer) { clearTimeout(sceneTimer); sceneTimer = null; }
+  sceneActive = false;
 }
  
-/* ═══════════════════════════════════════════
-   SCROLL FADE IN
-═══════════════════════════════════════════ */
-function initScrollFade() {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.style.opacity   = '1';
-        e.target.style.transform = 'translateY(0)';
-      }
-    });
-  }, { threshold: 0.08 });
+/* ══════ BYE ══════ */
+function mostrarBye() {
+  generarParticulas();
+  const overlay  = document.getElementById('bye-overlay');
+  const zone     = document.getElementById('bye-mascot-zone');
+  const svg      = document.getElementById('scene-svg').cloneNode(true);
+  svg.style.cssText = 'width:200px;height:350px;';
+  zone.innerHTML = '';
+  zone.appendChild(svg);
+  overlay.classList.remove('bye-hidden');
  
-  document.querySelectorAll('.ucard,.info-card,.deco-card').forEach(el => {
-    el.style.opacity   = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition= 'opacity .6s ease, transform .6s ease';
-    obs.observe(el);
-  });
+  setTimeout(() => {
+    overlay.style.transition = 'opacity 0.8s ease';
+    overlay.style.opacity    = '0';
+    setTimeout(() => {
+      overlay.style.opacity    = '';
+      overlay.style.transition = '';
+      overlay.classList.add('bye-hidden');
+      document.getElementById('btn-login-nav').classList.remove('hidden');
+      document.getElementById('user-pill').classList.add('hidden');
+    }, 850);
+  }, 3200);
 }
  
-/* ═══════════════════════════════════════════
-   AUTH
-═══════════════════════════════════════════ */
-function openLogin() {
+function generarParticulas() {
+  const c = document.getElementById('bye-particles');
+  c.innerHTML = '';
+  for (let i = 0; i < 35; i++) {
+    const p = document.createElement('div');
+    p.className = 'bye-particle';
+    const angle = Math.random() * 360;
+    const dist  = 80 + Math.random() * 220;
+    p.style.cssText = `
+      left:${15+Math.random()*70}%;top:${15+Math.random()*70}%;
+      width:${3+Math.random()*8}px;height:${3+Math.random()*8}px;
+      background:${Math.random()>0.5?'#f97316':Math.random()>0.5?'#fff':'#ffb347'};
+      border-radius:${Math.random()>0.4?'50%':'3px'};
+      --tx:${Math.cos(angle*Math.PI/180)*dist}px;
+      --ty:${Math.sin(angle*Math.PI/180)*dist}px;
+      --dur:${1.5+Math.random()*1.8}s;
+      --delay:${Math.random()*0.4}s;
+    `;
+    c.appendChild(p);
+  }
+}
+ 
+/* ══════ OJITO ══════ */
+function togglePass(inputId, btn) {
+  const input  = document.getElementById(inputId);
+  const open   = btn.querySelector('.eye-open');
+  const closed = btn.querySelector('.eye-closed');
+  if (input.type === 'password') {
+    input.type = 'text'; open.classList.add('hidden'); closed.classList.remove('hidden');
+  } else {
+    input.type = 'password'; open.classList.remove('hidden'); closed.classList.add('hidden');
+  }
+}
+ 
+/* ══════ ADMIN TOGGLE ══════ */
+let adminFieldVisible = false;
+function toggleAdminField() {
+  adminFieldVisible = !adminFieldVisible;
+  document.getElementById('admin-code-field').style.display = adminFieldVisible ? '' : 'none';
+  const btn = document.getElementById('admin-toggle-btn');
+  btn.style.cssText = adminFieldVisible ? 'border-color:var(--orange);color:var(--orange);' : '';
+}
+ 
+/* ══════ AUTH ══════ */
+function abrirLogin() {
   document.getElementById('ov-login').classList.add('open');
-  document.getElementById('merr').textContent = '';
+  document.getElementById('auth-err').textContent = '';
 }
-function closeLogin() {
+function cerrarLogin() {
   document.getElementById('ov-login').classList.remove('open');
-  document.getElementById('merr').textContent = '';
+  document.getElementById('auth-err').textContent = '';
 }
-function setErr(msg) { document.getElementById('merr').textContent = msg; }
+function showErr(msg) { document.getElementById('auth-err').textContent = msg; }
  
-function switchTab(t) {
-  document.getElementById('merr').textContent = '';
-  const isL = t === 'l';
-  document.getElementById('f-l').style.display   = isL ? '' : 'none';
-  document.getElementById('f-r').style.display   = isL ? 'none' : '';
-  document.getElementById('t-l').classList.toggle('active', isL);
-  document.getElementById('t-r').classList.toggle('active', !isL);
-  if (!isL) { adminOpen = false; document.getElementById('r-code-wrap').style.display = 'none'; }
-}
- 
-let adminOpen = false;
-function toggleAdmin() {
-  adminOpen = !adminOpen;
-  document.getElementById('r-code-wrap').style.display = adminOpen ? '' : 'none';
-  const btn = document.getElementById('btn-toggle-admin');
-  btn.style.cssText = adminOpen ? 'border-color:rgba(99,102,241,.4);color:var(--accent);' : '';
+function switchTab(tab) {
+  document.getElementById('auth-err').textContent = '';
+  const isL = tab === 'login';
+  document.getElementById('f-login').style.display = isL ? '' : 'none';
+  document.getElementById('f-reg').style.display   = isL ? 'none' : '';
+  document.getElementById('t-login').classList.toggle('active', isL);
+  document.getElementById('t-reg').classList.toggle('active', !isL);
+  if (!isL) { adminFieldVisible = false; document.getElementById('admin-code-field').style.display = 'none'; }
 }
  
 async function doLogin() {
-  const u = document.getElementById('l-u').value.trim();
-  const p = document.getElementById('l-p').value.trim();
-  if (!u || !p) return setErr('Completa todos los campos.');
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value.trim();
+  if (!user || !pass) return showErr('Completa todos los campos.');
   try {
-    const rows = await dbGet('users', [['user','==',u],['pass','==',p]]);
-    if (!rows.length) return setErr('Usuario o contraseña incorrectos.');
-    loginOk(rows[0]);
-  } catch { setErr('Error de conexión. Verifica Firebase.'); }
+    const users = await fbGetAll('users', [['user','==',user],['pass','==',pass]]);
+    if (!users.length) return showErr('Usuario o contraseña incorrectos.');
+    loginSuccess(users[0]);
+  } catch(e) { showErr('Error de conexión. Verifica Firebase.'); console.error(e); }
 }
  
 async function doRegister() {
-  const u = document.getElementById('r-u').value.trim();
-  const p = document.getElementById('r-p').value.trim();
-  const n = document.getElementById('r-n').value.trim();
-  const c = (document.getElementById('r-c')?.value || '').trim();
-  if (!u || !p || !n) return setErr('Completa todos los campos.');
-  const role = c === ADMIN_CODE ? 'ADMIN' : 'VIEWER';
+  const user = document.getElementById('r-user').value.trim();
+  const pass = document.getElementById('r-pass').value.trim();
+  const name = document.getElementById('r-name').value.trim();
+  const code = (document.getElementById('r-code')?.value || '').trim();
+  if (!user || !pass || !name) return showErr('Completa todos los campos.');
+  const role = code === ADMIN_SECRET ? 'ADMIN' : 'VIEWER';
   try {
-    const ex = await dbGet('users', [['user','==',u]]);
-    if (ex.length) return setErr('Ese usuario ya existe.');
-    await dbAdd('users', { user:u, pass:p, name:n, role });
-    setErr(role==='ADMIN' ? '✅ Cuenta ADMIN creada. Inicia sesión.' : '✅ Cuenta creada. Inicia sesión.');
-    switchTab('l');
-    document.getElementById('l-u').value = u;
-  } catch { setErr('Error al registrar. Verifica Firebase.'); }
+    const existing = await fbGetAll('users', [['user','==',user]]);
+    if (existing.length) return showErr('Ese usuario ya existe.');
+    await fbAdd('users', { user, pass, name, role });
+    showErr(role === 'ADMIN' ? '✅ Cuenta ADMIN creada. Inicia sesión.' : '✅ Cuenta Viewer creada. Inicia sesión.');
+    switchTab('login');
+    document.getElementById('l-user').value = user;
+  } catch(e) { showErr('Error al registrar. Verifica Firebase.'); }
 }
  
-function loginOk(u) {
-  user = u;
-  closeLogin();
-  // Limpiar campos
-  document.getElementById('l-u').value = '';
-  document.getElementById('l-p').value = '';
+function loginSuccess(u) {
+  currentUser = u;
+  cerrarLogin();
+  // Limpiar campos ✅
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
  
-  // Navbar
-  document.getElementById('btn-login').classList.add('hidden');
+  document.getElementById('btn-login-nav').classList.add('hidden');
   const pill = document.getElementById('user-pill');
   pill.classList.remove('hidden');
+  const initials = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('pill-avatar').textContent = initials;
+  document.getElementById('pill-name').textContent   = u.name.toUpperCase();
+  const roleEl = document.getElementById('pill-role');
+  roleEl.textContent = u.role;
+  roleEl.style.cssText = u.role === 'ADMIN'
+    ? 'background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;'
+    : 'background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;';
  
-  const ini = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('pill-av').textContent   = ini;
-  document.getElementById('pill-name').textContent  = u.name;
-  const re = document.getElementById('pill-role');
-  re.textContent = u.role;
-  re.style.cssText = u.role === 'ADMIN'
-    ? 'background:rgba(99,102,241,.15);color:#6366f1;border:1px solid rgba(99,102,241,.3);'
-    : 'background:rgba(255,255,255,.05);color:#888;border:1px solid #222;';
-  re.style.cssText += 'font-family:var(--mono);font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.8px;';
- 
-  // Robot sale completo y habla
-  robotSpeak(rnd(HELLO_PHRASES), true);
+  // Animación sorpresa al login, luego las otras aleatoriamente
+  mostrarMascotaEscena(rnd(FRASES_BIENVENIDA), 'surprise');
 }
  
 function doLogout() {
-  user = null;
-  // Limpiar campos
-  document.getElementById('l-u').value = '';
-  document.getElementById('l-p').value = '';
- 
-  document.getElementById('btn-login').classList.remove('hidden');
-  document.getElementById('user-pill').classList.add('hidden');
- 
-  // Robot se esconde
-  robotHide();
- 
-  // BYE
-  setTimeout(() => {
-    const bye = document.getElementById('bye');
-    bye.classList.remove('bye-off');
-    setTimeout(() => {
-      bye.style.opacity = '0';
-      setTimeout(() => {
-        bye.style.opacity = '';
-        bye.classList.add('bye-off');
-        // Volver a peek
-        const robot = document.getElementById('robot');
-        robot.classList.remove('robot-hide');
-        robot.classList.add('robot-peek');
-      }, 750);
-    }, 2800);
-  }, 200);
+  currentUser = null;
+  // Limpiar campos también al cerrar sesión ✅
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+  ocultarMascotaEscena();
+  setTimeout(() => mostrarBye(), 100);
 }
  
-/* ── OJITO ── */
-function tp(id, btn) {
-  const i  = document.getElementById(id);
-  const eo = btn.querySelector('.eo');
-  const ec = btn.querySelector('.ec');
-  if (i.type === 'password') { i.type='text'; eo.classList.add('hidden'); ec.classList.remove('hidden'); }
-  else { i.type='password'; eo.classList.remove('hidden'); ec.classList.add('hidden'); }
-}
- 
-/* ═══════════════════════════════════════════
-   CONTADORES
-═══════════════════════════════════════════ */
-async function refreshCounters() {
+/* ══════ CONTADORES ══════ */
+async function updateCounters() {
   try {
-    const files = await dbGet('files');
-    let total = 0;
+    const files = await fbGetAll('files');
     for (let i = 1; i <= 4; i++) {
       const n = files.filter(f => f.unit == i).length;
-      total += n;
       const el = document.getElementById('c' + i);
-      if (el) el.textContent = n + ' archivo' + (n !== 1 ? 's' : '');
+      if (el) el.textContent = n + (n === 1 ? ' archivo' : ' archivos');
     }
-    const st = document.getElementById('stat-total');
-    if (st) st.textContent = total;
   } catch {
     for (let i = 1; i <= 4; i++) {
       const el = document.getElementById('c' + i);
-      if (el) el.textContent = '—';
+      if (el) el.textContent = '— archivos';
     }
   }
 }
  
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════════════
    INFO CARDS
-═══════════════════════════════════════════ */
-function toggleCard(id) {
-  const body = document.getElementById('icb-' + id);
-  const card = document.getElementById('ic-' + id);
-  const tog  = document.getElementById('ict-' + id);
-  const isOpen = body.classList.contains('visible');
-  if (!isOpen && id === 'progreso') renderProgress();
-  body.classList.toggle('visible', !isOpen);
+══════════════════════════════════════════════ */
+function toggleInfoCard(id) {
+  const body  = document.getElementById('icb-' + id);
+  const card  = document.getElementById('ic-' + id);
+  const isOpen = !body.classList.contains('hidden');
+ 
+  if (id === 'progreso' && !isOpen) {
+    // Cargar progreso dinámicamente
+    renderProgress();
+  }
+ 
+  body.classList.toggle('hidden', isOpen);
   card.classList.toggle('open', !isOpen);
 }
  
 async function renderProgress() {
-  const bars  = document.getElementById('prog-bars');
-  const alert = document.getElementById('prog-alert');
-  bars.innerHTML = '<p class="prog-loading">Calculando…</p>';
-  let files = [];
-  try { files = await dbGet('files'); }
-  catch { bars.innerHTML = '<p class="prog-loading">Error de conexión.</p>'; return; }
+  const bars   = document.getElementById('progress-bars');
+  const tipMsg = document.getElementById('ic-tip-msg');
+  bars.innerHTML = '<div class="prog-loading">Calculando…</div>';
  
-  let missingUnit = null, html = '';
-  const clrs = ['','','','u3','u4'];
-  const bg   = ['','#6366f1','#8b5cf6','#06b6d4','#10b981'];
+  let allFiles = [];
+  try { allFiles = await fbGetAll('files'); } catch { bars.innerHTML = '<div class="prog-loading">Error de conexión</div>'; return; }
+ 
+  const colors = ['','','u2','u3','u4'];
+  const MAX = WEEKS_PER_UNIT * FILES_PER_WEEK; // 4 semanas * 2 archivos = 8 por unidad
+  let missingUnit = null;
+  let html = '';
  
   for (let u = 1; u <= 4; u++) {
-    const count = files.filter(f => f.unit == u).length;
-    const pct   = Math.min(100, Math.round(count / MAX_FILES * 100));
+    const count = allFiles.filter(f => f.unit == u).length;
+    const pct   = Math.min(100, Math.round((count / MAX) * 100));
     if (count === 0 && missingUnit === null) missingUnit = u;
     html += `
       <div class="prog-unit">
         <div class="prog-head">
           <span class="prog-label">${unitNames[u]}</span>
-          <span class="prog-pct">${pct}% · ${count}/${MAX_FILES}</span>
+          <span class="prog-pct">${pct}% · ${count}/${MAX}</span>
         </div>
-        <div class="prog-track">
-          <div class="prog-fill" id="pf${u}" style="background:${bg[u]}"></div>
+        <div class="prog-bar-bg">
+          <div class="prog-bar-fill ${colors[u]}" id="pb${u}" style="width:0%"></div>
         </div>
       </div>`;
   }
+ 
   bars.innerHTML = html;
+ 
+  // Animar barras
   requestAnimationFrame(() => {
     for (let u = 1; u <= 4; u++) {
-      const count = files.filter(f => f.unit == u).length;
-      const pct   = Math.min(100, Math.round(count / MAX_FILES * 100));
+      const count = allFiles.filter(f => f.unit == u).length;
+      const pct   = Math.min(100, Math.round((count / MAX) * 100));
       setTimeout(() => {
-        const el = document.getElementById('pf' + u);
-        if (el) el.style.width = pct + '%';
-      }, u * 100);
+        const bar = document.getElementById('pb' + u);
+        if (bar) bar.style.width = pct + '%';
+      }, u * 120);
     }
   });
  
-  if (missingUnit) {
-    alert.textContent = `⚠️ La ${unitNames[missingUnit]} no tiene archivos aún. ¡Es momento de subir!`;
-    alert.classList.remove('hidden');
+  // Aviso si hay unidad vacía
+  if (missingUnit !== null) {
+    tipMsg.textContent = `⚠️ La ${unitNames[missingUnit]} aún no tiene archivos. ¡Es momento de subir tus tareas!`;
+    tipMsg.classList.add('show');
   } else {
-    alert.classList.add('hidden');
+    tipMsg.classList.remove('show');
   }
 }
  
-/* ═══════════════════════════════════════════
-   MODAL UNIDAD
-═══════════════════════════════════════════ */
+/* ══════ MODAL UNIDAD ══════ */
 function openUnit(u) {
-  unitActive = u; weekActive = null;
-  document.getElementById('u-num').textContent   = '0' + u;
-  document.getElementById('u-title').textContent = unitNames[u];
-  document.querySelectorAll('.wtab').forEach(b => b.classList.remove('active'));
-  document.getElementById('u-body').innerHTML    = '<p class="u-hint">Selecciona una semana</p>';
+  activeUnit = u; activeWeek = null;
+  document.getElementById('um-num').textContent   = '0' + u;
+  document.getElementById('um-title').textContent = unitNames[u];
+  document.getElementById('um-sub').textContent   = 'Selecciona una semana';
+  document.querySelectorAll('.wbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('unit-body').innerHTML  =
+    '<div class="pick-hint">Selecciona una semana para ver los archivos</div>';
   document.getElementById('ov-unit').classList.add('open');
 }
-function closeUnit() { document.getElementById('ov-unit').classList.remove('open'); }
+function cerrarUnidad() { document.getElementById('ov-unit').classList.remove('open'); }
  
-function selWeek(w) {
-  weekActive = w;
-  document.querySelectorAll('.wtab').forEach((b,i) => b.classList.toggle('active', i+1===w));
+function selectWeek(w) {
+  activeWeek = w;
+  document.querySelectorAll('.wbtn').forEach((b,i) => b.classList.toggle('active', i+1===w));
+  document.getElementById('um-sub').textContent = 'Semana ' + w;
   renderFiles();
 }
  
-/* ═══════════════════════════════════════════
-   RENDER ARCHIVOS
-═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   RENDER ARCHIVOS + OPCIÓN VÍNCULO/URL
+══════════════════════════════════════════════ */
 async function renderFiles() {
-  const body = document.getElementById('u-body');
-  body.innerHTML = '<div class="load-row"><div class="spin"></div> Cargando…</div>';
+  const body = document.getElementById('unit-body');
+  body.innerHTML = '<div class="loading-row"><div class="spin"></div> Cargando archivos…</div>';
+ 
   let files = [];
-  try {
-    files = await dbGet('files', [['unit','==',unitActive],['week','==',weekActive]]);
-  } catch {
-    body.innerHTML = '<p class="u-hint">Error de conexión.</p>';
-    return;
-  }
+  try { files = await fbGetAll('files',[['unit','==',activeUnit],['week','==',activeWeek]]); }
+  catch { body.innerHTML = '<div class="empty-msg">Error al conectar con Firebase.</div>'; return; }
  
   let html = '';
  
-  // Zona de subida — solo ADMIN con sesión iniciada
-  if (user?.role === 'ADMIN') {
+  if (currentUser !== null && currentUser.role === 'ADMIN') {
     html += `
-      <div class="upload-box">
-        <span class="upload-label-top">Agregar contenido</span>
-        <div class="upload-mode-tabs">
-          <button class="umtab ${uploadMode==='file'?'active':''}" onclick="setMode('file')">📄 Archivo</button>
-          <button class="umtab ${uploadMode==='link'?'active':''}" onclick="setMode('link')">🔗 Vínculo</button>
+      <div class="upload-zone">
+        <span class="upload-label">↑ Agregar contenido</span>
+        <div class="upload-tabs">
+          <button class="utab ${uploadMode==='file'?'active':''}" onclick="setUploadMode('file')">📄 Archivo</button>
+          <button class="utab ${uploadMode==='link'?'active':''}" onclick="setUploadMode('link')">🔗 Vínculo / URL</button>
         </div>
-        <div class="upload-row">
-          <input type="text" id="ft" placeholder="Título del trabajo académico">
+        <div class="upload-row1">
+          <input type="text" id="f-title" placeholder="Título del contenido">
         </div>
-        <div id="zone-file" class="upload-row-file" style="display:${uploadMode==='file'?'flex':'none'}">
-          <input type="file" id="ff">
-          <button class="btn-upload" onclick="doUploadFile()">Subir</button>
+        <div id="upload-file-zone" class="upload-row2" style="display:${uploadMode==='file'?'flex':'none'}">
+          <input type="file" id="f-file">
+          <button class="btn-upload" onclick="uploadFile()">Subir</button>
         </div>
-        <div id="zone-link" class="upload-row" style="display:${uploadMode==='link'?'block':'none'}">
-          <input type="text" id="fu" placeholder="https://...">
-          <button class="btn-upload" style="margin-top:6px;width:100%;text-align:center;" onclick="doUploadLink()">Guardar vínculo</button>
+        <div id="upload-link-zone" class="upload-row3" style="display:${uploadMode==='link'?'flex':'none'}">
+          <input type="text" id="f-url" placeholder="https://...">
+          <button class="btn-upload" onclick="uploadLink()">Guardar</button>
         </div>
       </div>`;
   }
  
   if (files.length === 0) {
-    html += '<p class="empty-hint">Sin archivos en esta semana.</p>';
+    html += '<div class="empty-msg">Sin archivos en esta semana.</div>';
   } else {
     html += '<div class="file-list">';
     files.forEach(f => {
-      const isLink = f.type === 'link';
-      const canDel = user?.role === 'ADMIN';
+      const isLink   = f.type === 'link';
+      const canAdmin = currentUser?.role === 'ADMIN';
       html += `
-        <div class="fitem ${isLink?'is-link':''}">
-          <div class="fi-info">
-            <div class="fi-name">${isLink?'🔗 ':'📄 '}${f.title}</div>
-            <div class="fi-meta">${isLink ? f.url : f.filename}</div>
+        <div class="fitem ${isLink ? 'is-link' : ''}">
+          <div class="finfo">
+            <div class="fname">${isLink ? '🔗 ' : '📄 '}${f.title}</div>
+            <div class="fmeta">${isLink ? f.url : f.filename}</div>
           </div>
-          <div class="fi-acts">
+          <div class="factions">
             ${isLink
-              ? `<button class="btn-link" onclick="window.open('${f.url}','_blank','noopener')">↗ Abrir</button>`
-              : `<button class="btn-dl" onclick="doDownload('${f.id}')">↓ Descargar</button>`
+              ? `<button class="btn-open-link" onclick="openLink('${f.url}')">↗ Abrir</button>`
+              : `<button class="btn-dl" onclick="downloadFile('${f.id}')">↓ Descargar</button>`
             }
-            ${canDel ? `<button class="btn-del" onclick="doDelete('${f.id}')">✕</button>` : ''}
+            ${canAdmin ? `<button class="btn-del" onclick="deleteFile('${f.id}')">✕</button>` : ''}
           </div>
         </div>`;
     });
     html += '</div>';
   }
+ 
   body.innerHTML = html;
 }
  
-function setMode(m) {
-  uploadMode = m;
-  const zf = document.getElementById('zone-file');
-  const zl = document.getElementById('zone-link');
-  if (zf) zf.style.display = m==='file' ? 'flex' : 'none';
-  if (zl) zl.style.display = m==='link' ? 'block' : 'none';
-  document.querySelectorAll('.umtab').forEach((t,i) => {
-    t.classList.toggle('active', (i===0&&m==='file')||(i===1&&m==='link'));
+function setUploadMode(mode) {
+  uploadMode = mode;
+  // Re-render zona de subida sin recargar toda la lista
+  const fileZ = document.getElementById('upload-file-zone');
+  const linkZ = document.getElementById('upload-link-zone');
+  if (fileZ) fileZ.style.display = mode === 'file' ? 'flex' : 'none';
+  if (linkZ) linkZ.style.display = mode === 'link' ? 'flex' : 'none';
+  document.querySelectorAll('.utab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0 && mode==='file') || (i===1 && mode==='link'));
   });
 }
  
-/* ── CRUD ── */
-async function doUploadFile() {
-  const title = document.getElementById('ft')?.value.trim() || '';
-  const file  = document.getElementById('ff')?.files[0];
+/* ══════ CRUD ══════ */
+async function uploadFile() {
+  const title = document.getElementById('f-title')?.value.trim() || '';
+  const file  = document.getElementById('f-file')?.files[0];
   if (!title || !file) return alert('Escribe un título y selecciona un archivo.');
+ 
   const btn = document.querySelector('.btn-upload');
   if (btn) { btn.textContent = 'Subiendo…'; btn.disabled = true; }
-  const r = new FileReader();
-  r.onload = async () => {
+ 
+  const reader = new FileReader();
+  reader.onload = async function () {
     try {
-      await dbAdd('files', {
-        type:'file', unit:unitActive, week:weekActive,
-        title, filename:file.name, data:r.result, ts:Date.now()
+      await fbAdd('files',{
+        type:'file', unit:activeUnit, week:activeWeek,
+        title, filename:file.name, data:reader.result, ts:Date.now()
       });
-      await refreshCounters();
+      await updateCounters();
       renderFiles();
-      robotSpeak(rnd(UPLOAD_PHRASES), false);
-    } catch { alert('Error al subir.'); if(btn){btn.textContent='Subir';btn.disabled=false;} }
+      mostrarMascotaEscena(rnd(FRASES_SUBIDA));
+    } catch(e) {
+      alert('Error al subir. Revisa Firebase.');
+      if (btn) { btn.textContent = 'Subir'; btn.disabled = false; }
+    }
   };
-  r.readAsDataURL(file);
+  reader.readAsDataURL(file);
 }
  
-async function doUploadLink() {
-  const title = document.getElementById('ft')?.value.trim() || '';
-  const url   = document.getElementById('fu')?.value.trim() || '';
+async function uploadLink() {
+  const title = document.getElementById('f-title')?.value.trim() || '';
+  const url   = document.getElementById('f-url')?.value.trim() || '';
   if (!title || !url) return alert('Escribe un título y la URL.');
-  if (!url.startsWith('http')) return alert('La URL debe empezar con http(s)://');
-  const btn = document.querySelector('.btn-upload:last-child');
+  if (!url.startsWith('http')) return alert('La URL debe empezar con http:// o https://');
+ 
+  const btn = document.querySelector('.btn-upload');
   if (btn) { btn.textContent = 'Guardando…'; btn.disabled = true; }
   try {
-    await dbAdd('files', { type:'link', unit:unitActive, week:weekActive, title, url, ts:Date.now() });
-    await refreshCounters();
+    await fbAdd('files',{
+      type:'link', unit:activeUnit, week:activeWeek,
+      title, url, ts:Date.now()
+    });
+    await updateCounters();
     renderFiles();
-    robotSpeak(rnd(UPLOAD_PHRASES), false);
-  } catch { alert('Error al guardar.'); if(btn){btn.textContent='Guardar vínculo';btn.disabled=false;} }
+    mostrarMascotaEscena(rnd(FRASES_SUBIDA));
+  } catch(e) {
+    alert('Error al guardar. Revisa Firebase.');
+    if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
+  }
 }
  
-async function doDownload(id) {
+function openLink(url) {
+  window.open(url, '_blank', 'noopener');
+}
+ 
+async function downloadFile(id) {
   try {
-    const files = await dbGet('files');
+    const files = await fbGetAll('files');
     const f = files.find(x => x.id === id);
-    if (!f) return alert('No encontrado.');
+    if (!f) return alert('Archivo no encontrado.');
     const a = document.createElement('a');
     a.href = f.data; a.download = f.filename; a.click();
   } catch { alert('Error al descargar.'); }
 }
  
-async function doDelete(id) {
-  if (!confirm('¿Eliminar permanentemente?')) return;
-  try { await dbDel('files', id); await refreshCounters(); renderFiles(); }
-  catch { alert('Error al eliminar.'); }
+async function deleteFile(id) {
+  if (!confirm('¿Eliminar este contenido permanentemente?')) return;
+  try {
+    await fbDelete('files', id);
+    await updateCounters();
+    renderFiles();
+  } catch { alert('Error al eliminar.'); }
 }
- 
