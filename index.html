@@ -1,4 +1,4 @@
-
+Index · HTML
 Copiar
 
 <!DOCTYPE html>
@@ -6,529 +6,380 @@ Copiar
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOSE MOORI | ACADEMIC OS</title>
+  <title>Jose Moori — Portafolio Académico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
  
-<!-- ═══════════ CURSOR PERSONALIZADO ═══════════ -->
-<div id="custom-cursor" class="custom-cursor"></div>
-<div id="cursor-ring" class="cursor-ring"></div>
+<!-- ── CURSOR ── -->
+<div id="cur" class="cur"></div>
  
-<!-- ═══════════ CANVAS PARTÍCULAS ═══════════ -->
-<canvas id="bg-canvas"></canvas>
- 
-<!-- ═══════════ NOISE OVERLAY ═══════════ -->
-<div class="noise-overlay"></div>
- 
-<!-- ═══════════ ROBOT 3D ═══════════ -->
-<div id="robot-wrap" class="robot-wrap">
-  <div id="robot-body" class="robot-body">
-    <!-- ROBOT SVG estilo ChainGPT -->
-    <svg id="robot-svg" class="robot-svg" viewBox="0 0 260 420" xmlns="http://www.w3.org/2000/svg">
+<!-- ── ROBOT (esquina inferior derecha, solo cabeza visible) ── -->
+<div id="robot" class="robot robot-peek">
+  <div class="robot-speech" id="robot-speech"></div>
+  <div class="robot-head">
+    <svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" class="robot-svg">
       <defs>
-        <!-- Gradientes metálicos -->
-        <linearGradient id="metal1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#c8c8d0"/>
-          <stop offset="40%" stop-color="#e8e8f0"/>
-          <stop offset="100%" stop-color="#8888a0"/>
+        <linearGradient id="faceGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#2a2a2a"/>
+          <stop offset="100%" stop-color="#111111"/>
         </linearGradient>
-        <linearGradient id="metal2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#d0d0dc"/>
-          <stop offset="100%" stop-color="#7878a0"/>
+        <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#0d0d1a"/>
+          <stop offset="100%" stop-color="#050510"/>
         </linearGradient>
-        <linearGradient id="metalDark" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#4a4a6a"/>
-          <stop offset="100%" stop-color="#1a1a2e"/>
-        </linearGradient>
-        <!-- RGB glow para la cabeza -->
-        <linearGradient id="rgbGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#ff0080"/>
-          <stop offset="25%"  stop-color="#ff8c00"/>
-          <stop offset="50%"  stop-color="#00ff88"/>
-          <stop offset="75%"  stop-color="#0088ff"/>
-          <stop offset="100%" stop-color="#ff0080"/>
-        </linearGradient>
-        <linearGradient id="rgbGrad2" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#0088ff"/>
-          <stop offset="33%"  stop-color="#ff0080"/>
-          <stop offset="66%"  stop-color="#00ff88"/>
-          <stop offset="100%" stop-color="#ff8c00"/>
-        </linearGradient>
-        <!-- Glow filter -->
-        <filter id="glow-blue">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glow-rgb">
-          <feGaussianBlur stdDeviation="6" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="metal-shadow">
-          <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.5)"/>
+        <filter id="eyeGlow">
+          <feGaussianBlur stdDeviation="2.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
  
-      <!-- ── PIERNAS ── -->
-      <!-- Pierna izq -->
-      <rect x="72" y="320" width="40" height="68" rx="8" fill="url(#metal2)" filter="url(#metal-shadow)"/>
-      <rect x="72" y="320" width="40" height="8" rx="4" fill="#b0b0c8"/>
-      <rect x="74" y="330" width="6" height="50" rx="3" fill="rgba(255,255,255,0.15)"/>
-      <!-- Pie izq -->
-      <rect x="64" y="380" width="52" height="18" rx="9" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-      <rect x="64" y="380" width="52" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+      <!-- Orejas / Altavoces -->
+      <rect x="1"   y="28" width="12" height="44" rx="6" fill="#1e1e1e" stroke="#333" stroke-width="0.5"/>
+      <rect x="107" y="28" width="12" height="44" rx="6" fill="#1e1e1e" stroke="#333" stroke-width="0.5"/>
+      <rect x="3"   y="36" width="8"  height="28" rx="4" fill="#141414"/>
+      <rect x="109" y="36" width="8"  height="28" rx="4" fill="#141414"/>
  
-      <!-- Pierna der -->
-      <rect x="148" y="320" width="40" height="68" rx="8" fill="url(#metal2)" filter="url(#metal-shadow)"/>
-      <rect x="148" y="320" width="40" height="8" rx="4" fill="#b0b0c8"/>
-      <rect x="150" y="330" width="6" height="50" rx="3" fill="rgba(255,255,255,0.15)"/>
-      <!-- Pie der -->
-      <rect x="144" y="380" width="52" height="18" rx="9" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-      <rect x="144" y="380" width="52" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+      <!-- Cabeza principal -->
+      <rect x="13" y="4" width="94" height="92" rx="18" fill="url(#faceGrad)" stroke="#2e2e2e" stroke-width="1"/>
  
-      <!-- ── CUERPO TORSO ── -->
-      <rect x="56" y="220" width="148" height="108" rx="20" fill="url(#metal2)" filter="url(#metal-shadow)"/>
-      <!-- Panel frontal del torso -->
-      <rect x="70" y="234" width="120" height="80" rx="10" fill="url(#metalDark)"/>
-      <!-- Luces LED en el torso -->
-      <circle cx="100" cy="258" r="5" fill="#00ff88" filter="url(#glow-blue)" class="led-blink-1"/>
-      <circle cx="120" cy="258" r="5" fill="#0088ff" filter="url(#glow-blue)" class="led-blink-2"/>
-      <circle cx="140" cy="258" r="5" fill="#ff0080" filter="url(#glow-blue)" class="led-blink-3"/>
-      <!-- Rejilla ventilación -->
-      <line x1="80" y1="278" x2="180" y2="278" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-      <line x1="80" y1="285" x2="180" y2="285" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-      <line x1="80" y1="292" x2="180" y2="292" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-      <line x1="80" y1="299" x2="180" y2="299" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-      <!-- Emblema central -->
-      <circle cx="130" cy="268" r="14" fill="none" stroke="rgba(0,136,255,0.6)" stroke-width="2" filter="url(#glow-blue)"/>
-      <text x="130" y="273" text-anchor="middle" font-family="monospace" font-size="9" fill="#0088ff" font-weight="bold">DB</text>
-      <!-- Línea RGB torso inferior -->
-      <rect x="56" y="318" width="148" height="6" rx="3" fill="url(#rgbGrad)" opacity="0.85" filter="url(#glow-rgb)"/>
+      <!-- Panel pantalla -->
+      <rect x="22" y="14" width="76" height="72" rx="12" fill="url(#screenGrad)" stroke="#1a1a2e" stroke-width="0.5"/>
  
-      <!-- ── HOMBROS ── -->
-      <ellipse cx="56" cy="245" rx="22" ry="20" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-      <ellipse cx="204" cy="245" rx="22" ry="20" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-      <ellipse cx="56" cy="245" rx="14" ry="12" fill="rgba(255,255,255,0.1)"/>
-      <ellipse cx="204" cy="245" rx="14" ry="12" fill="rgba(255,255,255,0.1)"/>
+      <!-- OJO IZQUIERDO — pantalla cuadrada -->
+      <rect x="30" y="24" width="22" height="22" rx="5" fill="#080814"/>
+      <circle cx="41" cy="35" r="8" fill="white" class="eye-l" filter="url(#eyeGlow)"/>
+      <circle cx="41" cy="35" r="5" fill="#6366f1"/>
+      <circle cx="41" cy="35" r="2.5" fill="#0a0a1a"/>
+      <circle cx="44" cy="32" r="1.5" fill="rgba(255,255,255,0.9)"/>
  
-      <!-- ── BRAZO IZQ ── -->
-      <g class="robot-arm-l" style="transform-origin:56px 245px">
-        <rect x="28" y="250" width="32" height="72" rx="10" fill="url(#metal2)" filter="url(#metal-shadow)"/>
-        <rect x="28" y="250" width="32" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
-        <rect x="30" y="262" width="6" height="52" rx="3" fill="rgba(255,255,255,0.1)"/>
-        <!-- Mano izq -->
-        <rect x="22" y="316" width="44" height="24" rx="12" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-        <!-- Dedos -->
-        <rect x="24" y="338" width="10" height="16" rx="5" fill="url(#metal2)"/>
-        <rect x="37" y="338" width="10" height="18" rx="5" fill="url(#metal2)"/>
-        <rect x="50" y="338" width="10" height="14" rx="5" fill="url(#metal2)"/>
-      </g>
+      <!-- OJO DERECHO -->
+      <rect x="68" y="24" width="22" height="22" rx="5" fill="#080814"/>
+      <circle cx="79" cy="35" r="8" fill="white" class="eye-r" filter="url(#eyeGlow)"/>
+      <circle cx="79" cy="35" r="5" fill="#6366f1"/>
+      <circle cx="79" cy="35" r="2.5" fill="#0a0a1a"/>
+      <circle cx="82" cy="32" r="1.5" fill="rgba(255,255,255,0.9)"/>
  
-      <!-- ── BRAZO DER ── -->
-      <g class="robot-arm-r" style="transform-origin:204px 245px">
-        <rect x="200" y="250" width="32" height="72" rx="10" fill="url(#metal2)" filter="url(#metal-shadow)"/>
-        <rect x="200" y="250" width="32" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
-        <rect x="202" y="262" width="6" height="52" rx="3" fill="rgba(255,255,255,0.1)"/>
-        <!-- Mano der -->
-        <rect x="194" y="316" width="44" height="24" rx="12" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-        <!-- Dedos -->
-        <rect x="196" y="338" width="10" height="16" rx="5" fill="url(#metal2)"/>
-        <rect x="209" y="338" width="10" height="18" rx="5" fill="url(#metal2)"/>
-        <rect x="222" y="338" width="10" height="14" rx="5" fill="url(#metal2)"/>
-      </g>
+      <!-- BARRA DE BOCA — ecualizador minimalista -->
+      <rect x="30" y="62" width="60" height="14" rx="4" fill="#080814"/>
+      <rect class="eq-bar" x="33"  y="65" width="6"  height="8"  rx="2" fill="#6366f1" opacity="0.85"/>
+      <rect class="eq-bar" x="41"  y="64" width="6"  height="10" rx="2" fill="#6366f1" opacity="0.7"/>
+      <rect class="eq-bar" x="49"  y="66" width="6"  height="6"  rx="2" fill="#6366f1" opacity="0.6"/>
+      <rect class="eq-bar" x="57"  y="63" width="6"  height="12" rx="2" fill="#6366f1" opacity="0.9"/>
+      <rect class="eq-bar" x="65"  y="65" width="6"  height="8"  rx="2" fill="#6366f1" opacity="0.65"/>
+      <rect class="eq-bar" x="73"  y="64" width="6"  height="10" rx="2" fill="#6366f1" opacity="0.75"/>
  
-      <!-- ── CUELLO ── -->
-      <rect x="108" y="204" width="44" height="22" rx="8" fill="url(#metal2)"/>
-      <rect x="112" y="207" width="36" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
-      <rect x="112" y="214" width="36" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
- 
-      <!-- ── CABEZA ── -->
-      <!-- Cuerpo cabeza -->
-      <rect x="50" y="80" width="160" height="128" rx="24" fill="url(#metal1)" filter="url(#metal-shadow)"/>
-      <!-- Panel oscuro frente -->
-      <rect x="62" y="90" width="136" height="108" rx="16" fill="url(#metalDark)"/>
-      <!-- Strip RGB parte superior cabeza -->
-      <rect x="50" y="78" width="160" height="8" rx="4" fill="url(#rgbGrad)" opacity="0.9" filter="url(#glow-rgb)" class="rgb-anim"/>
-      <!-- Strip RGB parte inferior cabeza -->
-      <rect x="50" y="200" width="160" height="6" rx="3" fill="url(#rgbGrad2)" opacity="0.8" filter="url(#glow-rgb)" class="rgb-anim2"/>
- 
-      <!-- ── OJOS PANTALLA ── -->
-      <!-- Ojo izquierdo — cuadrado redondeado como el robot -->
-      <rect x="76" y="108" rx="12" ry="12" width="44" height="44" fill="#0a0a1e"/>
-      <rect x="78" y="110" rx="10" ry="10" width="40" height="40" fill="#050510"/>
-      <!-- Brillo ojo izq -->
-      <circle cx="98" cy="130" r="14" fill="white" class="eye-glow-l"/>
-      <circle cx="98" cy="130" r="10" fill="#0088ff" filter="url(#glow-blue)"/>
-      <circle cx="98" cy="130" r="6"  fill="white"/>
-      <circle cx="104" cy="124" r="3" fill="rgba(255,255,255,0.9)"/>
- 
-      <!-- Ojo derecho -->
-      <rect x="140" y="108" rx="12" ry="12" width="44" height="44" fill="#0a0a1e"/>
-      <rect x="142" y="110" rx="10" ry="10" width="40" height="40" fill="#050510"/>
-      <circle cx="162" cy="130" r="14" fill="white" class="eye-glow-r"/>
-      <circle cx="162" cy="130" r="10" fill="#0088ff" filter="url(#glow-blue)"/>
-      <circle cx="162" cy="130" r="6"  fill="white"/>
-      <circle cx="168" cy="124" r="3" fill="rgba(255,255,255,0.9)"/>
- 
-      <!-- Boca / display panel -->
-      <rect x="82" y="162" width="96" height="22" rx="8" fill="#050510"/>
-      <rect id="robot-mouth-bar" x="84" y="164" width="30" height="18" rx="6" fill="#00ff88" opacity="0.8" class="mouth-anim"/>
-      <rect x="118" y="164" width="20" height="18" rx="6" fill="#0088ff" opacity="0.6" class="mouth-anim2"/>
-      <rect x="142" y="164" width="14" height="18" rx="6" fill="#ff0080" opacity="0.5" class="mouth-anim3"/>
-      <rect x="160" y="164" width="16" height="18" rx="6" fill="#ff8c00" opacity="0.4" class="mouth-anim4"/>
- 
-      <!-- ── ANTENAS ── -->
-      <line x1="100" y1="80" x2="86" y2="36" stroke="#c8c8d8" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="86" cy="32" r="8" fill="#0088ff" filter="url(#glow-blue)" class="antenna-pulse-l"/>
-      <circle cx="86" cy="32" r="4" fill="white"/>
- 
-      <line x1="160" y1="80" x2="174" y2="36" stroke="#c8c8d8" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="174" cy="32" r="8" fill="#ff0080" filter="url(#glow-blue)" class="antenna-pulse-r"/>
-      <circle cx="174" cy="32" r="4" fill="white"/>
- 
-      <!-- ── DETALLES LATERALES CABEZA ── -->
-      <rect x="34" y="100" width="18" height="40" rx="9" fill="url(#metal2)"/>
-      <rect x="208" y="100" width="18" height="40" rx="9" fill="url(#metal2)"/>
-      <rect x="36" y="118" width="14" height="6" rx="3" fill="#0088ff" opacity="0.6" filter="url(#glow-blue)"/>
-      <rect x="210" y="118" width="14" height="6" rx="3" fill="#0088ff" opacity="0.6" filter="url(#glow-blue)"/>
+      <!-- Antena izquierda -->
+      <line x1="38" y1="4" x2="32" y2="-10" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="32" cy="-11" r="4" fill="#6366f1" class="ant-glow"/>
+      <!-- Antena derecha -->
+      <line x1="82" y1="4" x2="88" y2="-10" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="88" cy="-11" r="4" fill="#6366f1" class="ant-glow"/>
     </svg>
-  </div>
-  <!-- Burbuja del robot -->
-  <div class="robot-bubble" id="robot-bubble"></div>
-</div>
  
-<!-- ═══════════ BYE OVERLAY ═══════════ -->
-<div id="bye-overlay" class="bye-overlay bye-hidden">
-  <div class="bye-particles" id="bye-particles"></div>
-  <canvas id="bye-canvas" class="bye-canvas"></canvas>
-  <div class="bye-content">
-    <div class="bye-text">BYE BYE</div>
-    <div class="bye-sub">¡Hasta la próxima, señorón!</div>
-  </div>
-</div>
- 
-<!-- ═══════════ NAVBAR ═══════════ -->
-<nav class="navbar" id="navbar">
-  <div class="nav-brand" data-tip="Portafolio de Jose Moori 🤖">
-    <div class="nav-logo-3d">
-      <span>JM</span>
-      <div class="logo-glow"></div>
+    <!-- Cuerpo que aparece solo cuando el robot sale completo -->
+    <div class="robot-body-part" id="robot-body-part">
+      <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" class="body-svg">
+        <defs>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#222"/>
+            <stop offset="100%" stop-color="#111"/>
+          </linearGradient>
+        </defs>
+        <!-- Cuello -->
+        <rect x="46" y="0" width="28" height="16" rx="6" fill="#1a1a1a" stroke="#2e2e2e" stroke-width="0.5"/>
+        <!-- Torso -->
+        <rect x="18" y="14" width="84" height="82" rx="16" fill="url(#bodyGrad)" stroke="#2a2a2a" stroke-width="1"/>
+        <!-- Panel torso -->
+        <rect x="30" y="26" width="60" height="48" rx="8" fill="#0d0d0d"/>
+        <!-- LEDs -->
+        <circle cx="45" cy="40" r="3.5" fill="#6366f1" class="led-1"/>
+        <circle cx="60" cy="40" r="3.5" fill="#6366f1" class="led-2"/>
+        <circle cx="75" cy="40" r="3.5" fill="#6366f1" class="led-3"/>
+        <!-- Líneas panel -->
+        <line x1="34" y1="52" x2="86" y2="52" stroke="#1e1e1e" stroke-width="1"/>
+        <line x1="34" y1="58" x2="86" y2="58" stroke="#1e1e1e" stroke-width="1"/>
+        <line x1="34" y1="64" x2="86" y2="64" stroke="#1e1e1e" stroke-width="1"/>
+        <!-- Hombros redondeados -->
+        <ellipse cx="18" cy="28" rx="10" ry="8" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="0.5"/>
+        <ellipse cx="102" cy="28" rx="10" ry="8" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="0.5"/>
+        <!-- Brazos -->
+        <rect class="arm-l" x="2"  y="26" width="18" height="60" rx="9" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="0.5"/>
+        <rect class="arm-r" x="100" y="26" width="18" height="60" rx="9" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="0.5"/>
+        <!-- Manos -->
+        <ellipse cx="11"  cy="90" rx="10" ry="8" fill="#161616" stroke="#2a2a2a" stroke-width="0.5"/>
+        <ellipse cx="109" cy="90" rx="10" ry="8" fill="#161616" stroke="#2a2a2a" stroke-width="0.5"/>
+        <!-- Piernas -->
+        <rect x="30" y="94"  width="24" height="44" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="0.5"/>
+        <rect x="66" y="94"  width="24" height="44" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="0.5"/>
+        <!-- Pies -->
+        <ellipse cx="42" cy="136" rx="16" ry="6" fill="#111" stroke="#2a2a2a" stroke-width="0.5"/>
+        <ellipse cx="78" cy="136" rx="16" ry="6" fill="#111" stroke="#2a2a2a" stroke-width="0.5"/>
+      </svg>
     </div>
-    <span class="nav-name">Jose Moori</span>
-    <span class="nav-dot"></span>
-    <span class="nav-status">SYSTEM ONLINE</span>
   </div>
-  <div class="nav-center">
-    <a href="#hero-sec" class="nav-link" data-tip="Inicio 🏠">Home</a>
-    <a href="#info-cards-sec" class="nav-link" data-tip="Mi información 📋">Perfil</a>
-    <a href="#units-sec" class="nav-link" data-tip="Mis tareas académicas 📚">Unidades</a>
+</div>
+ 
+<!-- ── NAVBAR ── -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="logo-sq">JM</div>
+    <span class="logo-name">Jose Moori</span>
   </div>
-  <div class="nav-right">
-    <button id="btn-login-nav" class="btn-launch" onclick="abrirLogin()" data-tip="¡Inicia sesión aquí! 🔑">
-      <span class="btn-dots">●●●</span> INICIAR SESIÓN
-    </button>
+  <div class="nav-links">
+    <a href="#section-info" class="nav-a">Perfil</a>
+    <a href="#section-units" class="nav-a">Unidades</a>
+  </div>
+  <div class="nav-end">
+    <button id="btn-login" class="btn-login" onclick="openLogin()">Iniciar sesión</button>
     <div id="user-pill" class="user-pill hidden">
-      <div class="pill-avatar" id="pill-avatar">JM</div>
-      <div class="pill-info">
-        <span id="pill-name"></span>
-        <span id="pill-role"></span>
-      </div>
-      <button onclick="doLogout()" class="pill-x" data-tip="Cerrar sesión 👋">✕</button>
+      <div class="pill-av" id="pill-av">JM</div>
+      <span id="pill-name"></span>
+      <span id="pill-role"></span>
+      <button class="pill-x" onclick="doLogout()">✕</button>
     </div>
   </div>
 </nav>
  
-<!-- ═══════════ HERO ═══════════ -->
-<section class="hero-sec" id="hero-sec">
-  <div class="hero-grid"></div>
- 
-  <!-- Texto izquierda -->
-  <div class="hero-left">
-    <div class="hero-label">
-      <span class="label-dot"></span>
-      PORTAFOLIO ACADÉMICO · UPLA PERÚ
-    </div>
- 
-    <!-- Frases animadas estilo ChainGPT -->
-    <div class="hero-terminal">
-      <div class="terminal-line active" id="tl-1">
-        <span class="tl-q">›</span>
-        <span class="tl-text">Análisis de bases de datos relacionales.</span>
-      </div>
-      <div class="terminal-line" id="tl-2">
-        <span class="tl-q">›</span>
-        <span class="tl-text">Diseño de modelos entidad–relación.</span>
-      </div>
-      <div class="terminal-line dim" id="tl-3">
-        <span class="tl-q">›</span>
-        <span class="tl-text">Sentencias SQL avanzadas con joins y subqueries.</span>
-      </div>
-    </div>
- 
-    <h1 class="hero-h1">
-      PORTAFOLIO<br>
-      <span class="hero-h1-accent">ACADÉMICO</span>
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="hero-label">UPLA · INGENIERÍA DE SISTEMAS · 2025</div>
+    <h1 class="hero-title">
+      Portafolio<br>
+      <span class="hero-accent">Académico</span>
     </h1>
- 
-    <p class="hero-desc">Sistema de gestión de tareas · Base de Datos II · UPLA</p>
- 
-    <div class="hero-actions">
-      <button class="btn-primary-3d" onclick="document.getElementById('units-sec').scrollIntoView({behavior:'smooth'})" data-tip="Ver mis unidades académicas 📚">
-        VER UNIDADES ↓
+    <p class="hero-sub">
+      Sistema de gestión de tareas y archivos<br>
+      del curso de Base de Datos II.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="document.getElementById('section-units').scrollIntoView({behavior:'smooth'})">
+        Ver unidades
       </button>
-      <button class="btn-ghost-3d" onclick="abrirLogin()" data-tip="Ingresa al sistema 🔐">
-        INGRESAR AL SISTEMA
-      </button>
-    </div>
- 
-    <!-- Stats -->
-    <div class="hero-stats">
-      <div class="hstat">
-        <div class="hstat-num" id="stat-files">—</div>
-        <div class="hstat-lbl">ARCHIVOS</div>
-      </div>
-      <div class="hstat-sep"></div>
-      <div class="hstat">
-        <div class="hstat-num">4</div>
-        <div class="hstat-lbl">UNIDADES</div>
-      </div>
-      <div class="hstat-sep"></div>
-      <div class="hstat">
-        <div class="hstat-num">16</div>
-        <div class="hstat-lbl">SEMANAS</div>
+      <div class="hero-meta">
+        <span class="meta-item"><span class="meta-dot"></span><span id="stat-total">—</span> archivos</span>
+        <span class="meta-item"><span class="meta-dot"></span>4 unidades</span>
+        <span class="meta-item"><span class="meta-dot"></span>16 semanas</span>
       </div>
     </div>
   </div>
  
-  <!-- Derecha: lista de módulos estilo ChainGPT -->
-  <div class="hero-right">
-    <div class="module-list">
-      <div class="module-item" onclick="openUnit(1)" data-tip="Abrir Unidad 1 📊">
-        <span class="mi-arrow">◄</span>
-        <span class="mi-label">ANÁLISIS DE DATOS</span>
-      </div>
-      <div class="module-item" onclick="openUnit(2)" data-tip="Abrir Unidad 2 🔗">
-        <span class="mi-arrow">◄</span>
-        <span class="mi-label">DISEÑO RELACIONAL</span>
-      </div>
-      <div class="module-item" onclick="openUnit(3)" data-tip="Abrir Unidad 3 🗃️">
-        <span class="mi-arrow">◄</span>
-        <span class="mi-label">SENTENCIAS SQL</span>
-      </div>
-      <div class="module-item" onclick="openUnit(4)" data-tip="Abrir Unidad 4 🔐">
-        <span class="mi-arrow">◄</span>
-        <span class="mi-label">SEGURIDAD</span>
-      </div>
-      <div class="module-item dim-item">
-        <span class="mi-label" style="opacity:0.3">Y MUCHO MÁS...</span>
-      </div>
+  <!-- Decoración lado derecho -->
+  <div class="hero-deco">
+    <div class="deco-card deco-1">
+      <div class="deco-tag">U_01</div>
+      <div class="deco-text">Análisis de Datos</div>
+      <div class="deco-bar" style="--w:72%;--c:#6366f1"></div>
     </div>
-  </div>
- 
-  <!-- Barra inferior de scroll -->
-  <div class="hero-bottom">
-    <div class="scroll-line">
-      <div class="scroll-line-fill"></div>
+    <div class="deco-card deco-2">
+      <div class="deco-tag">U_02</div>
+      <div class="deco-text">Diseño Relacional</div>
+      <div class="deco-bar" style="--w:55%;--c:#6366f1"></div>
     </div>
-    <span class="scroll-lbl" data-tip="Desplázate hacia abajo ↓">SCROLL DOWN ↓</span>
-  </div>
-</section>
- 
-<!-- ═══════════ INFO CARDS ═══════════ -->
-<section class="info-cards-sec" id="info-cards-sec">
-  <div class="section-header">
-    <div class="sec-tag">● INFORMACIÓN</div>
-    <h2 class="sec-h2">Sistema de datos</h2>
-  </div>
-  <div class="info-cards-grid">
-    <div class="info-card-3d" id="ic-perfil" onclick="toggleInfoCard('perfil')">
-      <div class="ic3-top">
-        <span class="ic3-icon">👤</span>
-        <span class="ic3-title">Perfil académico</span>
-        <span class="ic3-chev" id="chev-perfil">+</span>
-      </div>
-      <div class="ic3-body hidden" id="icb-perfil">
-        <div class="ic3-row"><span class="ic3-key">Nombre</span><span class="ic3-val">Jose Moori</span></div>
-        <div class="ic3-row"><span class="ic3-key">Carrera</span><span class="ic3-val">Ing. de Sistemas e Informática</span></div>
-        <div class="ic3-row"><span class="ic3-key">Universidad</span><span class="ic3-val">UPLA · Huancayo, Perú</span></div>
-        <div class="ic3-row"><span class="ic3-key">Ciclo</span><span class="ic3-val">2025 · Semestre I</span></div>
-        <div class="ic3-row"><span class="ic3-key">Curso</span><span class="ic3-val">Base de Datos II</span></div>
-        <div class="ic3-row"><span class="ic3-key">Especialidad</span><span class="ic3-val">SQL · Diseño Relacional · Seguridad</span></div>
-      </div>
+    <div class="deco-card deco-3">
+      <div class="deco-tag">U_03</div>
+      <div class="deco-text">Sentencias SQL</div>
+      <div class="deco-bar" style="--w:40%;--c:#6366f1"></div>
     </div>
- 
-    <div class="info-card-3d" id="ic-contacto" onclick="toggleInfoCard('contacto')">
-      <div class="ic3-top">
-        <span class="ic3-icon">📡</span>
-        <span class="ic3-title">Contacto</span>
-        <span class="ic3-chev" id="chev-contacto">+</span>
-      </div>
-      <div class="ic3-body hidden" id="icb-contacto">
-        <div class="ic3-row"><span class="ic3-key">Teléfono</span><span class="ic3-val">+51 999 600 911</span></div>
-        <div class="ic3-row"><span class="ic3-key">Email</span><span class="ic3-val">jose.moori@upla.edu.pe</span></div>
-        <div class="ic3-row"><span class="ic3-key">WhatsApp</span><span class="ic3-val">Disponible Lun–Vie 8am–10pm</span></div>
-        <div class="ic3-row"><span class="ic3-key">GitHub</span><span class="ic3-val">github.com/joseamz-design</span></div>
-        <div class="ic3-row"><span class="ic3-key">Portfolio</span><span class="ic3-val">joseamz-design.github.io</span></div>
-      </div>
-    </div>
- 
-    <div class="info-card-3d" id="ic-progreso" onclick="toggleInfoCard('progreso')">
-      <div class="ic3-top">
-        <span class="ic3-icon">📊</span>
-        <span class="ic3-title">Progreso del portafolio</span>
-        <span class="ic3-chev" id="chev-progreso">+</span>
-      </div>
-      <div class="ic3-body hidden" id="icb-progreso">
-        <div id="progress-bars"><div class="prog-loading">Cargando…</div></div>
-        <div class="ic-tip-msg hidden" id="ic-tip-msg"></div>
-      </div>
+    <div class="deco-card deco-4">
+      <div class="deco-tag">U_04</div>
+      <div class="deco-text">Seguridad</div>
+      <div class="deco-bar" style="--w:25%;--c:#6366f1"></div>
     </div>
   </div>
 </section>
  
-<!-- ═══════════ UNIDADES ═══════════ -->
-<section class="units-sec" id="units-sec">
-  <div class="section-header">
-    <div class="sec-tag">● ARCHIVOS ACADÉMICOS</div>
-    <h2 class="sec-h2">Unidades del curso</h2>
+<!-- ── SECCIÓN INFO ── -->
+<section class="section-info" id="section-info">
+  <div class="section-label">INFORMACIÓN</div>
+  <div class="info-grid">
+ 
+    <div class="info-card" id="ic-perfil" onclick="toggleCard('perfil')">
+      <div class="ic-head">
+        <span class="ic-icon">◈</span>
+        <span class="ic-title">Perfil académico</span>
+        <span class="ic-toggle" id="ict-perfil">+</span>
+      </div>
+      <div class="ic-body" id="icb-perfil">
+        <div class="ic-row"><span class="ic-k">Nombre</span><span class="ic-v">Jose Moori</span></div>
+        <div class="ic-row"><span class="ic-k">Carrera</span><span class="ic-v">Ing. de Sistemas e Informática</span></div>
+        <div class="ic-row"><span class="ic-k">Universidad</span><span class="ic-v">UPLA · Huancayo, Perú</span></div>
+        <div class="ic-row"><span class="ic-k">Ciclo</span><span class="ic-v">2025 · Semestre I</span></div>
+        <div class="ic-row"><span class="ic-k">Curso</span><span class="ic-v">Base de Datos II</span></div>
+        <div class="ic-row"><span class="ic-k">Enfoque</span><span class="ic-v">SQL · Modelado · Seguridad</span></div>
+      </div>
+    </div>
+ 
+    <div class="info-card" id="ic-contacto" onclick="toggleCard('contacto')">
+      <div class="ic-head">
+        <span class="ic-icon">◈</span>
+        <span class="ic-title">Contacto</span>
+        <span class="ic-toggle" id="ict-contacto">+</span>
+      </div>
+      <div class="ic-body" id="icb-contacto">
+        <div class="ic-row"><span class="ic-k">Teléfono</span><span class="ic-v">+51 999 600 911</span></div>
+        <div class="ic-row"><span class="ic-k">Email</span><span class="ic-v">jose.moori@upla.edu.pe</span></div>
+        <div class="ic-row"><span class="ic-k">WhatsApp</span><span class="ic-v">Lun–Vie · 8am–10pm</span></div>
+        <div class="ic-row"><span class="ic-k">GitHub</span><span class="ic-v">github.com/joseamz-design</span></div>
+        <div class="ic-row"><span class="ic-k">Portfolio</span><span class="ic-v">joseamz-design.github.io</span></div>
+      </div>
+    </div>
+ 
+    <div class="info-card" id="ic-progreso" onclick="toggleCard('progreso')">
+      <div class="ic-head">
+        <span class="ic-icon">◈</span>
+        <span class="ic-title">Progreso</span>
+        <span class="ic-toggle" id="ict-progreso">+</span>
+      </div>
+      <div class="ic-body" id="icb-progreso">
+        <div id="prog-bars"><p class="prog-loading">Cargando…</p></div>
+        <div class="prog-alert hidden" id="prog-alert"></div>
+      </div>
+    </div>
+ 
   </div>
-  <div class="units-grid-3d">
-    <div class="ucard-3d" onclick="openUnit(1)" data-tip="Abrir Unidad 1 · Análisis de Datos 📊">
-      <div class="ucard-3d-inner">
-        <div class="ucard-accent" style="--ac:#f97316"></div>
-        <div class="ucard-3d-num">01</div>
-        <div class="ucard-3d-title">Análisis de<br>Datos</div>
-        <div class="ucard-3d-stat" id="c1">— archivos</div>
-        <div class="ucard-3d-cta">ABRIR →</div>
-      </div>
+</section>
+ 
+<!-- ── SECCIÓN UNIDADES ── -->
+<section class="section-units" id="section-units">
+  <div class="section-label">UNIDADES DEL CURSO</div>
+  <div class="units-grid">
+    <div class="ucard" onclick="openUnit(1)">
+      <div class="uc-accent" style="background:#6366f1"></div>
+      <div class="uc-n">01</div>
+      <div class="uc-title">Análisis de Datos</div>
+      <div class="uc-stat" id="c1">—</div>
+      <div class="uc-arrow">→</div>
     </div>
-    <div class="ucard-3d" onclick="openUnit(2)" data-tip="Abrir Unidad 2 · Diseño Relacional 🔗">
-      <div class="ucard-3d-inner">
-        <div class="ucard-accent" style="--ac:#06b6d4"></div>
-        <div class="ucard-3d-num">02</div>
-        <div class="ucard-3d-title">Diseño<br>Relacional</div>
-        <div class="ucard-3d-stat" id="c2">— archivos</div>
-        <div class="ucard-3d-cta">ABRIR →</div>
-      </div>
+    <div class="ucard" onclick="openUnit(2)">
+      <div class="uc-accent" style="background:#8b5cf6"></div>
+      <div class="uc-n">02</div>
+      <div class="uc-title">Diseño Relacional</div>
+      <div class="uc-stat" id="c2">—</div>
+      <div class="uc-arrow">→</div>
     </div>
-    <div class="ucard-3d" onclick="openUnit(3)" data-tip="Abrir Unidad 3 · Sentencias SQL 🗃️">
-      <div class="ucard-3d-inner">
-        <div class="ucard-accent" style="--ac:#22c55e"></div>
-        <div class="ucard-3d-num">03</div>
-        <div class="ucard-3d-title">Sentencias<br>SQL</div>
-        <div class="ucard-3d-stat" id="c3">— archivos</div>
-        <div class="ucard-3d-cta">ABRIR →</div>
-      </div>
+    <div class="ucard" onclick="openUnit(3)">
+      <div class="uc-accent" style="background:#06b6d4"></div>
+      <div class="uc-n">03</div>
+      <div class="uc-title">Sentencias SQL</div>
+      <div class="uc-stat" id="c3">—</div>
+      <div class="uc-arrow">→</div>
     </div>
-    <div class="ucard-3d" onclick="openUnit(4)" data-tip="Abrir Unidad 4 · Seguridad 🔐">
-      <div class="ucard-3d-inner">
-        <div class="ucard-accent" style="--ac:#a855f7"></div>
-        <div class="ucard-3d-num">04</div>
-        <div class="ucard-3d-title">Protocolos de<br>Seguridad</div>
-        <div class="ucard-3d-stat" id="c4">— archivos</div>
-        <div class="ucard-3d-cta">ABRIR →</div>
-      </div>
+    <div class="ucard" onclick="openUnit(4)">
+      <div class="uc-accent" style="background:#10b981"></div>
+      <div class="uc-n">04</div>
+      <div class="uc-title">Seguridad</div>
+      <div class="uc-stat" id="c4">—</div>
+      <div class="uc-arrow">→</div>
     </div>
   </div>
 </section>
  
-<!-- ═══════════ OVERLAY LOGIN ═══════════ -->
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <span>Jose Moori · UPLA · Base de Datos II · 2025</span>
+</footer>
+ 
+<!-- ── MODAL LOGIN ── -->
 <div class="overlay" id="ov-login">
-  <div class="mbox login-box">
-    <div class="login-deco">
-      <div class="login-logo">JM</div>
-      <div class="login-logo-text"><span>ACADEMIC OS</span><small>Jose Moori · UPLA</small></div>
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Sistema de acceso</div>
+      <button class="modal-close" onclick="closeLogin()">✕</button>
     </div>
-    <button class="mclose" onclick="cerrarLogin()">✕</button>
-    <div class="mtabs">
-      <button class="mtab active" id="t-login" onclick="switchTab('login')">Iniciar sesión</button>
-      <button class="mtab" id="t-reg" onclick="switchTab('reg')">Registrarse</button>
+    <div class="modal-tabs">
+      <button class="mtab active" id="t-l" onclick="switchTab('l')">Iniciar sesión</button>
+      <button class="mtab" id="t-r" onclick="switchTab('r')">Registrarse</button>
     </div>
-    <div id="f-login">
-      <div class="mfield"><label>Usuario</label>
-        <div class="input-wrap">
-          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-          <input type="text" id="l-user" placeholder="tu_usuario" autocomplete="off">
+ 
+    <!-- LOGIN -->
+    <div id="f-l">
+      <div class="mf">
+        <label>Usuario</label>
+        <div class="iw">
+          <input type="text" id="l-u" placeholder="tu_usuario" autocomplete="off">
         </div>
       </div>
-      <div class="mfield"><label>Contraseña</label>
-        <div class="input-wrap">
-          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <input type="password" id="l-pass" placeholder="••••••••">
-          <button class="eye-btn" onclick="togglePass('l-pass',this)" type="button" tabindex="-1">
-            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg class="eye-closed hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+      <div class="mf">
+        <label>Contraseña</label>
+        <div class="iw">
+          <input type="password" id="l-p" placeholder="••••••••">
+          <button class="eye" onclick="tp('l-p',this)" tabindex="-1">
+            <svg class="eo" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="ec hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
           </button>
         </div>
       </div>
-      <button class="btn-main" onclick="doLogin()">Acceder al sistema →</button>
+      <button class="btn-modal-main" onclick="doLogin()">Acceder</button>
     </div>
-    <div id="f-reg" style="display:none">
-      <div class="mfield"><label>Usuario</label>
-        <div class="input-wrap">
-          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-          <input type="text" id="r-user" placeholder="tu_usuario" autocomplete="off">
-        </div>
+ 
+    <!-- REGISTRO -->
+    <div id="f-r" style="display:none">
+      <div class="mf">
+        <label>Usuario</label>
+        <div class="iw"><input type="text" id="r-u" placeholder="tu_usuario" autocomplete="off"></div>
       </div>
-      <div class="mfield"><label>Contraseña</label>
-        <div class="input-wrap">
-          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <input type="password" id="r-pass" placeholder="••••••••">
-          <button class="eye-btn" onclick="togglePass('r-pass',this)" type="button" tabindex="-1">
-            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg class="eye-closed hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+      <div class="mf">
+        <label>Contraseña</label>
+        <div class="iw">
+          <input type="password" id="r-p" placeholder="••••••••">
+          <button class="eye" onclick="tp('r-p',this)" tabindex="-1">
+            <svg class="eo" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="ec hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
           </button>
         </div>
       </div>
-      <div class="mfield"><label>Nombre completo</label>
-        <div class="input-wrap">
-          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="r-name" placeholder="Tu nombre completo">
-        </div>
+      <div class="mf">
+        <label>Nombre completo</label>
+        <div class="iw"><input type="text" id="r-n" placeholder="Tu nombre"></div>
       </div>
-      <div class="mfield" id="admin-code-field" style="display:none">
-        <label>Código de admin <span style="color:#f97316">(opcional)</span></label>
-        <div class="input-wrap">
-          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <input type="password" id="r-code" placeholder="••••••••••">
-          <button class="eye-btn" onclick="togglePass('r-code',this)" type="button" tabindex="-1">
-            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg class="eye-closed hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+      <div class="mf" id="r-code-wrap" style="display:none">
+        <label>Código admin <span style="color:#6366f1;font-size:11px">(opcional)</span></label>
+        <div class="iw">
+          <input type="password" id="r-c" placeholder="••••••••">
+          <button class="eye" onclick="tp('r-c',this)" tabindex="-1">
+            <svg class="eo" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="ec hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
           </button>
         </div>
       </div>
-      <button class="admin-toggle-btn" onclick="toggleAdminField()" id="admin-toggle-btn" type="button">
-        🔐 ¿Tienes código de administrador?
-      </button>
-      <button class="btn-main" onclick="doRegister()">Crear cuenta →</button>
+      <button class="btn-toggle-admin" onclick="toggleAdmin()" id="btn-toggle-admin">¿Eres administrador?</button>
+      <button class="btn-modal-main" onclick="doRegister()">Crear cuenta</button>
     </div>
-    <p class="merror" id="auth-err"></p>
+ 
+    <p class="merr" id="merr"></p>
   </div>
 </div>
  
-<!-- ═══════════ OVERLAY UNIDAD ═══════════ -->
+<!-- ── MODAL UNIDAD ── -->
 <div class="overlay" id="ov-unit">
-  <div class="mbox unit-box">
-    <button class="mclose" onclick="cerrarUnidad()">✕</button>
-    <div class="umhead">
-      <div class="umhead-num" id="um-num">01</div>
+  <div class="modal modal-unit">
+    <div class="modal-header">
       <div>
-        <h3 id="um-title">Unidad</h3>
-        <p id="um-sub" class="um-sub">Semana —</p>
+        <div class="modal-u-num" id="u-num">01</div>
+        <div class="modal-title" id="u-title">Unidad</div>
       </div>
+      <button class="modal-close" onclick="closeUnit()">✕</button>
     </div>
-    <div class="week-row">
-      <button class="wbtn" onclick="selectWeek(1)">Semana 1</button>
-      <button class="wbtn" onclick="selectWeek(2)">Semana 2</button>
-      <button class="wbtn" onclick="selectWeek(3)">Semana 3</button>
-      <button class="wbtn" onclick="selectWeek(4)">Semana 4</button>
+    <div class="week-tabs">
+      <button class="wtab" onclick="selWeek(1)">Sem. 1</button>
+      <button class="wtab" onclick="selWeek(2)">Sem. 2</button>
+      <button class="wtab" onclick="selWeek(3)">Sem. 3</button>
+      <button class="wtab" onclick="selWeek(4)">Sem. 4</button>
     </div>
-    <div id="unit-body" class="unit-body">
-      <div class="pick-hint">Selecciona una semana para ver los archivos</div>
+    <div id="u-body" class="u-body">
+      <p class="u-hint">Selecciona una semana</p>
     </div>
   </div>
+</div>
+ 
+<!-- ── BYE ── -->
+<div id="bye" class="bye bye-off">
+  <div class="bye-text">BYE BYE 👋</div>
+  <p class="bye-sub">¡Hasta la próxima!</p>
 </div>
  
 <script src="script.js"></script>
