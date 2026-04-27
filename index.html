@@ -1,3 +1,6 @@
+Index · HTML
+Copiar
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,7 +15,6 @@
  
 <!-- ═══════════ CURSOR MASCOTA ═══════════ -->
 <div id="cursor-mascot" class="cursor-mascot">
-  <!-- Cabeza como cursor -->
   <svg class="cursor-head" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <radialGradient id="ch" cx="38%" cy="32%">
@@ -21,24 +23,18 @@
       </radialGradient>
     </defs>
     <circle cx="20" cy="20" r="18" fill="url(#ch)"/>
-    <!-- Brillo -->
     <ellipse cx="14" cy="13" rx="7" ry="4.5" fill="rgba(255,255,255,0.2)" transform="rotate(-20,14,13)"/>
-    <!-- Ojos -->
     <ellipse class="cur-eye-l" cx="14" cy="18" rx="4.5" ry="5" fill="white"/>
     <ellipse class="cur-eye-r" cx="26" cy="18" rx="4.5" ry="5" fill="white"/>
     <ellipse cx="14" cy="19" rx="3" ry="3.5" fill="#0f0f20"/>
     <ellipse cx="26" cy="19" rx="3" ry="3.5" fill="#0f0f20"/>
     <circle cx="15" cy="17.5" r="1.2" fill="white"/>
     <circle cx="27" cy="17.5" r="1.2" fill="white"/>
-    <!-- Boca pequeña -->
     <path id="cur-mouth" d="M15 27 Q20 31 25 27" stroke="#0f0f20" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <!-- Gorrito mini -->
     <ellipse cx="20" cy="5" rx="11" ry="2.5" fill="#0f0f20"/>
     <path d="M9 5 L20 -2 L31 5 Z" fill="#0f0f20"/>
     <circle cx="20" cy="-2" r="2" fill="#f97316"/>
   </svg>
- 
-  <!-- Cuerpo completo que sale cuando hay tooltip (normalmente oculto) -->
   <div class="cursor-body" id="cursor-body">
     <svg class="cursor-body-svg" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -51,43 +47,31 @@
           <stop offset="100%" stop-color="#14142a"/>
         </radialGradient>
       </defs>
-      <!-- Piernas -->
       <path d="M30 95 Q26 107 22 114" stroke="#c45a00" stroke-width="6" stroke-linecap="round" fill="none"/>
       <path d="M50 95 Q54 107 58 114" stroke="#c45a00" stroke-width="6" stroke-linecap="round" fill="none"/>
       <ellipse cx="19" cy="115" rx="8" ry="3.5" fill="#0f0f20"/>
       <ellipse cx="61" cy="115" rx="8" ry="3.5" fill="#0f0f20"/>
-      <!-- Cuerpo -->
       <ellipse cx="40" cy="80" rx="24" ry="22" fill="url(#cbody)"/>
-      <!-- Cuello -->
       <rect x="32" y="64" width="16" height="9" rx="4.5" fill="#c45a00"/>
-      <!-- Brazo izq -->
       <path d="M18 72 Q6 80 4 92" stroke="#f97316" stroke-width="7" stroke-linecap="round" fill="none"/>
       <circle cx="3" cy="95" r="5" fill="#f97316"/>
-      <!-- Brazo der -->
       <path d="M62 72 Q74 80 76 92" stroke="#f97316" stroke-width="7" stroke-linecap="round" fill="none"/>
       <circle cx="77" cy="95" r="5" fill="#f97316"/>
-      <!-- Cabeza -->
       <circle cx="40" cy="34" r="28" fill="url(#cbg)"/>
       <ellipse cx="28" cy="27" rx="10" ry="6" fill="rgba(255,255,255,0.15)" transform="rotate(-20,28,27)"/>
-      <!-- Orejas -->
       <ellipse cx="13" cy="34" rx="7" ry="9" fill="#c45a00"/>
       <ellipse cx="67" cy="34" rx="7" ry="9" fill="#c45a00"/>
-      <!-- Ojos -->
       <ellipse cx="30" cy="31" rx="7.5" ry="8" fill="white"/>
       <ellipse cx="50" cy="31" rx="7.5" ry="8" fill="white"/>
       <ellipse cx="30" cy="32" rx="5" ry="5.5" fill="#0f0f20"/>
       <ellipse cx="50" cy="32" rx="5" ry="5.5" fill="#0f0f20"/>
       <circle cx="32" cy="29.5" r="2" fill="white"/>
       <circle cx="52" cy="29.5" r="2" fill="white"/>
-      <!-- Cejas -->
       <path d="M23 21 Q30 17 37 21" stroke="#0f0f20" stroke-width="2.5" stroke-linecap="round" fill="none"/>
       <path d="M43 21 Q50 17 57 21" stroke="#0f0f20" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <!-- Nariz -->
       <ellipse cx="40" cy="40" rx="3" ry="2" fill="#c45a00" opacity="0.7"/>
-      <!-- Boca -->
       <path d="M30 49 Q40 57 50 49" stroke="#0f0f20" stroke-width="2.5" stroke-linecap="round" fill="none"/>
       <path d="M32 49.5 Q40 56 48 49.5 L48 54 Q40 61 32 54 Z" fill="white" opacity="0.85"/>
-      <!-- Gorro -->
       <ellipse cx="40" cy="10" rx="22" ry="5" fill="#0f0f20"/>
       <path d="M18 10 L40 -4 L62 10 Z" fill="#0f0f20"/>
       <line x1="62" y1="-4" x2="70" y2="8" stroke="#f97316" stroke-width="2"/>
@@ -98,11 +82,10 @@
   </div>
 </div>
  
-<!-- ═══════════ MASCOTA GRANDE (para escenas) ═══════════ -->
+<!-- ═══════════ MASCOTA GRANDE ═══════════ -->
 <div id="scene-mascot" class="scene-mascot scene-hidden">
   <div class="scene-bubble" id="scene-bubble"></div>
   <div class="scene-svg-wrap" id="scene-svg-wrap">
-    <!-- SVG detallado humanoide -->
     <svg id="scene-svg" class="scene-svg" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <radialGradient id="shg" cx="38%" cy="32%"><stop offset="0%" stop-color="#ffb347"/><stop offset="60%" stop-color="#f97316"/><stop offset="100%" stop-color="#c45a00"/></radialGradient>
@@ -110,24 +93,17 @@
         <linearGradient id="sag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c45a00"/></linearGradient>
         <filter id="sglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-      <!-- Sombra -->
       <ellipse cx="80" cy="274" rx="38" ry="8" fill="rgba(249,115,22,0.2)"/>
-      <!-- Piernas -->
       <path class="sl-leg" d="M62 222 Q55 245 48 260" stroke="#c45a00" stroke-width="12" stroke-linecap="round" fill="none"/>
       <path class="sr-leg" d="M98 222 Q105 245 112 260" stroke="#c45a00" stroke-width="12" stroke-linecap="round" fill="none"/>
       <ellipse cx="44" cy="262" rx="14" ry="6" fill="#0f0f20"/>
       <ellipse cx="116" cy="262" rx="14" ry="6" fill="#0f0f20"/>
-      <!-- Cuerpo -->
       <ellipse cx="80" cy="190" rx="44" ry="40" fill="url(#sbg)"/>
-      <!-- Detalles ropa -->
       <path d="M40 190 Q80 205 120 190" stroke="rgba(249,115,22,0.2)" stroke-width="5" fill="none"/>
       <rect x="75" y="178" width="10" height="6" rx="3" fill="rgba(249,115,22,0.4)"/>
-      <!-- Cuello -->
       <rect x="65" y="152" width="30" height="16" rx="8" fill="#c45a00"/>
-      <!-- Hombros -->
       <ellipse cx="40" cy="162" rx="14" ry="12" fill="#1e1e38"/>
       <ellipse cx="120" cy="162" rx="14" ry="12" fill="#1e1e38"/>
-      <!-- Brazo izq -->
       <g class="sl-arm" style="transform-origin:40px 162px">
         <path d="M40 162 Q12 178 8 204" stroke="url(#sag)" stroke-width="13" stroke-linecap="round" fill="none"/>
         <circle cx="7" cy="208" r="10" fill="#f97316"/>
@@ -135,7 +111,6 @@
         <circle cx="7" cy="196" r="5.5" fill="#f97316"/>
         <circle cx="14" cy="201" r="5.5" fill="#f97316"/>
       </g>
-      <!-- Brazo der -->
       <g class="sr-arm" style="transform-origin:120px 162px">
         <path d="M120 162 Q148 178 152 204" stroke="url(#sag)" stroke-width="13" stroke-linecap="round" fill="none"/>
         <circle cx="153" cy="208" r="10" fill="#f97316"/>
@@ -143,19 +118,14 @@
         <circle cx="153" cy="196" r="5.5" fill="#f97316"/>
         <circle cx="146" cy="201" r="5.5" fill="#f97316"/>
       </g>
-      <!-- Cabeza -->
       <circle cx="80" cy="88" r="60" fill="url(#shg)" filter="url(#sglow)"/>
-      <!-- Brillo cabeza -->
       <ellipse cx="58" cy="62" rx="22" ry="13" fill="rgba(255,255,255,0.14)" transform="rotate(-22,58,62)"/>
-      <!-- Orejas -->
       <ellipse cx="22" cy="88" rx="12" ry="16" fill="#c45a00"/>
       <ellipse cx="22" cy="88" rx="7" ry="10" fill="#e8752a"/>
       <ellipse cx="138" cy="88" rx="12" ry="16" fill="#c45a00"/>
       <ellipse cx="138" cy="88" rx="7" ry="10" fill="#e8752a"/>
-      <!-- Ojos blancos -->
       <ellipse cx="60" cy="82" rx="15" ry="16" fill="white"/>
       <ellipse cx="100" cy="82" rx="15" ry="16" fill="white"/>
-      <!-- Pupilas -->
       <g class="se-l" style="transform-origin:60px 83px">
         <ellipse cx="60" cy="83" rx="9.5" ry="10.5" fill="#0f0f20"/>
         <ellipse cx="60" cy="83" rx="6.5" ry="7.5" fill="#2d2d60"/>
@@ -168,16 +138,12 @@
         <circle cx="104" cy="79.5" r="3.5" fill="white"/>
         <circle cx="97" cy="88" r="1.5" fill="rgba(255,255,255,0.3)"/>
       </g>
-      <!-- Cejas -->
       <path class="sb-l" d="M46 65 Q60 57 74 65" stroke="#0f0f20" stroke-width="4" stroke-linecap="round" fill="none"/>
       <path class="sb-r" d="M86 65 Q100 57 114 65" stroke="#0f0f20" stroke-width="4" stroke-linecap="round" fill="none"/>
-      <!-- Nariz -->
       <ellipse cx="80" cy="98" rx="5.5" ry="3.5" fill="#c45a00" opacity="0.7"/>
-      <!-- Boca -->
       <path id="scene-mouth" d="M64 112 Q80 126 96 112" stroke="#0f0f20" stroke-width="4" stroke-linecap="round" fill="none"/>
       <path d="M67 113 Q80 124 93 113 L93 120 Q80 131 67 120 Z" fill="white" opacity="0.88"/>
       <ellipse cx="80" cy="124" rx="7" ry="4.5" fill="#e05c8a" opacity="0.65"/>
-      <!-- Gorro -->
       <ellipse cx="80" cy="32" rx="40" ry="8" fill="#0f0f20"/>
       <path d="M40 32 L80 4 L120 32 Z" fill="#0f0f20"/>
       <rect x="41" y="28" width="78" height="10" rx="5" fill="#1e1e38"/>
@@ -185,9 +151,7 @@
       <circle cx="136" cy="32" r="6.5" fill="#f97316"/>
       <text x="62" y="27" font-family="monospace" font-size="12" fill="#f97316" font-weight="bold">DB</text>
     </svg>
-    <!-- Prop de cocina (para animación cocinando) -->
     <div class="scene-prop cooking-prop" id="cooking-prop">🍳</div>
-    <!-- Ropa atrapada (para animación colgando) -->
     <div class="scene-prop hook-prop" id="hook-prop">🪝</div>
   </div>
 </div>
@@ -238,14 +202,13 @@
     <h1 class="hero-h1">Hola, soy<br><em class="hero-name">Jose Moori</em></h1>
     <p class="hero-desc">Gestión de tareas académicas<br>de la Universidad Peruana Los Andes.</p>
     <div class="hero-chips">
-      <span class="chip orange" data-tip="Unidad 1 · Unidad I📊">Unidad I</span>
-      <span class="chip cyan"   data-tip="Unidad 3 · Unidad II 🗃️">Unidad II</span>
-      <span class="chip green"  data-tip="Unidad 2 · Unidad III🔗">Unidad III</span>
-      <span class="chip purple" data-tip="Unidad 4 · Unidad IV🔐">Unidad IV</span>
+      <span class="chip orange" data-tip="Unidad I 📊">Unidad I</span>
+      <span class="chip cyan"   data-tip="Unidad II 🗃️">Unidad II</span>
+      <span class="chip green"  data-tip="Unidad III 🔗">Unidad III</span>
+      <span class="chip purple" data-tip="Unidad IV 🔐">Unidad IV</span>
     </div>
   </div>
   <div class="hero-3d" id="hero-3d">
-    <!-- Tarjeta decorativa estática derecha -->
     <div class="float-obj fo-a" style="animation:float-a 6s ease-in-out infinite;">
       <div class="fo-inner">🗄️</div><div class="fo-lbl">BASE DE DATOS</div>
     </div>
@@ -259,11 +222,9 @@
   <div class="scroll-arrow" data-tip="Desplázate para ver las unidades ↓">↓</div>
 </section>
  
-<!-- ═══════════ INFO CARDS (entre hero y unidades) ═══════════ -->
+<!-- ═══════════ INFO CARDS ═══════════ -->
 <section class="info-cards-sec" id="info-cards-sec">
   <div class="info-cards-grid">
- 
-    <!-- TARJETA PERFIL -->
     <div class="info-card" id="ic-perfil" onclick="toggleInfoCard('perfil')">
       <div class="ic-header">
         <div class="ic-icon">👤</div>
@@ -279,8 +240,6 @@
         <div class="ic-row"><span class="ic-emoji">⚡</span><div><strong>Especialización</strong><br><span>Bases de datos, SQL, seguridad informática</span></div></div>
       </div>
     </div>
- 
-    <!-- TARJETA CONTACTO -->
     <div class="info-card" id="ic-contacto" onclick="toggleInfoCard('contacto')">
       <div class="ic-header">
         <div class="ic-icon">📱</div>
@@ -296,8 +255,6 @@
         <div class="ic-row"><span class="ic-emoji">🌐</span><div><strong>Portfolio web</strong><br><span>joseamz-design.github.io</span></div></div>
       </div>
     </div>
- 
-    <!-- TARJETA PROGRESO -->
     <div class="info-card" id="ic-progreso" onclick="toggleInfoCard('progreso')">
       <div class="ic-header">
         <div class="ic-icon">📈</div>
@@ -306,13 +263,11 @@
       </div>
       <div class="ic-body hidden" id="icb-progreso">
         <div class="progress-bars" id="progress-bars">
-          <!-- Se generan dinámicamente -->
           <div class="prog-loading">Calculando progreso…</div>
         </div>
         <div class="ic-tip-msg" id="ic-tip-msg"></div>
       </div>
     </div>
- 
   </div>
 </section>
  
@@ -324,35 +279,35 @@
     <p class="sec-desc">Haz clic en una unidad para ver o descargar archivos</p>
   </div>
   <div class="units-grid">
-    <div class="ucard" onclick="openUnit(1)" data-tip="Abrir Unidad 1 · Análisis de Datos 📊">
+    <div class="ucard" onclick="openUnit(1)" data-tip="Abrir Unidad I 📊">
       <div class="ucard-line" style="--clr:#f97316"></div>
       <div class="ucard-glow" style="--clr:rgba(249,115,22,0.15)"></div>
       <div class="ucard-num">01</div>
-      <div class="ucard-title">Análisis de Datos</div>
+      <div class="ucard-title">Unidad I</div>
       <div class="ucard-stat" id="c1">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
-    <div class="ucard" onclick="openUnit(2)" data-tip="Abrir Unidad 2 · Diseño Relacional 🔗">
+    <div class="ucard" onclick="openUnit(2)" data-tip="Abrir Unidad II 🔗">
       <div class="ucard-line" style="--clr:#06b6d4"></div>
       <div class="ucard-glow" style="--clr:rgba(6,182,212,0.15)"></div>
       <div class="ucard-num">02</div>
-      <div class="ucard-title">Diseño Relacional</div>
+      <div class="ucard-title">Unidad II</div>
       <div class="ucard-stat" id="c2">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
-    <div class="ucard" onclick="openUnit(3)" data-tip="Abrir Unidad 3 · Sentencias SQL 🗃️">
+    <div class="ucard" onclick="openUnit(3)" data-tip="Abrir Unidad III 🗃️">
       <div class="ucard-line" style="--clr:#22c55e"></div>
       <div class="ucard-glow" style="--clr:rgba(34,197,94,0.15)"></div>
       <div class="ucard-num">03</div>
-      <div class="ucard-title">Sentencias SQL</div>
+      <div class="ucard-title">Unidad III</div>
       <div class="ucard-stat" id="c3">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
-    <div class="ucard" onclick="openUnit(4)" data-tip="Abrir Unidad 4 · Protocolos de Seguridad 🔐">
+    <div class="ucard" onclick="openUnit(4)" data-tip="Abrir Unidad IV 🔐">
       <div class="ucard-line" style="--clr:#a855f7"></div>
       <div class="ucard-glow" style="--clr:rgba(168,85,247,0.15)"></div>
       <div class="ucard-num">04</div>
-      <div class="ucard-title">Protocolos de Seguridad</div>
+      <div class="ucard-title">Unidad IV</div>
       <div class="ucard-stat" id="c4">— archivos</div>
       <div class="ucard-arrow">→</div>
     </div>
@@ -460,10 +415,10 @@
       </div>
     </div>
     <div class="week-row">
-      <button class="wbtn" onclick="selectWeek(1)" data-tip="Semana 1: Introduccion a la inegniera de BD 📂">Semana 1: Introduccion a la inegniera de BD</button>
-      <button class="wbtn" onclick="selectWeek(2)" data-tip="Semana 2: Gstores de BD📂">Semana 2: Gstores de BD</button>
-      <button class="wbtn" onclick="selectWeek(3)" data-tip="Semana 3: Arquitectura de BD📂">Semana 3: Arquitectura de BD</button>
-      <button class="wbtn" onclick="selectWeek(4)" data-tip="Semana 4: Diseño de arquitectura de BD📂">Semana 4: Diseño de arquitectura de BD</button>
+      <button class="wbtn" onclick="selectWeek(1)" data-tip="Semana 1: Introducción a la Arquitectura de BD 📂">Semana 1: Introducción a la Arquitectura de BD</button>
+      <button class="wbtn" onclick="selectWeek(2)" data-tip="Semana 2: Gestores de BD 📂">Semana 2: Gestores de BD</button>
+      <button class="wbtn" onclick="selectWeek(3)" data-tip="Semana 3: Arquitectura de BD 📂">Semana 3: Arquitectura de BD</button>
+      <button class="wbtn" onclick="selectWeek(4)" data-tip="Semana 4: Diseño de arquitectura de BD 📂">Semana 4: Diseño de arquitectura de BD</button>
     </div>
     <div id="unit-body" class="unit-body">
       <div class="pick-hint">Selecciona una semana para ver los archivos</div>
@@ -474,4 +429,5 @@
 <script src="script.js"></script>
 </body>
 </html>
+ 
 
