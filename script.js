@@ -10,6 +10,7 @@
    ✅ Info cards expandibles horizontales
    ✅ Progreso por unidad + aviso si falta subir
    ✅ Subir archivos Y vínculos/URLs
+   ✅ Mascota habla en voz alta (Web Speech API)
 ═══════════════════════════════════════════════ */
  
 /* ══════ FIREBASE ══════ */
@@ -22,7 +23,7 @@ const FIREBASE_CONFIG = {
     appId:             "1:297650955910:web:1867650fe8c3dc492bd307"
   };
   const ADMIN_SECRET = "999600911";
-   
+ 
   const _s = document.createElement('script');
   _s.type = 'module';
   _s.textContent = `
@@ -35,7 +36,7 @@ const FIREBASE_CONFIG = {
     window.dispatchEvent(new Event('firebase-ready'));
   `;
   document.head.appendChild(_s);
-   
+ 
   /* ══════ ESTADO ══════ */
   let currentUser  = null;
   let activeUnit   = null;
@@ -43,21 +44,65 @@ const FIREBASE_CONFIG = {
   let fbReady      = false;
   let uploadMode   = 'file'; // 'file' | 'link'
   const unitNames  = ['','Unidad I','Unidad II','Unidad III','Unidad IV'];
-  const WEEKS_PER_UNIT = 4; // semanas por unidad
-  const FILES_PER_WEEK = 2; // archivos esperados por semana
-   
+  const WEEKS_PER_UNIT = 4;
+  const FILES_PER_WEEK = 2;
+ 
   /* ══════ INIT ══════ */
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('user-pill').classList.add('hidden');
     document.getElementById('btn-login-nav').classList.remove('hidden');
     initCursorMascot();
+    cargarVoces();
   });
-   
+ 
   window.addEventListener('firebase-ready', async () => {
     fbReady = true;
     await updateCounters();
   });
-   
+ 
+  /* ══════════════════════════════════════════════
+     VOZ — Web Speech API
+  ══════════════════════════════════════════════ */
+  let vozSeleccionada = null;
+ 
+  function cargarVoces() {
+    // Las voces pueden tardar en cargar, especialmente en Chrome
+    const cargar = () => {
+      const voces = window.speechSynthesis.getVoices();
+      if (!voces.length) return;
+ 
+      // Intentar encontrar voz en español, preferir la más natural disponible
+      vozSeleccionada =
+        voces.find(v => v.lang === 'es-PE') ||
+        voces.find(v => v.lang === 'es-MX') ||
+        voces.find(v => v.lang === 'es-ES') ||
+        voces.find(v => v.lang.startsWith('es')) ||
+        null;
+    };
+ 
+    cargar();
+    // Chrome dispara este evento cuando las voces están listas
+    window.speechSynthesis.onvoiceschanged = cargar;
+  }
+ 
+  function hablar(texto) {
+    if (!window.speechSynthesis) return; // Navegador no soporta la API
+    // Cancelar cualquier discurso anterior
+    window.speechSynthesis.cancel();
+ 
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang   = 'es-PE';
+    utterance.rate   = 0.95;   // velocidad natural
+    utterance.pitch  = 1.2;    // tono ligeramente agudo (voz simpática)
+    utterance.volume = 1;
+ 
+    if (vozSeleccionada) {
+      utterance.voice = vozSeleccionada;
+    }
+ 
+    window.speechSynthesis.speak(utterance);
+  }
+ 
   /* ══════ FIREBASE HELPERS ══════ */
   async function fbGetAll(col, filters = []) {
     if (!fbReady) throw new Error('Firebase no listo');
@@ -78,48 +123,41 @@ const FIREBASE_CONFIG = {
     const { db, doc, deleteDoc } = window._fb;
     await deleteDoc(doc(db, col, id));
   }
-   
+ 
   /* ══════════════════════════════════════════════
      CURSOR MASCOTA
-     - La cabeza siempre sigue el cursor
-     - El cuerpo + tip aparecen solo tras 2.5s estático en data-tip
   ══════════════════════════════════════════════ */
   let cursorX = 200, cursorY = 200;
   let tipTimer  = null;
   let bodyShown = false;
-   
+ 
   function initCursorMascot() {
     const cm     = document.getElementById('cursor-mascot');
     const tipEl  = document.getElementById('cursor-tip');
-   
-    // Mover cabeza con el cursor
+ 
     document.addEventListener('mousemove', (e) => {
       cursorX = e.clientX;
       cursorY = e.clientY;
       cm.style.left = (cursorX - 18) + 'px';
       cm.style.top  = (cursorY - 18) + 'px';
-   
-      // Si el cuerpo está mostrándose, reiniciar el timer
+ 
       if (tipTimer) {
         clearTimeout(tipTimer);
         tipTimer = null;
       }
-      // Si ya estaba el cuerpo visible, ocultarlo al mover
       if (bodyShown) {
         hideCursorBody();
       }
     });
-   
-    // Hover en elementos con data-tip
+ 
     document.addEventListener('mouseover', (e) => {
       const el = e.target.closest('[data-tip]');
       if (!el) return;
       const tip = el.getAttribute('data-tip');
       if (!tip) return;
-   
+ 
       cm.classList.add('hover');
-   
-      // Iniciar timer de 2.5s
+ 
       if (tipTimer) clearTimeout(tipTimer);
       tipTimer = setTimeout(() => {
         tipEl.textContent = tip;
@@ -128,19 +166,18 @@ const FIREBASE_CONFIG = {
         tipTimer = null;
       }, 2500);
     });
-   
+ 
     document.addEventListener('mouseout', (e) => {
       const el = e.target.closest('[data-tip]');
       if (!el) return;
       const to = e.relatedTarget;
       if (to && el.contains(to)) return;
-   
+ 
       cm.classList.remove('hover');
       if (tipTimer) { clearTimeout(tipTimer); tipTimer = null; }
       if (bodyShown) hideCursorBody();
     });
-   
-    // Click = pequeña reacción
+ 
     document.addEventListener('mousedown', () => {
       cm.style.transition = 'transform 0.1s';
       cm.querySelector('.cursor-head').style.transform = 'scale(0.85)';
@@ -149,16 +186,15 @@ const FIREBASE_CONFIG = {
       }, 150);
     });
   }
-   
+ 
   function hideCursorBody() {
     const cm = document.getElementById('cursor-mascot');
     cm.classList.remove('tip-active');
     bodyShown = false;
   }
-   
+ 
   /* ══════════════════════════════════════════════
      MASCOTA ESCENA GRANDE
-     Animaciones disponibles: peek | surprise | cook | hang
   ══════════════════════════════════════════════ */
   const FRASES_BIENVENIDA = [
     "¡Volviste, señorón! 👑",
@@ -179,29 +215,31 @@ const FIREBASE_CONFIG = {
     "La entrega puntual es el primer paso del éxito 📚",
   ];
   const ANIMACIONES = ['peek','cook','hang'];
-   
+ 
   let sceneTimer = null;
   let sceneActive = false;
-   
+ 
   function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-   
+ 
+  // Limpia emojis del texto antes de pasarlo a la voz
+  function limpiarTextoVoz(texto) {
+    return texto.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
+  }
+ 
   function mostrarMascotaEscena(frase, forcedAnim) {
     if (sceneTimer) { clearTimeout(sceneTimer); sceneTimer = null; }
-   
+ 
     const mascot = document.getElementById('scene-mascot');
     const bubble = document.getElementById('scene-bubble');
-   
-    // Resetear
+ 
     mascot.className = 'scene-mascot scene-hidden';
     mascot.style.cssText = '';
     bubble.classList.remove('show');
     bubble.textContent = '';
-   
-    // Pequeño delay para que el reset se aplique
+ 
     setTimeout(() => {
       const anim = forcedAnim || rnd(ANIMACIONES);
-   
-      // Resetear posición según animación
+ 
       if (anim === 'hang') {
         mascot.style.bottom = 'auto';
         mascot.style.top = '80px';
@@ -211,26 +249,27 @@ const FIREBASE_CONFIG = {
         mascot.style.bottom = '0';
         mascot.style.right = '40px';
       }
-   
+ 
       mascot.className = 'scene-mascot anim-' + anim;
       sceneActive = true;
-   
-      // Mostrar burbuja después de que la animación de entrada termine
+ 
       const bubbleDelay = anim === 'cook' ? 1400 : anim === 'hang' ? 1200 : 900;
       setTimeout(() => {
-        // Si es cook: primero gira como mirando, luego habla
         bubble.textContent = frase;
         bubble.classList.add('show');
-   
-        // Después de la frase, encoger hacia el cursor
+ 
+        // ✅ Hablar la frase en voz alta (sin emojis)
+        hablar(limpiarTextoVoz(frase));
+ 
         sceneTimer = setTimeout(() => {
           bubble.classList.remove('show');
+          window.speechSynthesis.cancel(); // Detener voz al cerrar burbuja
           setTimeout(() => encogerseHaciaCursor(), 400);
         }, 4500);
       }, bubbleDelay);
     }, 80);
   }
-   
+ 
   function encogerseHaciaCursor() {
     const mascot = document.getElementById('scene-mascot');
     const rect   = mascot.getBoundingClientRect();
@@ -238,11 +277,11 @@ const FIREBASE_CONFIG = {
     const cy = rect.top  + rect.height / 2;
     const dx = cursorX - cx;
     const dy = cursorY - cy;
-   
+ 
     mascot.style.transition = 'transform 0.85s cubic-bezier(0.55,0,1,0.45), opacity 0.6s ease';
     mascot.style.transform  = `translate(${dx}px,${dy}px) scale(0.03)`;
     mascot.style.opacity    = '0';
-   
+ 
     setTimeout(() => {
       mascot.style.transition = '';
       mascot.style.transform  = '';
@@ -251,16 +290,17 @@ const FIREBASE_CONFIG = {
       sceneActive = false;
     }, 900);
   }
-   
+ 
   function ocultarMascotaEscena() {
     const mascot = document.getElementById('scene-mascot');
     const bubble = document.getElementById('scene-bubble');
     bubble.classList.remove('show');
     mascot.className = 'scene-mascot scene-hidden';
     if (sceneTimer) { clearTimeout(sceneTimer); sceneTimer = null; }
+    window.speechSynthesis.cancel();
     sceneActive = false;
   }
-   
+ 
   /* ══════ BYE ══════ */
   function mostrarBye() {
     generarParticulas();
@@ -271,7 +311,10 @@ const FIREBASE_CONFIG = {
     zone.innerHTML = '';
     zone.appendChild(svg);
     overlay.classList.remove('bye-hidden');
-   
+ 
+    // ✅ Despedida en voz alta
+    hablar('¡Hasta la próxima, señorón!');
+ 
     setTimeout(() => {
       overlay.style.transition = 'opacity 0.8s ease';
       overlay.style.opacity    = '0';
@@ -281,10 +324,11 @@ const FIREBASE_CONFIG = {
         overlay.classList.add('bye-hidden');
         document.getElementById('btn-login-nav').classList.remove('hidden');
         document.getElementById('user-pill').classList.add('hidden');
+        window.speechSynthesis.cancel();
       }, 850);
     }, 3200);
   }
-   
+ 
   function generarParticulas() {
     const c = document.getElementById('bye-particles');
     c.innerHTML = '';
@@ -306,7 +350,7 @@ const FIREBASE_CONFIG = {
       c.appendChild(p);
     }
   }
-   
+ 
   /* ══════ OJITO ══════ */
   function togglePass(inputId, btn) {
     const input  = document.getElementById(inputId);
@@ -318,7 +362,7 @@ const FIREBASE_CONFIG = {
       input.type = 'password'; open.classList.remove('hidden'); closed.classList.add('hidden');
     }
   }
-   
+ 
   /* ══════ ADMIN TOGGLE ══════ */
   let adminFieldVisible = false;
   function toggleAdminField() {
@@ -327,7 +371,7 @@ const FIREBASE_CONFIG = {
     const btn = document.getElementById('admin-toggle-btn');
     btn.style.cssText = adminFieldVisible ? 'border-color:var(--orange);color:var(--orange);' : '';
   }
-   
+ 
   /* ══════ AUTH ══════ */
   function abrirLogin() {
     document.getElementById('ov-login').classList.add('open');
@@ -338,7 +382,7 @@ const FIREBASE_CONFIG = {
     document.getElementById('auth-err').textContent = '';
   }
   function showErr(msg) { document.getElementById('auth-err').textContent = msg; }
-   
+ 
   function switchTab(tab) {
     document.getElementById('auth-err').textContent = '';
     const isL = tab === 'login';
@@ -348,7 +392,7 @@ const FIREBASE_CONFIG = {
     document.getElementById('t-reg').classList.toggle('active', !isL);
     if (!isL) { adminFieldVisible = false; document.getElementById('admin-code-field').style.display = 'none'; }
   }
-   
+ 
   async function doLogin() {
     const user = document.getElementById('l-user').value.trim();
     const pass = document.getElementById('l-pass').value.trim();
@@ -359,7 +403,7 @@ const FIREBASE_CONFIG = {
       loginSuccess(users[0]);
     } catch(e) { showErr('Error de conexión. Verifica Firebase.'); console.error(e); }
   }
-   
+ 
   async function doRegister() {
     const user = document.getElementById('r-user').value.trim();
     const pass = document.getElementById('r-pass').value.trim();
@@ -376,14 +420,13 @@ const FIREBASE_CONFIG = {
       document.getElementById('l-user').value = user;
     } catch(e) { showErr('Error al registrar. Verifica Firebase.'); }
   }
-   
+ 
   function loginSuccess(u) {
     currentUser = u;
     cerrarLogin();
-    // Limpiar campos ✅
     document.getElementById('l-user').value = '';
     document.getElementById('l-pass').value = '';
-   
+ 
     document.getElementById('btn-login-nav').classList.add('hidden');
     const pill = document.getElementById('user-pill');
     pill.classList.remove('hidden');
@@ -395,20 +438,18 @@ const FIREBASE_CONFIG = {
     roleEl.style.cssText = u.role === 'ADMIN'
       ? 'background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;'
       : 'background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:1px;width:fit-content;';
-   
-    // Animación sorpresa al login, luego las otras aleatoriamente
+ 
     mostrarMascotaEscena(rnd(FRASES_BIENVENIDA), 'surprise');
   }
-   
+ 
   function doLogout() {
     currentUser = null;
-    // Limpiar campos también al cerrar sesión ✅
     document.getElementById('l-user').value = '';
     document.getElementById('l-pass').value = '';
     ocultarMascotaEscena();
     setTimeout(() => mostrarBye(), 100);
   }
-   
+ 
   /* ══════ CONTADORES ══════ */
   async function updateCounters() {
     try {
@@ -425,37 +466,34 @@ const FIREBASE_CONFIG = {
       }
     }
   }
-   
-  /* ══════════════════════════════════════════════
-     INFO CARDS
-  ══════════════════════════════════════════════ */
+ 
+  /* ══════ INFO CARDS ══════ */
   function toggleInfoCard(id) {
     const body  = document.getElementById('icb-' + id);
     const card  = document.getElementById('ic-' + id);
     const isOpen = !body.classList.contains('hidden');
-   
+ 
     if (id === 'progreso' && !isOpen) {
-      // Cargar progreso dinámicamente
       renderProgress();
     }
-   
+ 
     body.classList.toggle('hidden', isOpen);
     card.classList.toggle('open', !isOpen);
   }
-   
+ 
   async function renderProgress() {
     const bars   = document.getElementById('progress-bars');
     const tipMsg = document.getElementById('ic-tip-msg');
     bars.innerHTML = '<div class="prog-loading">Calculando…</div>';
-   
+ 
     let allFiles = [];
     try { allFiles = await fbGetAll('files'); } catch { bars.innerHTML = '<div class="prog-loading">Error de conexión</div>'; return; }
-   
+ 
     const colors = ['','','u2','u3','u4'];
-    const MAX = WEEKS_PER_UNIT * FILES_PER_WEEK; // 4 semanas * 2 archivos = 8 por unidad
+    const MAX = WEEKS_PER_UNIT * FILES_PER_WEEK;
     let missingUnit = null;
     let html = '';
-   
+ 
     for (let u = 1; u <= 4; u++) {
       const count = allFiles.filter(f => f.unit == u).length;
       const pct   = Math.min(100, Math.round((count / MAX) * 100));
@@ -471,10 +509,9 @@ const FIREBASE_CONFIG = {
           </div>
         </div>`;
     }
-   
+ 
     bars.innerHTML = html;
-   
-    // Animar barras
+ 
     requestAnimationFrame(() => {
       for (let u = 1; u <= 4; u++) {
         const count = allFiles.filter(f => f.unit == u).length;
@@ -485,8 +522,7 @@ const FIREBASE_CONFIG = {
         }, u * 120);
       }
     });
-   
-    // Aviso si hay unidad vacía
+ 
     if (missingUnit !== null) {
       tipMsg.textContent = `⚠️ La ${unitNames[missingUnit]} aún no tiene archivos. ¡Es momento de subir tus tareas!`;
       tipMsg.classList.add('show');
@@ -494,7 +530,7 @@ const FIREBASE_CONFIG = {
       tipMsg.classList.remove('show');
     }
   }
-   
+ 
   /* ══════ MODAL UNIDAD ══════ */
   function openUnit(u) {
     activeUnit = u; activeWeek = null;
@@ -507,27 +543,25 @@ const FIREBASE_CONFIG = {
     document.getElementById('ov-unit').classList.add('open');
   }
   function cerrarUnidad() { document.getElementById('ov-unit').classList.remove('open'); }
-   
+ 
   function selectWeek(w) {
     activeWeek = w;
     document.querySelectorAll('.wbtn').forEach((b,i) => b.classList.toggle('active', i+1===w));
     document.getElementById('um-sub').textContent = 'Semana ' + w;
     renderFiles();
   }
-   
-  /* ══════════════════════════════════════════════
-     RENDER ARCHIVOS + OPCIÓN VÍNCULO/URL
-  ══════════════════════════════════════════════ */
+ 
+  /* ══════ RENDER ARCHIVOS ══════ */
   async function renderFiles() {
     const body = document.getElementById('unit-body');
     body.innerHTML = '<div class="loading-row"><div class="spin"></div> Cargando archivos…</div>';
-   
+ 
     let files = [];
     try { files = await fbGetAll('files',[['unit','==',activeUnit],['week','==',activeWeek]]); }
     catch { body.innerHTML = '<div class="empty-msg">Error al conectar con Firebase.</div>'; return; }
-   
+ 
     let html = '';
-   
+ 
     if (currentUser !== null && currentUser.role === 'ADMIN') {
       html += `
         <div class="upload-zone">
@@ -549,7 +583,7 @@ const FIREBASE_CONFIG = {
           </div>
         </div>`;
     }
-   
+ 
     if (files.length === 0) {
       html += '<div class="empty-msg">Sin archivos en esta semana.</div>';
     } else {
@@ -574,13 +608,12 @@ const FIREBASE_CONFIG = {
       });
       html += '</div>';
     }
-   
+ 
     body.innerHTML = html;
   }
-   
+ 
   function setUploadMode(mode) {
     uploadMode = mode;
-    // Re-render zona de subida sin recargar toda la lista
     const fileZ = document.getElementById('upload-file-zone');
     const linkZ = document.getElementById('upload-link-zone');
     if (fileZ) fileZ.style.display = mode === 'file' ? 'flex' : 'none';
@@ -589,16 +622,16 @@ const FIREBASE_CONFIG = {
       t.classList.toggle('active', (i===0 && mode==='file') || (i===1 && mode==='link'));
     });
   }
-   
+ 
   /* ══════ CRUD ══════ */
   async function uploadFile() {
     const title = document.getElementById('f-title')?.value.trim() || '';
     const file  = document.getElementById('f-file')?.files[0];
     if (!title || !file) return alert('Escribe un título y selecciona un archivo.');
-   
+ 
     const btn = document.querySelector('.btn-upload');
     if (btn) { btn.textContent = 'Subiendo…'; btn.disabled = true; }
-   
+ 
     const reader = new FileReader();
     reader.onload = async function () {
       try {
@@ -616,13 +649,13 @@ const FIREBASE_CONFIG = {
     };
     reader.readAsDataURL(file);
   }
-   
+ 
   async function uploadLink() {
     const title = document.getElementById('f-title')?.value.trim() || '';
     const url   = document.getElementById('f-url')?.value.trim() || '';
     if (!title || !url) return alert('Escribe un título y la URL.');
     if (!url.startsWith('http')) return alert('La URL debe empezar con http:// o https://');
-   
+ 
     const btn = document.querySelector('.btn-upload');
     if (btn) { btn.textContent = 'Guardando…'; btn.disabled = true; }
     try {
@@ -638,11 +671,11 @@ const FIREBASE_CONFIG = {
       if (btn) { btn.textContent = 'Guardar'; btn.disabled = false; }
     }
   }
-   
+ 
   function openLink(url) {
     window.open(url, '_blank', 'noopener');
   }
-   
+ 
   async function downloadFile(id) {
     try {
       const files = await fbGetAll('files');
@@ -652,7 +685,7 @@ const FIREBASE_CONFIG = {
       a.href = f.data; a.download = f.filename; a.click();
     } catch { alert('Error al descargar.'); }
   }
-   
+ 
   async function deleteFile(id) {
     if (!confirm('¿Eliminar este contenido permanentemente?')) return;
     try {
@@ -661,4 +694,3 @@ const FIREBASE_CONFIG = {
       renderFiles();
     } catch { alert('Error al eliminar.'); }
   }
-  
